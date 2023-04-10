@@ -1,5 +1,5 @@
 import { createVuesticEssential, VaButton } from 'vuestic-ui'
-import 'vuestic-ui/styles/essential.css'
+import 'vuestic-ui/css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
