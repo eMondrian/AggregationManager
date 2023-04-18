@@ -6,31 +6,51 @@ import { ROUTES } from '@/router/routes.js'
 const route = useRoute();
 
 const link = computed(
-  () => route.path === ROUTES.aggregations.path
+  () => route.path === ROUTES.home.path
   ? { path: ROUTES.processes.path, text: 'Go to process' }
-  : { path: ROUTES.aggregations.path, text: 'Go to aggregation' }
+  : { path: ROUTES.home.path, text: 'Go to aggregation' }
 )
 </script>
 
 <template>
-  <header>
-    <h1>Aggregation Manager</h1>
-    <nav>
-      <RouterLink class="va-link" :to="link.path">{{ link.text }}</RouterLink>
-    </nav>
-  </header>
+  <va-navbar
+    color="primary"
+    class="mb-3"
+  >
+    <template #left>
+      <va-navbar-item class="logo">
+        Aggregation Manager
+      </va-navbar-item>
+    </template>
+    <template #right>
+      <va-navbar-item>
+        <RouterLink class="app-link" :to="link.path">{{ link.text }}</RouterLink>
+      </va-navbar-item>
+    </template>
+  </va-navbar>
 
-  <RouterView />
+  <main>
+    <RouterView />
+  </main>
 </template>
 
-<style scoped>
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+<style lang="scss">
+h2 {
+  color: var(--va-info)
 }
-nav {
+
+main {
+  padding: 0 5%;
   display: flex;
+  flex-direction: column;
   gap: 1rem;
+}
+
+.app-link {
+  color: var(--text-inverted);
+}
+
+.app-table {
+    --va-data-table-thead-color: var(--va-primary);
 }
 </style>

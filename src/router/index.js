@@ -1,23 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import AggregateListView from '@/views/AggregateListView.vue'
+import AggregateListView from '@/pages/AggregateList/Page.vue'
 import { ROUTES } from './routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: ROUTES.aggregations.path,
-      name: ROUTES.aggregations.name,
+      path: ROUTES.home.path,
+      name: ROUTES.home.name,
       component: AggregateListView
     },
     {
       path: ROUTES.processes.path,
       name: ROUTES.processes.name,
-      component: () => import('@/views/ProcessListView.vue')
+      component: () => import('@/pages/ProcessList/Page.vue')
     },
     { 
       path: '/:catchAll(.*)',
-      redirect: { name: ROUTES.aggregations.name }
+      redirect: { name: ROUTES.home.name }
     }
   ]
 })
