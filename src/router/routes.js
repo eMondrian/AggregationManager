@@ -1,7 +1,7 @@
 export const ROUTES = {
-    aggregations: {
-        path: '/aggregations',
-        name: 'aggregations',
+    home: {
+        path: '/',
+        name: 'home',
     },
     processes: {
         path: '/processes',
