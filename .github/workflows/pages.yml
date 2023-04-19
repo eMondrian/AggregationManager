@@ -61,7 +61,7 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Static HTML export
         env: 
-          VITE_BE_BASE_PATH: ${{ env.VITE_BE_BASE_PATH }}
+          VITE_BE_BASE_PATH: ${{ pages.VITE_BE_BASE_PATH }}
         run: ${{ steps.detect-package-manager.outputs.manager }} run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
