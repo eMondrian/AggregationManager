@@ -59,14 +59,10 @@ jobs:
           static_site_generator: nuxt
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
-      - name: Define env
-        run: |
-          echo "repository variable : ${{ vars.VITE_BE_BASE_PATH }}"
-          echo "organization variable : ${{ secrets.VITE_BE_BASE_PATH }}"
       - name: Static HTML export
         run: ${{ steps.detect-package-manager.outputs.manager }} run build
         env:
-          VITE_BE_BASE_PATH: ${{ secrets.VITE_BE_BASE_PATH }}
+          VITE_BE_BASE_PATH: https://ssemenkoff.dev/am-mock
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
