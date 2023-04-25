@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { generateTableData } from '@/helpers/generateMocks'
 import { getAggregatesTableData } from '@/api'
 import CreateNifiModal from './CreateNifiModal.vue'
 
@@ -29,15 +28,6 @@ const onUpdateButtonClick = () => {
 }
 
 // TODO: create useTable hock to incapsulate table functionality
-
-const items = generateTableData([
-    'name',
-    'tableName',
-    'lastSchemaUpdate',
-    'lastDataUpdate',
-    'rowsCount',
-    'nextDataUpdate',
-])
 
 const columns = [
     { key: "name", sortable: true },

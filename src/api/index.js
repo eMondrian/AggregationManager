@@ -1,2 +1,2 @@
 export { PATH } from './path'
-export { getAggregatesTableData } from './aggregates'
+export { getAggregatesTableData, createFromNifiProcess } from './aggregates'
