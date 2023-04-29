@@ -7,3 +7,15 @@ export const getAggregatesTableData = async () => {
 
     return AggregateTableData.parseFromDTO(result)
 }
+
+export const createFromNifiProcess = async ({ name, process }) => {
+    const result = await new Promise((res) => {
+        setTimeout(() => {
+            res({ name, process })
+        }, 1000)
+    })
+
+    console.log({ name, process })
+
+    return result
+}
