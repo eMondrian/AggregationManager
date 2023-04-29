@@ -28,10 +28,7 @@ const mockedNifiProcessOptions = ref([
 
 const resetState = () => {
     name.value = ''
-    nameInput.value.reset()
-
     nifiProcess.value = {}
-    nifiProcessSelect.value.reset()
 }
 
 const onSave = async () => {
