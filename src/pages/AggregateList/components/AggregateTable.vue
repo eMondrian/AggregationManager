@@ -27,6 +27,18 @@ const onUpdateButtonClick = () => {
     fetchTableData()
 }
 
+const onCalculate = (item) => {
+    console.log(item)
+}
+
+const onEdit = (item) => {
+    console.log(item)
+}
+
+const onDelete = (item) => {
+    console.log(item)
+}
+
 // TODO: create useTable hock to incapsulate table functionality
 
 const columns = [
@@ -47,7 +59,6 @@ const columns = [
             <va-button
                 @click="onUpdateButtonClick"
                 preset="plain"
-                color="info"
             >
                 <template #append>
                     <va-icon size="large" class="material-icons-outlined">
@@ -58,7 +69,6 @@ const columns = [
             <va-button
                 @click="onCreateButtonClick"
                 preset="plain"
-                color="info"
             >
                 <template #append>
                     <va-icon size="large" class="material-icons-outlined">
@@ -74,6 +84,49 @@ const columns = [
         :items="tableData"
         :columns="columns"
     >
+        <template #cell(actions)="{ rowIndex }">
+            <div class="table-action-buttons">
+                <va-button
+                    preset="plain"
+                    color="info"
+                    @click="onCalculate(tableData[rowIndex])"
+                >
+                    <template #append>
+                        <va-icon class="material-icons-outlined">
+                            calculate
+                        </va-icon>
+                    </template>
+                </va-button>
+                <va-button
+                    preset="plain"
+                    color="info"
+                    @click="onEdit(tableData[rowIndex])"
+                >
+                    <template #append>
+                        <va-icon class="material-icons-outlined">
+                            edit
+                        </va-icon>
+                    </template>
+                </va-button>
+                <va-button
+                    preset="plain"
+                    color="info"
+                    @click="onDelete(tableData[rowIndex])"
+                >
+                    <template #append>
+                        <va-icon class="material-icons-outlined">
+                            delete
+                        </va-icon>
+                    </template>
+                </va-button>
+                <!-- Hover is not working for this button inside table -->
+                <!-- <va-button
+                    preset="plain"
+                    icon="delete"
+                    @click="onDelete(tableData[rowIndex])"
+                /> -->
+            </div>
+        </template>
     </va-data-table>
 
     <create-nifi-modal
@@ -90,6 +143,12 @@ const columns = [
 
 .buttons-container {
     display: flex;
+    gap: 0.5rem;
+}
+
+.table-action-buttons {
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
 }
 </style>
