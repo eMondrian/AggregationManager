@@ -24,8 +24,8 @@ const columns = [
         <div class="buttons-container">
             <va-button
                 @click="onCreateButtonClick"
+                title="Create"
                 preset="plain"
-                color="info"
             >
                 <template #append>
                     <va-icon size="large" class="material-icons-outlined">

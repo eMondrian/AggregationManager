@@ -1,4 +1,6 @@
-import { createVuesticEssential, VaButton, VaInput, VaSelect, VaIcon, VaDataTable, VaNavbar, VaNavbarItem, VaModal } from 'vuestic-ui'
+import { 
+    createVuesticEssential, VaButton, VaButtonDropdown, VaInput, VaSelect, VaIcon, VaDataTable, VaNavbar, VaNavbarItem, VaModal,
+} from 'vuestic-ui'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
@@ -14,5 +16,5 @@ app.use(createPinia())
 app.use(router)
 
 
-app.use(createVuesticEssential({ components: { VaButton, VaInput, VaSelect, VaIcon, VaDataTable, VaNavbar, VaNavbarItem, VaModal } }));
+app.use(createVuesticEssential({ components: { VaButton, VaButtonDropdown, VaInput, VaSelect, VaIcon, VaDataTable, VaNavbar, VaNavbarItem, VaModal } }));
 app.mount('#app')

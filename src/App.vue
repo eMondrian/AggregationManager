@@ -36,7 +36,7 @@ const link = computed(
 
 <style lang="scss">
 h2 {
-  color: var(--va-info)
+  color: var(--va-primary)
 }
 
 main {

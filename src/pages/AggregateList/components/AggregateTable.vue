@@ -20,23 +20,30 @@ onMounted(() => {
    fetchTableData()
 })
 
-const onCreateButtonClick = () => {
+const onCreateAggregationClick = () => {
+    console.log('Open Create Aggregation Modal')
+}
+const onCreateFromNifiButtonClick = () => {
     createNifiModal.value.run()
 }
+const onCreateWithWizzardButtonClick = () => {
+    console.log('Open Create with Wizzard Modal')
+}
+
 const onUpdateButtonClick = () => {
     fetchTableData()
 }
 
 const onCalculate = (item) => {
-    console.log(item)
+    console.log('Run calculation', item)
 }
 
 const onEdit = (item) => {
-    console.log(item)
+    console.log('Edit', item)
 }
 
 const onDelete = (item) => {
-    console.log(item)
+    console.log('Delete', item)
 }
 
 // TODO: create useTable hock to incapsulate table functionality
@@ -66,16 +73,41 @@ const columns = [
                     </va-icon>
                 </template>
             </va-button>
-            <va-button
-                @click="onCreateButtonClick"
+            <va-button-dropdown
+                title="Create"
                 preset="plain"
+                hide-icon
             >
-                <template #append>
+                <template #label>
                     <va-icon size="large" class="material-icons-outlined">
                         add_box
                     </va-icon>
                 </template>
-            </va-button>
+
+                <div class="nested-create-buttons">
+                    <va-button
+                        @click="onCreateAggregationClick"
+                        preset="secondary"
+                        size="small"
+                    >
+                        Create Aggregation
+                    </va-button>
+                    <va-button
+                        @click="onCreateFromNifiButtonClick"
+                        preset="secondary"
+                        size="small"
+                    >
+                        Create from NIFI Process
+                    </va-button>
+                    <va-button
+                        @click="onCreateWithWizzardButtonClick"
+                        preset="secondary"
+                        size="small"
+                    >
+                        Create with Wizzard
+                    </va-button>
+                </div>
+            </va-button-dropdown>
         </div>
     </section>
     <va-data-table
@@ -89,6 +121,7 @@ const columns = [
                 <va-button
                     preset="plain"
                     color="info"
+                    title="Run calculations"
                     @click="onCalculate(tableData[rowIndex])"
                 >
                     <template #append>
@@ -100,6 +133,7 @@ const columns = [
                 <va-button
                     preset="plain"
                     color="info"
+                    title="Edit"
                     @click="onEdit(tableData[rowIndex])"
                 >
                     <template #append>
@@ -111,6 +145,7 @@ const columns = [
                 <va-button
                     preset="plain"
                     color="info"
+                    title="Delete"
                     @click="onDelete(tableData[rowIndex])"
                 >
                     <template #append>
@@ -148,6 +183,14 @@ const columns = [
 
 .table-action-buttons {
     display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nested-create-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
     gap: 0.5rem;
 }
