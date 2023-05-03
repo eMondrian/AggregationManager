@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "pinia": "^2.0.34",
+    "monaco-editor": "^0.38.0",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6",
     "vuestic-ui": "^1.6.3"

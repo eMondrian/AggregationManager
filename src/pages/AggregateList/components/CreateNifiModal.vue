@@ -52,13 +52,7 @@ defineExpose({ run })
 </script>
 
 <template>
-    <va-modal
-        :modelValue="isOpened"
-        size="large"
-        noPadding
-        no-outside-dismiss
-        hide-default-actions
-    >
+    <va-modal :modelValue="isOpened" size="large" noPadding no-outside-dismiss hide-default-actions>
         <template #header>
             <h2 class="modal-header">
                 Create from NIFI process
@@ -66,33 +60,17 @@ defineExpose({ run })
         </template>
         <template #default>
             <section class="modal-content">
-                <va-input
-                    ref="nameInput"
-                    v-model="name"
-                    placeholder="Name"
-                />
-                <va-select
-                    ref="nifiProcessSelect"
-                    v-model="nifiProcess"
-                    placeholder="NIFI process"
-                    text-by="text"
-                    :options="mockedNifiProcessOptions"
-                />
+                <va-input ref="nameInput" v-model="name" placeholder="Name" />
+                <va-select ref="nifiProcessSelect" v-model="nifiProcess" placeholder="NIFI process" text-by="text"
+                    :options="mockedNifiProcessOptions" />
             </section>
         </template>
         <template #footer>
             <div class="controll-buttons">
-                <va-button
-                    preset="secondary"
-                    @click="onCancel"
-                >
+                <va-button preset="secondary" @click="onCancel">
                     Cancel
                 </va-button>
-                <va-button
-                    :loading="isRequestInProcess"
-                    :disabled="!isModalFilled"
-                    @click="onSave"
-                >
+                <va-button :loading="isRequestInProcess" :disabled="!isModalFilled" @click="onSave">
                     Save
                 </va-button>
             </div>

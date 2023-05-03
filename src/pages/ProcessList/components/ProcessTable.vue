@@ -1,5 +1,5 @@
 <script setup>
-import { generateTableData } from '@/helpers/generateMocks' 
+import { generateTableData } from '@/helpers/generateMocks'
 
 const onCreateButtonClick = () => {
     console.log('onCreateButtonClick')
@@ -22,11 +22,7 @@ const columns = [
     <section class="control-panel">
         <h2>List of processes</h2>
         <div class="buttons-container">
-            <va-button
-                @click="onCreateButtonClick"
-                title="Create"
-                preset="plain"
-            >
+            <va-button @click="onCreateButtonClick" title="Create" preset="plain">
                 <template #append>
                     <va-icon size="large" class="material-icons-outlined">
                         add_box
@@ -35,11 +31,7 @@ const columns = [
             </va-button>
         </div>
     </section>
-    <va-data-table
-        class="app-table"
-        :items="items"
-        :columns="columns"
-    >
+    <va-data-table class="app-table" :items="items" :columns="columns">
     </va-data-table>
 </template>
 

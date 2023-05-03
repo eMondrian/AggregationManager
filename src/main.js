@@ -1,8 +1,7 @@
-import { 
-    createVuesticEssential, VaButton, VaButtonDropdown, VaInput, VaSelect, VaIcon, VaDataTable, VaNavbar, VaNavbarItem, VaModal,
+import {
+    createVuesticEssential, VaButton, VaButtonDropdown, VaInput, VaSelect, VaIcon, VaDataTable, VaNavbar, VaNavbarItem, VaModal, VaTabs, VaTab,
 } from 'vuestic-ui'
 import { createApp } from 'vue'
-import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
@@ -12,9 +11,12 @@ import 'vuestic-ui/css'
 
 const app = createApp(App)
 
-app.use(createPinia())
 app.use(router)
 
-
-app.use(createVuesticEssential({ components: { VaButton, VaButtonDropdown, VaInput, VaSelect, VaIcon, VaDataTable, VaNavbar, VaNavbarItem, VaModal } }));
+app.use(createVuesticEssential({ components: { VaButton, VaButtonDropdown, VaInput, VaSelect, VaIcon, VaDataTable, VaNavbar, VaNavbarItem, VaModal, VaTabs, VaTab } }));
+// app.config.globalProperties.$customWizzards = [{ 
+//     openButtonText: '',
+//     component: {},
+//     onClose: ()=>{},
+// }]
 app.mount('#app')

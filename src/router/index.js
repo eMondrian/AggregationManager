@@ -15,7 +15,7 @@ const router = createRouter({
       name: ROUTES.processes.name,
       component: () => import('@/pages/ProcessList/Page.vue')
     },
-    { 
+    {
       path: '/:catchAll(.*)',
       redirect: { name: ROUTES.home.name }
     }
