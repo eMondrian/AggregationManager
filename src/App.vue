@@ -53,4 +53,15 @@ main {
 .app-table {
     --va-data-table-thead-color: var(--va-primary);
 }
+
+// To enable full with modal
+.full-size-modal {
+    .va-modal__container {
+        width: 100%;
+    }
+
+    .va-modal__dialog {
+        margin: 0 auto;
+    }
+}
 </style>

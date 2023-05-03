@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getAggregatesTableData } from '@/api'
-import CreateAggregationModal from './CreateEditAggregationModal.vue'
+import CreateWithWizzardModal from './CreateWithWizzardModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
 
-const createAggregationModal = ref(null)
+const createWithWizzardModal = ref(null)
 const createNifiModal = ref(null)
 const tableData = ref([])
 const isLoading = ref(false)
@@ -22,13 +22,13 @@ onMounted(() => {
     fetchTableData()
 })
 
-const onCreateAggregationClick = () => {
-    createAggregationModal.value.run()
+const onCreateWithWizzardButtonClick = () => {
+    createWithWizzardModal.value.run()
 }
 const onCreateFromNifiButtonClick = () => {
     createNifiModal.value.run()
 }
-const onCreateWithWizzardButtonClick = () => {
+const onCreateAggregationClick = () => {
     console.log('Open Create with Wizzard Modal')
 }
 
@@ -80,14 +80,14 @@ const columns = [
                 </template>
 
                 <div class="nested-create-buttons">
-                    <va-button @click="onCreateAggregationClick" preset="secondary" size="small">
-                        Create Aggregation
+                    <va-button @click="onCreateWithWizzardButtonClick" preset="secondary" size="small">
+                        Create with Wizzard
                     </va-button>
                     <va-button @click="onCreateFromNifiButtonClick" preset="secondary" size="small">
                         Create from NIFI Process
                     </va-button>
-                    <va-button @click="onCreateWithWizzardButtonClick" preset="secondary" size="small">
-                        Create with Wizzard
+                    <va-button @click="onCreateAggregationClick" preset="secondary" size="small">
+                        Create Aggregation
                     </va-button>
                 </div>
             </va-button-dropdown>
@@ -127,7 +127,7 @@ const columns = [
         </template>
     </va-data-table>
 
-    <create-aggregation-modal ref="createAggregationModal" />
+    <create-with-wizzard-modal ref="createWithWizzardModal" />
     <create-nifi-modal ref="createNifiModal" />
 </template>
 
