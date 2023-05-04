@@ -7,7 +7,7 @@ const props = defineProps({
         default: '// Type code here...\n',
     },
     onUnmount: {
-        default: () => {}
+        default: () => { }
     }
 })
 

@@ -7,9 +7,9 @@ const { isOpened, run, close } = usePromisifiedModal();
 
 const initialState = {
     steps: [
-        { label: 'Properties'},
-        { label: 'Query'},
-        { label: 'Schedule'},
+        { label: 'Properties' },
+        { label: 'Query' },
+        { label: 'Schedule' },
     ],
     activeStep: 0,
     propertiesData: {
@@ -25,7 +25,7 @@ const initialState = {
     }
 }
 
-const steps = ref([ ...initialState.steps])
+const steps = ref([...initialState.steps])
 const activeStep = ref(initialState.activeStep)
 const propertiesData = ref({ ...initialState.propertiesData })
 const query = ref(initialState.queryDefaultValue)
@@ -56,7 +56,7 @@ const resetState = () => {
 const onSave = async () => {
     console.log('Properties Data: ', { ...propertiesData.value })
     console.log('Query: ', { query: query.value })
-    console.log('Schedule Data: ',  { ...scheduleData.value })
+    console.log('Schedule Data: ', { ...scheduleData.value })
 
     resetState()
     close()
@@ -92,23 +92,23 @@ defineExpose({ run })
                     <template #step-content-0>
                         <section class="tab-content">
                             <div class="properties-inputs-wrapper">
-                                <va-input v-model="propertiesData.title" placeholder="Title"/>
-                                <va-input v-model="propertiesData.tableName" placeholder="Table name"/>
-                                <va-input v-model="propertiesData.otherProps" placeholder="Other properties"/>
+                                <va-input v-model="propertiesData.title" placeholder="Title" />
+                                <va-input v-model="propertiesData.tableName" placeholder="Table name" />
+                                <va-input v-model="propertiesData.otherProps" placeholder="Other properties" />
                             </div>
                         </section>
                     </template>
                     <template #step-content-1>
                         <section class="tab-content">
-                            <monaco-editor :initialInputValue="query" :onUnmount="onUnmountEditor"/>
+                            <monaco-editor :initialInputValue="query" :onUnmount="onUnmountEditor" />
                         </section>
                     </template>
                     <template #step-content-2>
                         <section class="tab-content">
                             <div class="properties-inputs-wrapper">
-                                <va-input v-model="scheduleData.some" placeholder="Some"/>
-                                <va-input v-model="scheduleData.timers" placeholder="Timers"/>
-                                <va-input v-model="scheduleData.here" placeholder="Here"/>
+                                <va-input v-model="scheduleData.some" placeholder="Some" />
+                                <va-input v-model="scheduleData.timers" placeholder="Timers" />
+                                <va-input v-model="scheduleData.here" placeholder="Here" />
                             </div>
                         </section>
                     </template>

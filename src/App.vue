@@ -7,16 +7,13 @@ const route = useRoute();
 
 const link = computed(
   () => route.path === ROUTES.home.path
-  ? { path: ROUTES.processes.path, text: 'Go to process' }
-  : { path: ROUTES.home.path, text: 'Go to aggregation' }
+    ? { path: ROUTES.processes.path, text: 'Go to process' }
+    : { path: ROUTES.home.path, text: 'Go to aggregation' }
 )
 </script>
 
 <template>
-  <va-navbar
-    color="primary"
-    class="mb-3"
-  >
+  <va-navbar color="primary" class="mb-3">
     <template #left>
       <va-navbar-item class="logo">
         Aggregation Manager
@@ -51,17 +48,17 @@ main {
 }
 
 .app-table {
-    --va-data-table-thead-color: var(--va-primary);
+  --va-data-table-thead-color: var(--va-primary);
 }
 
 // To enable full with modal
 .full-size-modal {
-    .va-modal__container {
-        width: 100%;
-    }
+  .va-modal__container {
+    width: 100%;
+  }
 
-    .va-modal__dialog {
-        margin: 0 auto;
-    }
+  .va-modal__dialog {
+    margin: 0 auto;
+  }
 }
 </style>

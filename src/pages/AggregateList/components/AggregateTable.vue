@@ -117,12 +117,6 @@ const columns = [
                         </va-icon>
                     </template>
                 </va-button>
-                <!-- Hover is not working for this button inside table -->
-                <!-- <va-button
-                    preset="plain"
-                    icon="delete"
-                    @click="onDelete(tableData[rowIndex])"
-                /> -->
             </div>
         </template>
     </va-data-table>
