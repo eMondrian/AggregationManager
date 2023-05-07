@@ -2,11 +2,11 @@ import { ref } from "vue";
 
 export const usePromisifiedModal = ({
   defaultIsOpened = false,
-  resetFn = () => {},
-  opened = () => {}
+  resetFn = () => { },
+  opened = () => { }
 } = {}) => {
   const isOpened = ref(defaultIsOpened);
-  let resolveFunction = () => {};
+  let resolveFunction = () => { };
   let runPromise = new Promise((res) => {
     resolveFunction = res;
   });

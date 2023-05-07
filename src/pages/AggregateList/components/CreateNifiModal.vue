@@ -43,7 +43,7 @@ const onSave = async () => {
     }
 }
 
-const onCancel = () => {
+const onClose = () => {
     close()
     resetState()
 }
@@ -52,47 +52,31 @@ defineExpose({ run })
 </script>
 
 <template>
-    <va-modal
-        :modelValue="isOpened"
-        size="large"
-        noPadding
-        no-outside-dismiss
-        hide-default-actions
-    >
+    <va-modal :modelValue="isOpened" noPadding no-outside-dismiss hide-default-actions class="full-size-modal">
         <template #header>
-            <h2 class="modal-header">
-                Create from NIFI process
-            </h2>
+            <section class="modal-header">
+                <h2>
+                    Create from NIFI process
+                </h2>
+                <va-button preset="plain" title="Close" @click="onClose">
+                    <template #append>
+                        <va-icon class="material-icons-outlined">
+                            close
+                        </va-icon>
+                    </template>
+                </va-button>
+            </section>
         </template>
         <template #default>
             <section class="modal-content">
-                <va-input
-                    ref="nameInput"
-                    v-model="name"
-                    placeholder="Name"
-                />
-                <va-select
-                    ref="nifiProcessSelect"
-                    v-model="nifiProcess"
-                    placeholder="NIFI process"
-                    text-by="text"
-                    :options="mockedNifiProcessOptions"
-                />
+                <va-input ref="nameInput" v-model="name" placeholder="Name" />
+                <va-select ref="nifiProcessSelect" v-model="nifiProcess" placeholder="NIFI process" text-by="text"
+                    :options="mockedNifiProcessOptions" />
             </section>
         </template>
         <template #footer>
             <div class="controll-buttons">
-                <va-button
-                    preset="secondary"
-                    @click="onCancel"
-                >
-                    Cancel
-                </va-button>
-                <va-button
-                    :loading="isRequestInProcess"
-                    :disabled="!isModalFilled"
-                    @click="onSave"
-                >
+                <va-button :loading="isRequestInProcess" :disabled="!isModalFilled" @click="onSave">
                     Save
                 </va-button>
             </div>
@@ -100,10 +84,13 @@ defineExpose({ run })
     </va-modal>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .modal-header {
     padding: 1rem 2rem;
     border-bottom: 1px solid var(--va-info);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .modal-content {
@@ -114,9 +101,9 @@ defineExpose({ run })
 }
 
 .controll-buttons {
-    padding: 1rem;
+    padding: 1rem 2rem;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     gap: 1rem;
 }
 </style>

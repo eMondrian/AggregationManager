@@ -1,3 +1,4 @@
+/* For removing autoadding scroll while page started with import 'vuestic-ui/css' */
 body {
-  overflow: hidden; /* For removing autoadding scroll while page started with import 'vuestic-ui/css' */
+  overflow: hidden;
 }
