@@ -135,7 +135,7 @@ defineExpose({ run })
                             <div class="table-data-inputs-wrapper">
                                 <va-input v-model="tableData.name" label="Name" />
                                 <va-select v-model="tableData.tableName" label="Table name" text-by="text"
-                                :options="mockedTableNameOptions" class="select-nifi-process" />
+                                    :options="mockedTableNameOptions" />
                             </div>
                         </section>
                     </template>

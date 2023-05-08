@@ -50,8 +50,6 @@ const onDelete = (item) => {
     console.log('Delete', item)
 }
 
-// TODO: create useTable hock to incapsulate table functionality
-
 const columns = [
     { key: "name", sortable: true },
     { key: "tableName", sortable: true },
@@ -129,6 +127,12 @@ const columns = [
 </template>
 
 <style lang="scss" scoped>
+// To remove additional magic 2px height
+// original height is 32px, but got 34px without any additional styles
+.va-button-dropdown {
+    height: 2rem;
+}
+
 .control-panel {
     display: flex;
     justify-content: space-between;
