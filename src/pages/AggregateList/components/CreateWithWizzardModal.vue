@@ -1,23 +1,26 @@
 <script setup>
+import cloneDeep from 'lodash/cloneDeep';
 import { computed, ref, watch } from 'vue';
 import MonacoEditor from './MonacoEditor.vue';
+import { createWithWizzard } from '@/api'
 import { usePromisifiedModal } from '@/composables'
 
 const { isOpened, run, close } = usePromisifiedModal();
 
 const initialState = {
     steps: [
-        { label: 'Properties' },
-        { label: 'Query' },
-        { label: 'Schedule' },
+        { label: 'Properties', icon: 'list_alt' },
+        { label: 'Query', icon: 'code' },
+        { label: 'Schedule', icon: 'schedule' },
     ],
     activeStep: 0,
     propertiesData: {
-        title: '',
+        name: '',
         tableName: '',
         otherProps: '',
+        nifiProcessName: ''
     },
-    queryDefaultValue: '// Type code here...\n',
+    queryDefaultValue: '',
     scheduleData: {
         some: '',
         timers: '',
@@ -25,41 +28,50 @@ const initialState = {
     }
 }
 
-const steps = ref([...initialState.steps])
+const steps = ref(cloneDeep(initialState.steps))
 const activeStep = ref(initialState.activeStep)
-const propertiesData = ref({ ...initialState.propertiesData })
+const propertiesData = ref(cloneDeep(initialState.propertiesData))
 const query = ref(initialState.queryDefaultValue)
-const scheduleData = ref({ ...initialState.scheduleData })
+const scheduleData = ref(cloneDeep(initialState.scheduleData))
+const isRequestInProcess = ref(false)
 
 const onUnmountEditor = (value) => {
     query.value = value
 }
 
 const isPropertiesReadyToSave = computed(() => Object.values(propertiesData.value).every((value) => value !== ''))
-watch(isPropertiesReadyToSave, (isReady) => steps.value[0].icon = isReady ? 'done' : undefined)
+watch(isPropertiesReadyToSave, (isReady) => steps.value[0].icon = isReady ? 'done' : initialState.steps[0].icon)
 
-const isQueryReadyToSave = computed(() => (query.value !== initialState.queryDefaultValue) && (query.value !== ''))
-watch(isQueryReadyToSave, (isReady) => steps.value[1].icon = isReady ? 'done' : undefined)
+const isQueryReadyToSave = computed(() => query.value !== initialState.queryDefaultValue)
+watch(isQueryReadyToSave, (isReady) => steps.value[1].icon = isReady ? 'done' : initialState.steps[1].icon)
 
 const isScheduleDataReadyToSave = computed(() => Object.values(scheduleData.value).every((value) => value !== ''))
-watch(isScheduleDataReadyToSave, (isReady) => steps.value[2].icon = isReady ? 'done' : undefined)
+watch(isScheduleDataReadyToSave, (isReady) => steps.value[2].icon = isReady ? 'done' : initialState.steps[2].icon)
 
 const isReadyToSave = computed(() => isPropertiesReadyToSave.value && isQueryReadyToSave.value && isScheduleDataReadyToSave.value)
 
 const resetState = () => {
+    steps.value = cloneDeep(initialState.steps)
     activeStep.value = initialState.activeStep
-    propertiesData.value = { ...initialState.propertiesData }
+    propertiesData.value = cloneDeep(initialState.propertiesData)
     query.value = initialState.editorDefaultInputValue
-    scheduleData.value = { ...initialState.scheduleData }
+    scheduleData.value = cloneDeep(initialState.scheduleData)
 }
 
 const onSave = async () => {
-    console.log('Properties Data: ', { ...propertiesData.value })
-    console.log('Query: ', { query: query.value })
-    console.log('Schedule Data: ', { ...scheduleData.value })
+    try {
+        isRequestInProcess.value = true
 
-    resetState()
-    close()
+        await createWithWizzard({
+            propertiesData: propertiesData.value,
+            query: query.value,
+            scheduleData: scheduleData.value
+        })
+    } finally {
+        isRequestInProcess.value = false
+        close()
+        resetState()
+    }
 }
 
 const onClose = () => {
@@ -92,23 +104,24 @@ defineExpose({ run })
                     <template #step-content-0>
                         <section class="tab-content">
                             <div class="properties-inputs-wrapper">
-                                <va-input v-model="propertiesData.title" placeholder="Title" />
-                                <va-input v-model="propertiesData.tableName" placeholder="Table name" />
-                                <va-input v-model="propertiesData.otherProps" placeholder="Other properties" />
+                                <va-input v-model="propertiesData.name" label="Name" />
+                                <va-input v-model="propertiesData.tableName" label="Table name" />
+                                <va-input v-model="propertiesData.otherProps" label="Other properties" />
+                                <va-input v-model="propertiesData.nifiProcessName" label="Nifi process name" />
                             </div>
                         </section>
                     </template>
                     <template #step-content-1>
-                        <section class="tab-content">
+                        <section>
                             <monaco-editor :initialInputValue="query" :onUnmount="onUnmountEditor" />
                         </section>
                     </template>
                     <template #step-content-2>
                         <section class="tab-content">
                             <div class="properties-inputs-wrapper">
-                                <va-input v-model="scheduleData.some" placeholder="Some" />
-                                <va-input v-model="scheduleData.timers" placeholder="Timers" />
-                                <va-input v-model="scheduleData.here" placeholder="Here" />
+                                <va-input v-model="scheduleData.some" label="Some" />
+                                <va-input v-model="scheduleData.timers" label="Timers" />
+                                <va-input v-model="scheduleData.here" label="Here" />
                             </div>
                         </section>
                     </template>
@@ -116,7 +129,8 @@ defineExpose({ run })
                         <div class="controll-buttons">
                             <va-button @click="prevStep()" :disabled="activeStep === 0">Previous</va-button>
                             <va-button v-if="activeStep !== steps.length - 1" @click="nextStep()">Next</va-button>
-                            <va-button v-else @click="onSave()" :disabled="!isReadyToSave">Save</va-button>
+                            <va-button v-else @click="onSave()" :disabled="!isReadyToSave"
+                                :loading="isRequestInProcess">Save</va-button>
                         </div>
                     </template>
                 </va-stepper>
@@ -143,9 +157,8 @@ defineExpose({ run })
 
 .tab-content {
     width: 100%;
-    min-height: 400px;
+    min-height: 33rem;
     margin-top: 1rem;
-    padding: 1rem;
 }
 
 .properties-inputs-wrapper {

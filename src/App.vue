@@ -61,4 +61,9 @@ main {
     margin: 0 auto;
   }
 }
+
+// To fix select-dropdown background 
+.va-select-dropdown__content {
+    z-index: 1;
+}
 </style>

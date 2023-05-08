@@ -8,14 +8,38 @@ export const getAggregatesTableData = async () => {
     return AggregateTableData.parseFromDTO(result)
 }
 
-export const createFromNifiProcess = async ({ name, process }) => {
+export const createWithWizzard = async (data) => {
     const result = await new Promise((res) => {
         setTimeout(() => {
-            res({ name, process })
+            res(data)
         }, 1000)
     })
 
-    console.log({ name, process })
+    console.log('createWithWizzard: ', data)
+
+    return result
+}
+
+export const createFromNifiProcess = async (data) => {
+    const result = await new Promise((res) => {
+        setTimeout(() => {
+            res(data)
+        }, 1000)
+    })
+
+    console.log('createFromNifiProcess: ', data)
+
+    return result
+}
+
+export const createAggregation = async (data) => {
+    const result = await new Promise((res) => {
+        setTimeout(() => {
+            res(data)
+        }, 1000)
+    })
+
+    console.log('createAggregation: ', data)
 
     return result
 }

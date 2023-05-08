@@ -3,9 +3,11 @@ import { ref, onMounted } from 'vue'
 import { getAggregatesTableData } from '@/api'
 import CreateWithWizzardModal from './CreateWithWizzardModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
+import CreateAggregationModal from './CreateAggregation.vue'
 
 const createWithWizzardModal = ref(null)
 const createNifiModal = ref(null)
+const createAggregationModal = ref(null)
 const tableData = ref([])
 const isLoading = ref(false)
 
@@ -29,7 +31,7 @@ const onCreateFromNifiButtonClick = () => {
     createNifiModal.value.run()
 }
 const onCreateAggregationClick = () => {
-    console.log('Open Create with Wizzard Modal')
+    createAggregationModal.value.run()
 }
 
 const onUpdateButtonClick = () => {
@@ -72,7 +74,7 @@ const columns = [
                     </va-icon>
                 </template>
             </va-button>
-            <va-button-dropdown title="Create" preset="plain" hide-icon>
+            <va-button-dropdown title="Create" preset="plain" hide-icon prevent-overflow>
                 <template #label>
                     <va-icon size="large" class="material-icons-outlined">
                         add_box
@@ -123,6 +125,7 @@ const columns = [
 
     <create-with-wizzard-modal ref="createWithWizzardModal" />
     <create-nifi-modal ref="createNifiModal" />
+    <create-aggregation-modal ref="createAggregationModal" />
 </template>
 
 <style lang="scss" scoped>
@@ -130,6 +133,12 @@ const columns = [
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.app-table {
+    display: flex;
+    height: 100%;
+    min-height: 10rem;
 }
 
 .buttons-container {
