@@ -24,9 +24,20 @@ const columns = [
         <div class="buttons-container">
             <va-button @click="onCreateButtonClick" title="Create" preset="plain">
                 <template #append>
-                    <va-icon size="large" class="material-icons-outlined">
+                    <!-- <va-icon size="large" class="material-icons-outlined">
                         add_box
+                    </va-icon> -->
+                    <!-- 
+                        START
+                        To remove later
+                    -->
+                    <va-icon size="large" class="material-icons-outlined">
+                        change_circle
                     </va-icon>
+                    <!-- 
+                        To remove later
+                        END
+                    -->
                 </template>
             </va-button>
         </div>

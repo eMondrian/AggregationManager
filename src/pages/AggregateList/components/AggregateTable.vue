@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getAggregatesTableData } from '@/api'
+import { getAggregatesTableData, addAgregation, removeAgregation } from '@/api'
 import CreateWithWizzardModal from './CreateWithWizzardModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
 import CreateAggregationModal from './CreateAggregation.vue'
@@ -24,14 +24,54 @@ onMounted(() => {
     fetchTableData()
 })
 
-const onCreateWithWizzardButtonClick = () => {
-    createWithWizzardModal.value.run()
+const onCreateWithWizzardButtonClick = async () => {
+    const aggregationDesc = await createWithWizzardModal.value.run()
+
+    if (aggregationDesc) {
+        try {
+            await addAgregation({
+                name: aggregationDesc.propertiesData.name,
+                tableName: aggregationDesc.propertiesData.tableName,
+            });
+            createWithWizzardModal.value.resetState()
+            await fetchTableData()
+        } catch (e) {
+            console.log(e)
+            await onCreateWithWizzardButtonClick()
+        }
+    }
 }
-const onCreateFromNifiButtonClick = () => {
-    createNifiModal.value.run()
+const onCreateFromNifiButtonClick = async () => {
+    const nifiAggregation = await createNifiModal.value.run()
+    if (nifiAggregation) {
+        try {
+            await addAgregation({
+                name: nifiAggregation.name,
+                tableName: "NO TABLE",
+            })
+            createNifiModal.value.resetState()
+            await fetchTableData()
+        } catch (e) {
+            console.log(e)
+            await onCreateFromNifiButtonClick()
+        }
+    }
 }
-const onCreateAggregationClick = () => {
-    createAggregationModal.value.run()
+const onCreateAggregationClick = async () => {
+    const aggregationDesc = await createAggregationModal.value.run()
+    if (aggregationDesc) {
+        try {
+            await addAgregation({
+                name: aggregationDesc.tableData.name,
+                tableName: aggregationDesc.tableData.tableName.text,
+            });
+            createAggregationModal.value.resetState()
+            await fetchTableData()
+        } catch (e) {
+            console.log(e)
+            await onCreateAggregationClick()
+        }
+    }
 }
 
 const onUpdateButtonClick = () => {
@@ -43,12 +83,20 @@ const onCalculate = (item) => {
 }
 
 const onEdit = (item) => {
-    console.log('Edit', item)
+    createWithWizzardModal.value.run()
 }
 
-const onDelete = (item) => {
-    console.log('Delete', item)
-}
+const onDelete = async (item) => {
+    try {
+        isLoading.value = true
+        await removeAgregation(item.id);
+        await fetchTableData();
+    } catch (e) {
+        console.log(e);
+    } finally {
+        isLoading.value = false
+    }
+};
 
 const columns = [
     { key: "name", sortable: true },

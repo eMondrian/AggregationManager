@@ -59,19 +59,24 @@ const resetState = () => {
 }
 
 const onSave = async () => {
-    try {
-        isRequestInProcess.value = true
+    close({
+        propertiesData: propertiesData.value,
+        query: query.value,
+        scheduleData: scheduleData.value
+    })
+    // try {
+    //     isRequestInProcess.value = true
 
-        await createWithWizzard({
-            propertiesData: propertiesData.value,
-            query: query.value,
-            scheduleData: scheduleData.value
-        })
-    } finally {
-        isRequestInProcess.value = false
-        close()
-        resetState()
-    }
+    //     await createWithWizzard({
+    //         propertiesData: propertiesData.value,
+    //         query: query.value,
+    //         scheduleData: scheduleData.value
+    //     })
+    // } finally {
+    //     isRequestInProcess.value = false
+    //     close()
+    //     resetState()
+    // }
 }
 
 const onClose = () => {
@@ -79,7 +84,7 @@ const onClose = () => {
     resetState()
 }
 
-defineExpose({ run })
+defineExpose({ run, resetState })
 </script>
 
 <template>

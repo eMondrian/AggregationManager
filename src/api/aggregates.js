@@ -5,7 +5,27 @@ export const getAggregatesTableData = async () => {
     const response = await fetch(PATH.AGGREGATION)
     const result = await response.json()
 
+
     return AggregateTableData.parseFromDTO(result)
+}
+
+export const addAgregation = async (data) => {
+    await fetch(PATH.AGGREGATION, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+export const removeAgregation = async (id) => {
+    await fetch(`${PATH.AGGREGATION}/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+})
 }
 
 export const createWithWizzard = async (data) => {

@@ -1,2 +1,2 @@
 export { PATH } from './path'
-export { getAggregatesTableData, createWithWizzard, createFromNifiProcess, createAggregation } from './aggregates'
+export { getAggregatesTableData, createWithWizzard, createFromNifiProcess, createAggregation, addAgregation, removeAgregation } from './aggregates'

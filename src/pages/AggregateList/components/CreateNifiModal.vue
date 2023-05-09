@@ -32,15 +32,15 @@ const resetState = () => {
 }
 
 const onSave = async () => {
-    try {
-        isRequestInProcess.value = true
+    close({ name: name.value, process: nifiProcess.value })
+    // try {
+    //     isRequestInProcess.value = true
 
-        await createFromNifiProcess({ name: name.value, process: nifiProcess.value })
-    } finally {
-        isRequestInProcess.value = false
-        close()
-        resetState()
-    }
+    //     await createFromNifiProcess({ name: name.value, process: nifiProcess.value })
+    // } finally {
+    //     isRequestInProcess.value = false
+    //     resetState()
+    // }
 }
 
 const onClose = () => {
@@ -48,7 +48,7 @@ const onClose = () => {
     resetState()
 }
 
-defineExpose({ run })
+defineExpose({ run, resetState })
 </script>
 
 <template>

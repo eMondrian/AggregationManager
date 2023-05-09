@@ -13,6 +13,7 @@ const initialState = {
         { label: 'Select columns', icon: 'table_chart', disabled: true },
     ],
     activeStep: 0,
+    // TODO: Tables have unique names, no need for complex objects
     tableData: {
         name: '',
         tableName: '',
@@ -56,15 +57,16 @@ const resetState = () => {
 }
 
 const onSave = async () => {
-    try {
-        isRequestInProcess.value = true
+    close({ tableData: tableData.value, selectedColumns: selectedColumns.value })
+    // try {
+    //     isRequestInProcess.value = true
 
-        await createAggregation({ tableData: tableData.value, selectedColumns: selectedColumns.value })
-    } finally {
-        isRequestInProcess.value = false
-        close()
-        resetState()
-    }
+    //     await createAggregation({ tableData: tableData.value, selectedColumns: selectedColumns.value })
+    // } finally {
+    //     isRequestInProcess.value = false
+    //     close()
+    //     resetState()
+    // }
 }
 
 const onClose = () => {
@@ -108,7 +110,7 @@ const mockedTableNameOptions = ref([
     }
 ])
 
-defineExpose({ run })
+defineExpose({ run, resetState })
 </script>
 
 <template>
