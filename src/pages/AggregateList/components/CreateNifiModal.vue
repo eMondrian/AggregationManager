@@ -69,8 +69,8 @@ defineExpose({ run })
         </template>
         <template #default>
             <section class="modal-content">
-                <va-input ref="nameInput" v-model="name" placeholder="Name" />
-                <va-select ref="nifiProcessSelect" v-model="nifiProcess" placeholder="NIFI process" text-by="text"
+                <va-input ref="nameInput" v-model="name" label="Name" />
+                <va-select ref="nifiProcessSelect" v-model="nifiProcess" label="NIFI process" text-by="text"
                     :options="mockedNifiProcessOptions" />
             </section>
         </template>

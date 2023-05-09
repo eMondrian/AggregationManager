@@ -4,7 +4,7 @@ import * as monaco from 'monaco-editor'
 
 const props = defineProps({
     initialInputValue: {
-        default: '// Type code here...\n',
+        default: '',
     },
     onUnmount: {
         default: () => { }
@@ -39,12 +39,22 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="editor" ref="editorElement"></div>
+    <section class="editor-wrapper">
+        <p>Type code below:</p>
+        <div class="editor" ref="editorElement"></div>
+    </section>
 </template>
 
 <style lang="scss" scoped>
+.editor-wrapper {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 .editor {
     width: 100%;
-    height: 368px;
+    height: 31rem;
 }
 </style>

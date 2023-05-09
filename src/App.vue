@@ -13,9 +13,9 @@ const link = computed(
 </script>
 
 <template>
-  <va-navbar color="primary" class="mb-3">
+  <va-navbar color="primary">
     <template #left>
-      <va-navbar-item class="logo">
+      <va-navbar-item>
         Aggregation Manager
       </va-navbar-item>
     </template>
@@ -37,7 +37,7 @@ h2 {
 }
 
 main {
-  padding: 0 5%;
+  padding: 1rem 4%;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -51,6 +51,11 @@ main {
   --va-data-table-thead-color: var(--va-primary);
 }
 
+// To fix mobile navbar template representation
+.va-navbar {
+  justify-content: space-around;
+}
+
 // To enable full with modal
 .full-size-modal {
   .va-modal__container {
@@ -60,5 +65,10 @@ main {
   .va-modal__dialog {
     margin: 0 auto;
   }
+}
+
+// To fix select-dropdown background 
+.va-select-dropdown__content {
+  z-index: 1;
 }
 </style>
