@@ -128,14 +128,16 @@ const columns = [
                 </template>
 
                 <div class="nested-create-buttons">
-                    <va-button @click="onCreateWithWizzardButtonClick" preset="secondary" size="small">
-                        Create with Wizzard
-                    </va-button>
                     <va-button @click="onCreateFromNifiButtonClick" preset="secondary" size="small">
                         Create from NIFI Process
                     </va-button>
-                    <va-button @click="onCreateAggregationClick" preset="secondary" size="small">
+                    <va-button @click="onCreateWithWizzardButtonClick" preset="secondary" size="small">
+                        <!-- Create with Wizzard -->
                         Create Aggregation
+                    </va-button>
+                    <va-button @click="onCreateAggregationClick" preset="secondary" size="small">
+                        Create with Wizzard
+                        <!-- Create Aggregation -->
                     </va-button>
                 </div>
             </va-button-dropdown>
