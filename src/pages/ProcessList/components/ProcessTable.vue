@@ -90,10 +90,10 @@ const columns = [
             <va-popover 
             :placement="data.rowIndex < 5 ? 'bottom-left' : 'top-left'"
             prevent-overflow
-            :message="data.rowData.eventMessage || 'Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message '"
+            :message="data.rowData.eventMessage"
             style="z-index: 1000;"
             >
-                <div class="event-message" @click="copyToClipboard($event)">{{ data.rowData.eventMessage  || 'Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message Very Long Test Message '}}</div>
+                <div class="event-message" @click="copyToClipboard($event)">{{ data.rowData.eventMessage }}</div>
             </va-popover>
         </template>
     </va-data-table>
