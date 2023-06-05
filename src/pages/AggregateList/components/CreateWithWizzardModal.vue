@@ -2,10 +2,11 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, ref, watch } from 'vue';
 import MonacoEditor from './MonacoEditor.vue';
-import { createWithWizzard } from '@/api'
+import { getProcesses } from '@/api'
 import { usePromisifiedModal } from '@/composables'
+import { useErrorHandler } from '../../../composables';
 
-const { isOpened, run, close } = usePromisifiedModal();
+const { handleError } = useErrorHandler();
 
 const initialState = {
     steps: [
@@ -17,14 +18,19 @@ const initialState = {
     propertiesData: {
         name: '',
         tableName: '',
-        otherProps: '',
-        nifiProcessName: ''
+        // otherProps: '',
+        nifiProcessId: '',
+        generated: true,
     },
     queryDefaultValue: '',
+    // scheduleData: {
+    //     some: '',
+    //     timers: '',
+    //     here: '',
+    // }
     scheduleData: {
-        some: '',
-        timers: '',
-        here: '',
+        schedule: '',
+        strategy: 'TIMER_DRIVEN'
     }
 }
 
@@ -34,15 +40,63 @@ const propertiesData = ref(cloneDeep(initialState.propertiesData))
 const query = ref(initialState.queryDefaultValue)
 const scheduleData = ref(cloneDeep(initialState.scheduleData))
 const isRequestInProcess = ref(false)
+const processesListLoading = ref(false);
+const processesList = ref([]);
+const isEdit = ref(false);
+
+const { isOpened, run, close } = usePromisifiedModal({ opened: async (data) => {
+    if (data) {
+        propertiesData.value.tableName = data.table_name;
+        propertiesData.value.name = data.aggregation_name;
+        propertiesData.value.generated = data.is_generated_nifi_process === 't';
+
+        query.value = data.query;
+
+        scheduleData.value.schedule = data.scheduling_period;
+        scheduleData.value.strategy = data.scheduling_strategy;
+
+        isEdit.value = true;
+    }
+
+    try {
+        processesListLoading.value = true;
+        const processes = await getProcesses();
+
+        processesList.value = [{
+            name: 'None',
+            value: null,
+        }];
+        processesList.value.push(...processes.map((e) => {
+            return {
+                name: e.name,
+                value: e.id
+            }
+        }))
+
+        if (data) {
+            propertiesData.value.nifiProcessId = data.start_nifi_process_id;
+        }
+    } catch (e) {
+        handleError(e);
+    } finally {
+        processesListLoading.value = false;
+    }
+}});
 
 const onUnmountEditor = (value) => {
     query.value = value
 }
 
-const isPropertiesReadyToSave = computed(() => Object.values(propertiesData.value).every((value) => value !== ''))
+// const isPropertiesReadyToSave = computed(() => Object.values(propertiesData.value).every((value) => value !== ''))
+const isPropertiesReadyToSave = computed(() => {
+    return propertiesData.value.name !== '' && (propertiesData.value.tableName || propertiesData.value.nifiProcessName);
+});
 watch(isPropertiesReadyToSave, (isReady) => steps.value[0].icon = isReady ? 'done' : initialState.steps[0].icon)
 
-const isQueryReadyToSave = computed(() => query.value !== initialState.queryDefaultValue)
+const isQueryReadyToSave = computed(() => {
+    if (propertiesData.value.nifiProcessName) return true;
+    else return query.value !== initialState.queryDefaultValue
+})
 watch(isQueryReadyToSave, (isReady) => steps.value[1].icon = isReady ? 'done' : initialState.steps[1].icon)
 
 const isScheduleDataReadyToSave = computed(() => Object.values(scheduleData.value).every((value) => value !== ''))
@@ -56,6 +110,8 @@ const resetState = () => {
     propertiesData.value = cloneDeep(initialState.propertiesData)
     query.value = initialState.editorDefaultInputValue
     scheduleData.value = cloneDeep(initialState.scheduleData)
+
+    isEdit.value = false;
 }
 
 const onSave = async () => {
@@ -92,7 +148,7 @@ defineExpose({ run, resetState })
         <template #header>
             <section class="modal-header">
                 <h2>
-                    Create Aggregation
+                    {{ isEdit ? 'Edit' : 'Create' }} Aggregation
                 </h2>
                 <va-button preset="plain" title="Close" @click="onClose">
                     <template #append>
@@ -111,8 +167,19 @@ defineExpose({ run, resetState })
                             <div class="properties-inputs-wrapper">
                                 <va-input v-model="propertiesData.name" label="Name" />
                                 <va-input v-model="propertiesData.tableName" label="Table name" />
-                                <va-input v-model="propertiesData.otherProps" label="Other properties" />
-                                <va-input v-model="propertiesData.nifiProcessName" label="Nifi process name" />
+                                <!-- <va-input v-model="propertiesData.otherProps" label="Other properties" /> -->
+                                <!-- <va-input v-model="propertiesData.nifiProcessName" label="Nifi process name" /> -->
+                                <va-select
+                                    ref="nifiProcessSelect" 
+                                    v-model="propertiesData.nifiProcessId" 
+                                    label="NIFI process" 
+                                    text-by="name"
+                                    value-by="value"
+                                    :disabled="propertiesData.generated"
+                                    :loading="processesListLoading"
+                                    :options="processesList"
+                                    prevent-overflow
+                                />
                             </div>
                         </section>
                     </template>
@@ -124,9 +191,17 @@ defineExpose({ run, resetState })
                     <template #step-content-2>
                         <section class="tab-content">
                             <div class="properties-inputs-wrapper">
-                                <va-input v-model="scheduleData.some" label="Some" />
+                                <va-input v-model="scheduleData.schedule" label="Schedule" />
+                                <va-select
+                                    ref="nifiProcessSelect" 
+                                    v-model="scheduleData.strategy" 
+                                    label="Scheduling strategy" 
+                                    :options="['TIMER_DRIVEN', 'CRON_DRIVEN']"
+                                    prevent-overflow
+                                />
+                                <!-- <va-input v-model="scheduleData.some" label="Some" />
                                 <va-input v-model="scheduleData.timers" label="Timers" />
-                                <va-input v-model="scheduleData.here" label="Here" />
+                                <va-input v-model="scheduleData.here" label="Here" /> -->
                             </div>
                         </section>
                     </template>

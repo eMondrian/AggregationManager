@@ -1,20 +1,29 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getAggregatesTableData, addAgregation, removeAgregation } from '@/api'
+import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/api'
 import CreateWithWizzardModal from './CreateWithWizzardModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
 import CreateAggregationModal from './CreateAggregation.vue'
+import ConfirmationModal from '../../../modals/ConfirmationModal.vue'
+import LoadingIndicator from '../../../modals/LoadingIndicator.vue'
+import { useErrorHandler } from '../../../composables'
 
 const createWithWizzardModal = ref(null)
 const createNifiModal = ref(null)
 const createAggregationModal = ref(null)
+const confirmationModal = ref(null)
 const tableData = ref([])
 const isLoading = ref(false)
+const apiCallRunning = ref(false);
+
+const { handleError } = useErrorHandler();
 
 const fetchTableData = async () => {
     try {
         isLoading.value = true
         tableData.value = await getAggregatesTableData()
+    } catch (e) {
+        handleError(e);
     } finally {
         isLoading.value = false
     }
@@ -26,18 +35,28 @@ onMounted(() => {
 
 const onCreateWithWizzardButtonClick = async () => {
     const aggregationDesc = await createWithWizzardModal.value.run()
-
+    
     if (aggregationDesc) {
         try {
+            apiCallRunning.value = true;
+            console.log(aggregationDesc);
             await addAgregation({
-                name: aggregationDesc.propertiesData.name,
-                tableName: aggregationDesc.propertiesData.tableName,
+                aggregation_name: aggregationDesc.propertiesData.name,
+                table_name: aggregationDesc.propertiesData.tableName,
+                query: aggregationDesc.query,
+                start_nifi_process_id: aggregationDesc.propertiesData.nifiProcessName,
+                is_generated_nifi_process: !aggregationDesc.propertiesData.nifiProcessName,
+                scheduling_period: aggregationDesc.scheduleData.schedule,
+                scheduling_strategy: aggregationDesc.scheduleData.strategy,
             });
             createWithWizzardModal.value.resetState()
             await fetchTableData()
         } catch (e) {
-            console.log(e)
+            handleError(e);
+            apiCallRunning.value = false;
             await onCreateWithWizzardButtonClick()
+        } finally {
+            apiCallRunning.value = false;
         }
     }
 }
@@ -45,15 +64,20 @@ const onCreateFromNifiButtonClick = async () => {
     const nifiAggregation = await createNifiModal.value.run()
     if (nifiAggregation) {
         try {
+            apiCallRunning.value = true;
             await addAgregation({
-                name: nifiAggregation.name,
-                tableName: "NO TABLE",
+                aggregation_name: nifiAggregation.name,
+                is_generated_nifi_process: false,
+                start_nifi_process_id: nifiAggregation.process,
             })
             createNifiModal.value.resetState()
             await fetchTableData()
         } catch (e) {
-            console.log(e)
+            handleError(e);
+            apiCallRunning.value = false;
             await onCreateFromNifiButtonClick()
+        } finally {
+            apiCallRunning.value = false;
         }
     }
 }
@@ -61,15 +85,19 @@ const onCreateAggregationClick = async () => {
     const aggregationDesc = await createAggregationModal.value.run()
     if (aggregationDesc) {
         try {
+            apiCallRunning.value = true;
             await addAgregation({
-                name: aggregationDesc.tableData.name,
+                aggregation_name: aggregationDesc.tableData.name,
                 tableName: aggregationDesc.tableData.tableName.text,
             });
             createAggregationModal.value.resetState()
             await fetchTableData()
         } catch (e) {
-            console.log(e)
+            handleError(e);
+            apiCallRunning.value = false;
             await onCreateAggregationClick()
+        } finally {
+            apiCallRunning.value = false;
         }
     }
 }
@@ -82,19 +110,47 @@ const onCalculate = (item) => {
     console.log('Run calculation', item)
 }
 
-const onEdit = (item) => {
-    createWithWizzardModal.value.run()
+const onEdit = async (item) => {
+    console.log(item);
+    const aggregation = await getAggregation(item.id);
+    const aggregationDesc = await createWithWizzardModal.value.run(aggregation);
+
+    if (aggregationDesc) {
+        try {
+            console.log(aggregationDesc);
+            apiCallRunning.value = true;
+            await updateAggregation({
+                aggregation_name: aggregationDesc.propertiesData.name,
+                table_name: aggregationDesc.propertiesData.tableName,
+                query: aggregationDesc.query,
+                start_nifi_process_id: aggregationDesc.propertiesData.nifiProcessName,
+                is_generated_nifi_process: !!aggregationDesc.propertiesData.nifiProcessName,
+                scheduling_period: aggregationDesc.scheduleData.schedule,
+                scheduling_strategy: aggregationDesc.scheduleData.strategy,
+            });
+            createWithWizzardModal.value.resetState()
+            await fetchTableData()
+        } catch (e) {
+            handleError(e);
+            apiCallRunning.value = false;
+            await onCreateWithWizzardButtonClick()
+        } finally {
+            apiCallRunning.value = false;
+        }
+    }
 }
 
 const onDelete = async (item) => {
+    const { confirmed } = await confirmationModal.value.run({ message: "Are you sure you want do remove this aggregation?" })
+    if (!confirmed) return;
     try {
-        isLoading.value = true
+        apiCallRunning.value = true;
         await removeAgregation(item.id);
         await fetchTableData();
     } catch (e) {
-        console.log(e);
+        handleError(e);
     } finally {
-        isLoading.value = false
+        apiCallRunning.value = false;
     }
 };
 
@@ -102,9 +158,9 @@ const columns = [
     { key: "name", sortable: true },
     { key: "tableName", sortable: true },
     { key: "lastSchemaUpdate", sortable: true },
+    { key: "schedule", sortable: true },
     { key: "lastDataUpdate", sortable: true },
-    { key: "rowsCount", sortable: true },
-    { key: "nextDataUpdate", sortable: true },
+    { key: "lastEvent", sortable: true },
     { key: "actions", width: 80 },
 ];
 </script>
@@ -144,6 +200,9 @@ const columns = [
         </div>
     </section>
     <va-data-table :loading="isLoading" class="app-table" :items="tableData" :columns="columns">
+        <template #cell(lastSchemaUpdate)="data">
+            <div>{{ data.rowData.lastSchemaUpdate }}</div>
+        </template>
         <template #cell(actions)="{ rowIndex }">
             <div class="table-action-buttons">
                 <va-button preset="plain" color="info" title="Run calculations" @click="onCalculate(tableData[rowIndex])">
@@ -172,8 +231,10 @@ const columns = [
     </va-data-table>
 
     <create-with-wizzard-modal ref="createWithWizzardModal" />
-    <create-nifi-modal ref="createNifiModal" />
-    <create-aggregation-modal ref="createAggregationModal" />
+    <create-nifi-modal ref="createNifiModal"  />
+    <create-aggregation-modal ref="createAggregationModal"  />
+    <confirmation-modal ref="confirmationModal"  />
+    <loading-indicator :isOpened="apiCallRunning"></loading-indicator>
 </template>
 
 <style lang="scss" scoped>
@@ -193,6 +254,8 @@ const columns = [
     display: flex;
     height: 100%;
     min-height: 10rem;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .buttons-container {

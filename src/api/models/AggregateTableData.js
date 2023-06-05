@@ -12,20 +12,20 @@
 export class AggregateTableData {
     constructor({
         id = '',
+        lastSchemaUpdate = '',
+        schedule = '',
+        lastDataUpdate = '',
+        lastEvent = '',
         name = '',
         tableName = '',
-        lastSchemaUpdate = '',
-        lastDataUpdate = '',
-        rowsCount = '',
-        nextDataUpdate = '',
     }) {
         this.id = id;
         this.name = name;
         this.tableName = tableName;
         this.lastSchemaUpdate = new Date(lastSchemaUpdate).toLocaleString();
         this.lastDataUpdate = new Date(lastDataUpdate).toLocaleString();
-        this.rowsCount = rowsCount;
-        this.nextDataUpdate = new Date(nextDataUpdate).toLocaleString();
+        this.schedule = schedule;
+        this.lastEvent = lastEvent;
     }
 
     /**
@@ -35,12 +35,12 @@ export class AggregateTableData {
     static parseFromDTO = (items) => items.map((item) => {
         const data = {
             id: item.id,
-            name: item.name,
+            lastSchemaUpdate: new Date(item.last_schema_update),
+            schedule: item.schedule,
+            lastDataUpdate: new Date(item.last_data_update),
+            lastEvent: item.last_event,
+            name: item.aggregation_name,
             tableName: item.table_name,
-            lastSchemaUpdate: item.last_schema_update,
-            lastDataUpdate: item.last_data_update,
-            rowsCount: item.rows_count,
-            nextDataUpdate: item.next_data_update,
         }
 
         return new AggregateTableData(data)

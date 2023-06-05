@@ -1,8 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue';
 import isEmpty from 'lodash/isEmpty';
-import { createFromNifiProcess } from '@/api'
+import { getProcesses } from '@/api'
 import { usePromisifiedModal } from '@/composables'
+import { onMounted } from 'vue';
+import { useErrorHandler } from '../../../composables';
 
 const nameInput = ref(null)
 const nifiProcessSelect = ref(null)
@@ -11,20 +13,41 @@ const name = ref('')
 const nifiProcess = ref({})
 const isRequestInProcess = ref(false)
 
-const { isOpened, run, close } = usePromisifiedModal();
+const processesList = ref([]);
+const processesListLoading = ref(false);
+
+const { handleError } = useErrorHandler();
+
+const { isOpened, run, close } = usePromisifiedModal({ opened: async () => {
+    try {
+        processesListLoading.value = true;
+        const processes = await getProcesses();
+        console.log(processes);
+        processesList.value = processes.map((e) => {
+            return {
+                name: e.name,
+                value: e.id
+            }
+        })
+    } catch (e) {
+        handleError(e);
+    } finally {
+        processesListLoading.value = false;
+    }
+}});
 
 const isModalFilled = computed(() => !isEmpty(name.value) && !isEmpty(nifiProcess.value))
 
-const mockedNifiProcessOptions = ref([
-    {
-        text: 'Option 1',
-        value: 'option-1'
-    },
-    {
-        text: 'Option 2',
-        value: 'option-2'
-    }
-])
+// const mockedNifiProcessOptions = ref([
+//     {
+//         text: 'Option 1',
+//         value: 'option-1'
+//     },
+//     {
+//         text: 'Option 2',
+//         value: 'option-2'
+//     }
+// ])
 
 const resetState = () => {
     name.value = ''
@@ -70,8 +93,16 @@ defineExpose({ run, resetState })
         <template #default>
             <section class="modal-content">
                 <va-input ref="nameInput" v-model="name" label="Name" />
-                <va-select ref="nifiProcessSelect" v-model="nifiProcess" label="NIFI process" text-by="text"
-                    :options="mockedNifiProcessOptions" />
+                <va-select
+                    ref="nifiProcessSelect" 
+                    v-model="nifiProcess" 
+                    label="NIFI process" 
+                    text-by="name"
+                    value-by="value"
+                    :loading="processesListLoading"
+                    :options="processesList"
+                    prevent-overflow
+                />
             </section>
         </template>
         <template #footer>

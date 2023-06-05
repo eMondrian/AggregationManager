@@ -4,7 +4,7 @@ export const ROUTES = {
         name: 'home',
     },
     processes: {
-        path: '/processes',
-        name: 'processes',
+        path: '/events',
+        name: 'events',
     },
 }
