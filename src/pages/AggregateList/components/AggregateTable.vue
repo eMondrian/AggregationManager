@@ -1,9 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { getAggregatesTableData, addAgregation, removeAgregation } from '@/api'
 import CreateWithWizzardModal from './CreateWithWizzardModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
 import CreateAggregationModal from './CreateAggregation.vue'
+
+const app = getCurrentInstance()
+const customWizzards = app.appContext.config.globalProperties.$customWizzards
 
 const createWithWizzardModal = ref(null)
 const createNifiModal = ref(null)
@@ -18,6 +21,21 @@ const fetchTableData = async () => {
     } finally {
         isLoading.value = false
     }
+}
+
+const customWizzardsRefs = customWizzards.reduce((acc, { name }) => {
+    acc[name] = ref(null)
+    return acc
+}, {})
+
+const onCustomWizzardsOpen = customWizzards.reduce((acc, { name, open }) => {
+    acc[name] = () => open(customWizzardsRefs[name].value[0])
+    return acc
+}, {})
+
+const wrappedOnSaveWizzard = (onSave) => async (data) => {
+    await onSave(data)
+    await fetchTableData()
 }
 
 onMounted(() => {
@@ -139,6 +157,10 @@ const columns = [
                         Create with Wizzard
                         <!-- Create Aggregation -->
                     </va-button>
+                    <va-button v-for="wizzard in this.$customWizzards" @click="onCustomWizzardsOpen[wizzard.name]" preset="secondary" size="small">
+                        {{wizzard.name}}
+                        <!-- Custom Wizzard -->
+                    </va-button>
                 </div>
             </va-button-dropdown>
         </div>
@@ -174,6 +196,7 @@ const columns = [
     <create-with-wizzard-modal ref="createWithWizzardModal" />
     <create-nifi-modal ref="createNifiModal" />
     <create-aggregation-modal ref="createAggregationModal" />
+    <component v-for="wizzard in this.$customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="wrappedOnSaveWizzard(wizzard.onSave)"></component>
 </template>
 
 <style lang="scss" scoped>
