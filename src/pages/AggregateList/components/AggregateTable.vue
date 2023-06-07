@@ -49,7 +49,7 @@ onMounted(() => {
     fetchTableData()
 })
 
-const onCreateAggregationClick2 = async () => {
+const onCreateAggregationClick = async () => {
     const aggregationDesc = await createAggregationModal.value.run()
     
     if (aggregationDesc) {
@@ -70,7 +70,7 @@ const onCreateAggregationClick2 = async () => {
         } catch (e) {
             handleError(e);
             apiCallRunning.value = false;
-            await onCreateAggregationClick2()
+            await onCreateAggregationClick()
         } finally {
             apiCallRunning.value = false;
         }
@@ -127,7 +127,7 @@ const onEdit = async (item) => {
         } catch (e) {
             handleError(e);
             apiCallRunning.value = false;
-            await onCreateAggregationClick2()
+            await onCreateAggregationClick()
         } finally {
             apiCallRunning.value = false;
         }
@@ -178,11 +178,11 @@ const columns = [
                 </template>
 
                 <div class="nested-create-buttons">
+                    <va-button @click="onCreateAggregationClick" preset="secondary" size="small">
+                        Create Aggregation
+                    </va-button>
                     <va-button @click="onCreateFromNifiButtonClick" preset="secondary" size="small">
                         Create from NIFI Process
-                    </va-button>
-                    <va-button @click="onCreateAggregationClick2" preset="secondary" size="small">
-                        Create Aggregation
                     </va-button>
                     <va-button v-for="wizzard in this.$customWizzards" @click="onCustomWizzardsOpen[wizzard.name]" preset="secondary" size="small">
                         {{wizzard.name}}
@@ -222,8 +222,8 @@ const columns = [
         </template>
     </va-data-table>
 
-    <create-nifi-modal ref="createNifiModal" />
     <create-aggregation-modal ref="createAggregationModal" />
+    <create-nifi-modal ref="createNifiModal" />
     <component v-for="wizzard in this.$customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="wrappedOnSaveWizzard(wizzard.onSave)"></component>
 
     <loading-indicator :isOpened="apiCallRunning" />
