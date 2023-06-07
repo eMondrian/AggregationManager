@@ -2,14 +2,22 @@
 import { computed } from 'vue';
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { ROUTES } from '@/router/routes.js'
+import { useErrorHandler } from './composables';
 
 const route = useRoute();
 
 const link = computed(
   () => route.path === ROUTES.home.path
-    ? { path: ROUTES.processes.path, text: 'Go to process' }
+    ? { path: ROUTES.processes.path, text: 'Go to events' }
     : { path: ROUTES.home.path, text: 'Go to aggregation' }
 )
+
+const { errorList, removeError } = useErrorHandler();
+const closeError = (uid) => {
+  console.log('close', uid)
+  removeError(uid);
+}
+
 </script>
 
 <template>
@@ -28,19 +36,36 @@ const link = computed(
 
   <main>
     <RouterView />
+    <div class="alerts-section">
+      <va-alert
+        v-for="error in errorList"
+        :key="error.uid"
+        @update:model-value="closeError(error.uid)"
+        closeable
+        color="danger"
+        class="mb-6"
+      >
+        <b>{{ error.name }}:</b> <span>{{ error.message }}</span> 
+      </va-alert>
+    </div>
   </main>
 </template>
+
+
+<style lang="css" scoped>
+main {
+  padding: 2rem 4%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  overflow: hidden;
+}
+</style>
 
 <style lang="scss">
 h2 {
   color: var(--va-primary)
-}
-
-main {
-  padding: 1rem 4%;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .app-link {
@@ -69,6 +94,15 @@ main {
 
 // To fix select-dropdown background 
 .va-select-dropdown__content {
-  z-index: 1;
+  z-index: 1000;
+}
+
+.alerts-section {
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  bottom: 0;
+  width: 100%;
+  bottom: 20px;
 }
 </style>

@@ -2,3 +2,5 @@ node_modules
 .idea
 dist
 *.local
+.env.development
+# .env.production

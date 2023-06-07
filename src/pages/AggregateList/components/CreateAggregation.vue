@@ -2,7 +2,6 @@
 import isEmpty from 'lodash/isEmpty'
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, ref, watch } from 'vue';
-import { createAggregation } from '@/api'
 import { usePromisifiedModal } from '@/composables'
 
 const { isOpened, run, close } = usePromisifiedModal();
@@ -137,7 +136,7 @@ defineExpose({ run, resetState })
                             <div class="table-data-inputs-wrapper">
                                 <va-input v-model="tableData.name" label="Name" />
                                 <va-select v-model="tableData.tableName" label="Table name" text-by="text"
-                                    :options="mockedTableNameOptions" />
+                                    :options="mockedTableNameOptions" prevent-overflow />
                             </div>
                         </section>
                     </template>
