@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, getCurrentInstance } from 'vue'
 import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/api'
 import CreateWithWizzardModal from './CreateWithWizzardModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
@@ -7,6 +7,9 @@ import CreateAggregationModal from './CreateAggregation.vue'
 import ConfirmationModal from '../../../modals/ConfirmationModal.vue'
 import LoadingIndicator from '../../../modals/LoadingIndicator.vue'
 import { useErrorHandler } from '../../../composables'
+
+const app = getCurrentInstance()
+const customWizzards = app.appContext.config.globalProperties.$customWizzards
 
 const createWithWizzardModal = ref(null)
 const createNifiModal = ref(null)
@@ -27,6 +30,21 @@ const fetchTableData = async () => {
     } finally {
         isLoading.value = false
     }
+}
+
+const customWizzardsRefs = customWizzards.reduce((acc, { name }) => {
+    acc[name] = ref(null)
+    return acc
+}, {})
+
+const onCustomWizzardsOpen = customWizzards.reduce((acc, { name, open }) => {
+    acc[name] = () => open(customWizzardsRefs[name].value[0])
+    return acc
+}, {})
+
+const wrappedOnSaveWizzard = (onSave) => async (data) => {
+    await onSave(data)
+    await fetchTableData()
 }
 
 onMounted(() => {
@@ -195,6 +213,10 @@ const columns = [
                         Create with Wizzard
                         <!-- Create Aggregation -->
                     </va-button>
+                    <va-button v-for="wizzard in this.$customWizzards" @click="onCustomWizzardsOpen[wizzard.name]" preset="secondary" size="small">
+                        {{wizzard.name}}
+                        <!-- Custom Wizzard -->
+                    </va-button>
                 </div>
             </va-button-dropdown>
         </div>
@@ -230,11 +252,13 @@ const columns = [
         </template>
     </va-data-table>
 
-    <create-with-wizzard-modal ref="createWithWizzardModal" />
     <create-nifi-modal ref="createNifiModal"  />
-    <create-aggregation-modal ref="createAggregationModal"  />
-    <confirmation-modal ref="confirmationModal"  />
+    <create-with-wizzard-modal ref="createWithWizzardModal" />
+    <create-aggregation-modal ref="createAggregationModal" />
+    <component v-for="wizzard in this.$customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="wrappedOnSaveWizzard(wizzard.onSave)"></component>
+
     <loading-indicator :isOpened="apiCallRunning"></loading-indicator>
+    <confirmation-modal ref="confirmationModal"  />
 </template>
 
 <style lang="scss" scoped>
