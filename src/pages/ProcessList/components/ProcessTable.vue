@@ -1,5 +1,4 @@
 <script setup>
-import { generateTableData } from '@/helpers/generateMocks'
 import { getEventsTableData} from '@/api'
 import { ref, onMounted } from 'vue';
 import { useErrorHandler } from '../../../composables'
@@ -31,7 +30,7 @@ onMounted(() => {
 })
 
 const copyToClipboard = (event) => {
-    var str = event.target.innerHTML;
+    const str = event.target.innerHTML;
     const el = document.createElement('textarea');
     el.value = str;
     document.body.appendChild(el);
@@ -40,6 +39,7 @@ const copyToClipboard = (event) => {
     document.body.removeChild(el);
 
     showCopiedMessage.value = true;
+
     setTimeout(() => {
         showCopiedMessage.value = false;
     }, 3000);
@@ -59,9 +59,6 @@ const columns = [
         <div class="buttons-container">
             <va-button @click="onCreateButtonClick" title="Create" preset="plain">
                 <template #append>
-                    <!-- <va-icon size="large" class="material-icons-outlined">
-                        add_box
-                    </va-icon> -->
                     <!-- 
                         START
                         To remove later
@@ -88,10 +85,10 @@ const columns = [
     > 
         <template #cell(eventMessage)="data">
             <va-popover 
-            :placement="data.rowIndex < 5 ? 'bottom-left' : 'top-left'"
-            prevent-overflow
-            :message="data.rowData.eventMessage"
-            style="z-index: 1000;"
+                :placement="data.rowIndex < 5 ? 'bottom-left' : 'top-left'"
+                prevent-overflow
+                :message="data.rowData.eventMessage"
+                style="z-index: 1000;"
             >
                 <div class="event-message" @click="copyToClipboard($event)">{{ data.rowData.eventMessage }}</div>
             </va-popover>

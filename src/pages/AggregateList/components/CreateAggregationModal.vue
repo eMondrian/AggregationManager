@@ -1,10 +1,9 @@
 <script setup>
 import cloneDeep from 'lodash/cloneDeep';
-import { computed, ref, watch } from 'vue';
+import { ref } from 'vue';
 import MonacoEditor from './MonacoEditor.vue';
 import { getProcesses } from '@/api'
-import { usePromisifiedModal } from '@/composables'
-import { useErrorHandler } from '../../../composables';
+import { usePromisifiedModal, useErrorHandler } from '@/composables'
 
 const { handleError } = useErrorHandler();
 
@@ -18,16 +17,10 @@ const initialState = {
     propertiesData: {
         name: '',
         tableName: '',
-        // otherProps: '',
         nifiProcessId: '',
         generated: true,
     },
     queryDefaultValue: '',
-    // scheduleData: {
-    //     some: '',
-    //     timers: '',
-    //     here: '',
-    // }
     scheduleData: {
         schedule: '',
         strategy: 'TIMER_DRIVEN'
@@ -87,23 +80,6 @@ const onUnmountEditor = (value) => {
     query.value = value
 }
 
-// const isPropertiesReadyToSave = computed(() => Object.values(propertiesData.value).every((value) => value !== ''))
-const isPropertiesReadyToSave = computed(() => {
-    return propertiesData.value.name !== '' && (propertiesData.value.tableName || propertiesData.value.nifiProcessName);
-});
-watch(isPropertiesReadyToSave, (isReady) => steps.value[0].icon = isReady ? 'done' : initialState.steps[0].icon)
-
-const isQueryReadyToSave = computed(() => {
-    if (propertiesData.value.nifiProcessName) return true;
-    else return query.value !== initialState.queryDefaultValue
-})
-watch(isQueryReadyToSave, (isReady) => steps.value[1].icon = isReady ? 'done' : initialState.steps[1].icon)
-
-const isScheduleDataReadyToSave = computed(() => Object.values(scheduleData.value).every((value) => value !== ''))
-watch(isScheduleDataReadyToSave, (isReady) => steps.value[2].icon = isReady ? 'done' : initialState.steps[2].icon)
-
-const isReadyToSave = computed(() => isPropertiesReadyToSave.value && isQueryReadyToSave.value && isScheduleDataReadyToSave.value)
-
 const resetState = () => {
     steps.value = cloneDeep(initialState.steps)
     activeStep.value = initialState.activeStep
@@ -120,19 +96,6 @@ const onSave = async () => {
         query: query.value,
         scheduleData: scheduleData.value
     })
-    // try {
-    //     isRequestInProcess.value = true
-
-    //     await createWithWizzard({
-    //         propertiesData: propertiesData.value,
-    //         query: query.value,
-    //         scheduleData: scheduleData.value
-    //     })
-    // } finally {
-    //     isRequestInProcess.value = false
-    //     close()
-    //     resetState()
-    // }
 }
 
 const onClose = () => {
@@ -167,8 +130,6 @@ defineExpose({ run, resetState })
                             <div class="properties-inputs-wrapper">
                                 <va-input v-model="propertiesData.name" label="Name" />
                                 <va-input v-model="propertiesData.tableName" label="Table name" />
-                                <!-- <va-input v-model="propertiesData.otherProps" label="Other properties" /> -->
-                                <!-- <va-input v-model="propertiesData.nifiProcessName" label="Nifi process name" /> -->
                                 <va-select
                                     ref="nifiProcessSelect" 
                                     v-model="propertiesData.nifiProcessId" 
@@ -199,9 +160,6 @@ defineExpose({ run, resetState })
                                     :options="['TIMER_DRIVEN', 'CRON_DRIVEN']"
                                     prevent-overflow
                                 />
-                                <!-- <va-input v-model="scheduleData.some" label="Some" />
-                                <va-input v-model="scheduleData.timers" label="Timers" />
-                                <va-input v-model="scheduleData.here" label="Here" /> -->
                             </div>
                         </section>
                     </template>
@@ -209,8 +167,7 @@ defineExpose({ run, resetState })
                         <div class="controll-buttons">
                             <va-button @click="prevStep()" :disabled="activeStep === 0">Previous</va-button>
                             <va-button v-if="activeStep !== steps.length - 1" @click="nextStep()">Next</va-button>
-                            <va-button v-else @click="onSave()" :disabled="!isReadyToSave"
-                                :loading="isRequestInProcess">Save</va-button>
+                            <va-button v-else @click="onSave()" :loading="isRequestInProcess">Save</va-button>
                         </div>
                     </template>
                 </va-stepper>

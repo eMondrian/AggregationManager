@@ -44,15 +44,15 @@ defineExpose({ run, resetState })
         <template #default>
             <section class="modal-content">
                 <div>
-                  {{ modalMessage }}
+                    {{ modalMessage }}
                 </div>
             </section>
         </template>
         <template #footer>
             <div class="controll-buttons">
-              <va-button color="primary" @click="onClose">
-                  Cancel
-              </va-button>
+                <va-button color="primary" @click="onClose">
+                    Cancel
+                </va-button>
                 <va-button color="danger" @click="onSave">
                     Remove
                 </va-button>

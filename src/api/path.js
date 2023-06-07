@@ -1,7 +1,6 @@
 import config from '@/app.config.js';
 
 const BASE_PATH = config.baseURL;
-console.log(config);
 
 export const PATH = {
     BASE: BASE_PATH,

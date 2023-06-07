@@ -4,7 +4,7 @@ import {
 import { createApp } from 'vue'
 
 import { addAgregation } from '@/api'
-import CustomWizzard from '@/pages/AggregateList/components/CustomWizzard.vue'
+import CreateAggregationWithWizzardModal from '@/pages/AggregateList/components/CreateAggregationWithWizzardModal.vue'
 import App from './App.vue'
 import router from './router'
 
@@ -19,8 +19,8 @@ app.use(router)
 app.use(createVuesticEssential({ components: { VaButton, VaButtonDropdown, VaInput, VaSelect, VaIcon, VaDataTable, VaNavbar, VaNavbarItem, VaModal, VaTabs, VaTab, VaStepper, VaPopover, VaInnerLoading, VaAlert } }));
 app.config.globalProperties.$customWizzards = [
     { 
-        name: 'Custom Wizzard #1#',
-        component: CustomWizzard,
+        name: 'Create with Wizzard',
+        component: CreateAggregationWithWizzardModal,
         open: (wizzardRef) => {
             wizzardRef.run()
         },

@@ -4,6 +4,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import { computed, ref, watch } from 'vue';
 import { usePromisifiedModal } from '@/composables'
 
+const props = defineProps(['onSave'])
+
 const { isOpened, run, close } = usePromisifiedModal();
 
 const initialState = {
@@ -55,22 +57,15 @@ const resetState = () => {
     isAnaliticStarted.value = initialState.isAnaliticStarted
 }
 
-const onSave = async () => {
-    close({ tableData: tableData.value, selectedColumns: selectedColumns.value })
-    // try {
-    //     isRequestInProcess.value = true
-
-    //     await createAggregation({ tableData: tableData.value, selectedColumns: selectedColumns.value })
-    // } finally {
-    //     isRequestInProcess.value = false
-    //     close()
-    //     resetState()
-    // }
-}
 
 const onClose = () => {
     close()
     resetState()
+}
+
+const onSave = async () => {
+    props.onSave({ tableData: tableData.value, selectedColumns: selectedColumns.value })
+    onClose()
 }
 
 const aggregationColumns = [

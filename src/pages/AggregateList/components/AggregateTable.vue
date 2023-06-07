@@ -1,19 +1,17 @@
 <script setup>
 import { ref, onMounted, getCurrentInstance } from 'vue'
 import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/api'
-import CreateWithWizzardModal from './CreateWithWizzardModal.vue'
+import CreateAggregationModal from './CreateAggregationModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
-import CreateAggregationModal from './CreateAggregation.vue'
-import ConfirmationModal from '../../../modals/ConfirmationModal.vue'
-import LoadingIndicator from '../../../modals/LoadingIndicator.vue'
-import { useErrorHandler } from '../../../composables'
+import ConfirmationModal from '@/modals/ConfirmationModal.vue'
+import LoadingIndicator from '@/modals/LoadingIndicator.vue'
+import { useErrorHandler } from '@/composables'
 
 const app = getCurrentInstance()
 const customWizzards = app.appContext.config.globalProperties.$customWizzards
 
-const createWithWizzardModal = ref(null)
-const createNifiModal = ref(null)
 const createAggregationModal = ref(null)
+const createNifiModal = ref(null)
 const confirmationModal = ref(null)
 const tableData = ref([])
 const isLoading = ref(false)
@@ -51,13 +49,13 @@ onMounted(() => {
     fetchTableData()
 })
 
-const onCreateWithWizzardButtonClick = async () => {
-    const aggregationDesc = await createWithWizzardModal.value.run()
+const onCreateAggregationClick2 = async () => {
+    const aggregationDesc = await createAggregationModal.value.run()
     
     if (aggregationDesc) {
         try {
             apiCallRunning.value = true;
-            console.log(aggregationDesc);
+
             await addAgregation({
                 aggregation_name: aggregationDesc.propertiesData.name,
                 table_name: aggregationDesc.propertiesData.tableName,
@@ -67,12 +65,12 @@ const onCreateWithWizzardButtonClick = async () => {
                 scheduling_period: aggregationDesc.scheduleData.schedule,
                 scheduling_strategy: aggregationDesc.scheduleData.strategy,
             });
-            createWithWizzardModal.value.resetState()
+            createAggregationModal.value.resetState()
             await fetchTableData()
         } catch (e) {
             handleError(e);
             apiCallRunning.value = false;
-            await onCreateWithWizzardButtonClick()
+            await onCreateAggregationClick2()
         } finally {
             apiCallRunning.value = false;
         }
@@ -99,26 +97,6 @@ const onCreateFromNifiButtonClick = async () => {
         }
     }
 }
-const onCreateAggregationClick = async () => {
-    const aggregationDesc = await createAggregationModal.value.run()
-    if (aggregationDesc) {
-        try {
-            apiCallRunning.value = true;
-            await addAgregation({
-                aggregation_name: aggregationDesc.tableData.name,
-                tableName: aggregationDesc.tableData.tableName.text,
-            });
-            createAggregationModal.value.resetState()
-            await fetchTableData()
-        } catch (e) {
-            handleError(e);
-            apiCallRunning.value = false;
-            await onCreateAggregationClick()
-        } finally {
-            apiCallRunning.value = false;
-        }
-    }
-}
 
 const onUpdateButtonClick = () => {
     fetchTableData()
@@ -129,13 +107,11 @@ const onCalculate = (item) => {
 }
 
 const onEdit = async (item) => {
-    console.log(item);
     const aggregation = await getAggregation(item.id);
-    const aggregationDesc = await createWithWizzardModal.value.run(aggregation);
+    const aggregationDesc = await createAggregationModal.value.run(aggregation);
 
     if (aggregationDesc) {
         try {
-            console.log(aggregationDesc);
             apiCallRunning.value = true;
             await updateAggregation({
                 aggregation_name: aggregationDesc.propertiesData.name,
@@ -146,12 +122,12 @@ const onEdit = async (item) => {
                 scheduling_period: aggregationDesc.scheduleData.schedule,
                 scheduling_strategy: aggregationDesc.scheduleData.strategy,
             });
-            createWithWizzardModal.value.resetState()
+            createAggregationModal.value.resetState()
             await fetchTableData()
         } catch (e) {
             handleError(e);
             apiCallRunning.value = false;
-            await onCreateWithWizzardButtonClick()
+            await onCreateAggregationClick2()
         } finally {
             apiCallRunning.value = false;
         }
@@ -205,17 +181,11 @@ const columns = [
                     <va-button @click="onCreateFromNifiButtonClick" preset="secondary" size="small">
                         Create from NIFI Process
                     </va-button>
-                    <va-button @click="onCreateWithWizzardButtonClick" preset="secondary" size="small">
-                        <!-- Create with Wizzard -->
+                    <va-button @click="onCreateAggregationClick2" preset="secondary" size="small">
                         Create Aggregation
-                    </va-button>
-                    <va-button @click="onCreateAggregationClick" preset="secondary" size="small">
-                        Create with Wizzard
-                        <!-- Create Aggregation -->
                     </va-button>
                     <va-button v-for="wizzard in this.$customWizzards" @click="onCustomWizzardsOpen[wizzard.name]" preset="secondary" size="small">
                         {{wizzard.name}}
-                        <!-- Custom Wizzard -->
                     </va-button>
                 </div>
             </va-button-dropdown>
@@ -252,12 +222,11 @@ const columns = [
         </template>
     </va-data-table>
 
-    <create-nifi-modal ref="createNifiModal"  />
-    <create-with-wizzard-modal ref="createWithWizzardModal" />
+    <create-nifi-modal ref="createNifiModal" />
     <create-aggregation-modal ref="createAggregationModal" />
     <component v-for="wizzard in this.$customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="wrappedOnSaveWizzard(wizzard.onSave)"></component>
 
-    <loading-indicator :isOpened="apiCallRunning"></loading-indicator>
+    <loading-indicator :isOpened="apiCallRunning" />
     <confirmation-modal ref="confirmationModal"  />
 </template>
 
