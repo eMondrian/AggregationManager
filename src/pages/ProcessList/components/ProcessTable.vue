@@ -3,8 +3,7 @@ import { getEventsTableData} from '@/api'
 import { ref, onMounted } from 'vue';
 import { useErrorHandler } from '@/composables'
 import { setIntervalAsync } from '@/helpers'
-
-const fetchTableDataInterval = 30000 // 30sec
+import { onUnmounted } from 'vue';
 
 const tableData = ref([])
 const showCopiedMessage = ref(false)
@@ -18,8 +17,18 @@ const fetchTableData = async () => {
     }
 }
 
-onMounted(async () => {
-    setIntervalAsync(fetchTableData, fetchTableDataInterval)
+const intervalConfig = {
+    isStoped: false,
+    callback: fetchTableData,
+    intervalTime: 10000,
+}
+
+onMounted(() => {
+    setIntervalAsync(intervalConfig)
+})
+
+onUnmounted(() => {
+    intervalConfig.isStoped = true
 })
 
 const copyToClipboard = (event) => {
