@@ -1,32 +1,25 @@
 <script setup>
 import { getEventsTableData} from '@/api'
 import { ref, onMounted } from 'vue';
-import { useErrorHandler } from '../../../composables'
+import { useErrorHandler } from '@/composables'
+import { setIntervalAsync } from '@/helpers'
 
-const isLoading = ref(false)
+const fetchTableDataInterval = 30000 // 30sec
+
 const tableData = ref([])
 const showCopiedMessage = ref(false)
 const { handleError } = useErrorHandler();
 
 const fetchTableData = async () => {
     try {
-        isLoading.value = true
         tableData.value = await getEventsTableData()
     } catch (e) {
         handleError(e);
-    } finally {
-        isLoading.value = false
     }
 }
 
-const onCreateButtonClick = () => {
-    // Temp refresh
-    fetchTableData()
-    console.log('onCreateButtonClick')
-}
-
-onMounted(() => {
-    fetchTableData()
+onMounted(async () => {
+    setIntervalAsync(fetchTableData, fetchTableDataInterval)
 })
 
 const copyToClipboard = (event) => {
@@ -56,29 +49,12 @@ const columns = [
 <template>
     <section class="control-panel">
         <h2>List of events</h2>
-        <div class="buttons-container">
-            <va-button @click="onCreateButtonClick" title="Create" preset="plain">
-                <template #append>
-                    <!-- 
-                        START
-                        To remove later
-                    -->
-                    <va-icon size="large" class="material-icons-outlined">
-                        change_circle
-                    </va-icon>
-                    <!-- 
-                        To remove later
-                        END
-                    -->
-                </template>
-            </va-button>
-        </div>
     </section>
+    <!-- table loader has incorrect displaing in centre of content but not of table -->
     <va-data-table 
         class="app-table" 
         :items="tableData" 
         :columns="columns" 
-        :loading="isLoading" 
         sticky-header
         height="100%"
         :scroll-bottom-margin="40"

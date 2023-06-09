@@ -1,0 +1,1 @@
+export { setIntervalAsync } from './setIntervalAsync'
