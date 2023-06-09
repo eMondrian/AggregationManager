@@ -1,9 +1,8 @@
 <script setup>
 import { getEventsTableData} from '@/api'
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useErrorHandler } from '@/composables'
-import { setIntervalAsync } from '@/helpers'
-import { onUnmounted } from 'vue';
+import { setIntervalAsync, sortNumbers } from '@/helpers'
 
 const intervalTime = 30000 // 30sec
 const clearInterval = ref(null)
@@ -46,7 +45,7 @@ const copyToClipboard = (event) => {
 const columns = [
     { key: "aggregationName", sortable: true, width: '15%' },
     { key: "eventType", sortable: true, width: '15%' },
-    { key: "dateTime", sortable: true, width: '15%' },
+    { key: "dateTime", sortable: true, sortingFn: sortNumbers, width: '15%' },
     { key: "eventMessage", sortable: true, width: '55%' },
 ];
 </script>
@@ -63,7 +62,10 @@ const columns = [
         sticky-header
         height="100%"
         :scroll-bottom-margin="40"
-    > 
+    >
+        <template #cell(dateTime)="data">
+            <div>{{ data.rowData.dateTime.toLocaleString() }}</div>
+        </template>
         <template #cell(eventMessage)="data">
             <va-popover 
                 :placement="data.rowIndex < 5 ? 'bottom-left' : 'top-left'"

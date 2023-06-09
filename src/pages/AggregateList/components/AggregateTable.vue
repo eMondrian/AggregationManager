@@ -1,11 +1,12 @@
 <script setup>
 import { ref, onMounted, getCurrentInstance } from 'vue'
 import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/api'
-import CreateAggregationModal from './CreateAggregationModal.vue'
-import CreateNifiModal from './CreateNifiModal.vue'
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
 import LoadingIndicator from '@/modals/LoadingIndicator.vue'
 import { useErrorHandler } from '@/composables'
+import { sortNumbers } from '@/helpers'
+import CreateAggregationModal from './CreateAggregationModal.vue'
+import CreateNifiModal from './CreateNifiModal.vue'
 
 const app = getCurrentInstance()
 const customWizzards = app.appContext.config.globalProperties.$customWizzards
@@ -135,7 +136,7 @@ const onEdit = async (item) => {
 }
 
 const onDelete = async (item) => {
-    const { confirmed } = await confirmationModal.value.run({ message: "Are you sure you want do remove this aggregation?" })
+    const { confirmed } = await confirmationModal.value.run({ message: 'Are you sure you want do remove this aggregation?' })
     if (!confirmed) return;
     try {
         apiCallRunning.value = true;
@@ -149,13 +150,13 @@ const onDelete = async (item) => {
 };
 
 const columns = [
-    { key: "name", sortable: true },
-    { key: "tableName", sortable: true },
-    { key: "lastSchemaUpdate", sortable: true },
-    { key: "schedule", sortable: true },
-    { key: "lastDataUpdate", sortable: true },
-    { key: "lastEvent", sortable: true },
-    { key: "actions", width: 80 },
+    { key: 'name', sortable: true },
+    { key: 'tableName', sortable: true },
+    { key: 'lastSchemaUpdate', sortable: true, sortingFn: sortNumbers },
+    { key: 'schedule', sortable: true },
+    { key: 'lastDataUpdate', sortable: true, sortingFn: sortNumbers },
+    { key: 'lastEvent', sortable: true },
+    { key: 'actions', width: 80 },
 ];
 </script>
 
@@ -193,7 +194,10 @@ const columns = [
     </section>
     <va-data-table :loading="isLoading" class="app-table" :items="tableData" :columns="columns">
         <template #cell(lastSchemaUpdate)="data">
-            <div>{{ data.rowData.lastSchemaUpdate }}</div>
+            <div>{{ data.rowData.lastSchemaUpdate.toLocaleString() }}</div>
+        </template>
+        <template #cell(lastDataUpdate)="data">
+            <div>{{ data.rowData.lastDataUpdate.toLocaleString() }}</div>
         </template>
         <template #cell(actions)="{ rowIndex }">
             <div class="table-action-buttons">
