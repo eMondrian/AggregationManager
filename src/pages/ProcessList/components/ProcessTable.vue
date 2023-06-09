@@ -87,7 +87,7 @@ const columns = [
 <style lang="scss" scoped>
 .app-table {
     width: 100%;
-    overflow-x: hidden;
+    // overflow-x: hidden;
 }
 .control-panel {
     display: flex;
@@ -101,6 +101,12 @@ const columns = [
 }
 
 .event-message {
+    // Todo: Test in perspective overflow ellipsis;
+    // ~start~
+    max-width: 55vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    // ~end~
     cursor: pointer;
 }
 </style>
