@@ -5,6 +5,8 @@ import { useErrorHandler } from '@/composables'
 import { setIntervalAsync } from '@/helpers'
 import { onUnmounted } from 'vue';
 
+const intervalTime = 30000 // 30sec
+const clearInterval = ref(null)
 const tableData = ref([])
 const showCopiedMessage = ref(false)
 const { handleError } = useErrorHandler();
@@ -17,18 +19,12 @@ const fetchTableData = async () => {
     }
 }
 
-const intervalConfig = {
-    isStoped: false,
-    callback: fetchTableData,
-    intervalTime: 10000,
-}
-
 onMounted(() => {
-    setIntervalAsync(intervalConfig)
+    clearInterval.value = setIntervalAsync(fetchTableData, intervalTime)
 })
 
 onUnmounted(() => {
-    intervalConfig.isStoped = true
+    clearInterval.value()
 })
 
 const copyToClipboard = (event) => {
