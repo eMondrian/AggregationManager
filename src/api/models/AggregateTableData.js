@@ -3,27 +3,37 @@
  * @property {string} id
  * @property {string} name
  * @property {string} table_name
- * @property {Date} last_schema_update
- * @property {Date} last_data_update
- * @property {number} rows_count
- * @property {Date} next_data_update
+ * @property {string} last_data_update
+ * @property {string} last_schema_update
+ * @property {string} schedule
+ * @property {string} last_event
  */
 
 export class AggregateTableData {
+    /**
+     * @param {Object} data
+     * @param {string} data.id
+     * @param {string} data.name
+     * @param {string} data.tableName
+     * @param {Date} data.lastSchemaUpdate
+     * @param {Date} data.lastDataUpdate
+     * @param {string} data.schedule
+     * @param {string} data.lastEvent
+     */
     constructor({
         id = '',
-        lastSchemaUpdate = '',
-        schedule = '',
-        lastDataUpdate = '',
-        lastEvent = '',
         name = '',
         tableName = '',
+        lastSchemaUpdate,
+        lastDataUpdate,
+        schedule = '',
+        lastEvent = '',
     }) {
         this.id = id;
         this.name = name;
         this.tableName = tableName;
-        this.lastSchemaUpdate = new Date(lastSchemaUpdate).toLocaleString();
-        this.lastDataUpdate = new Date(lastDataUpdate).toLocaleString();
+        this.lastSchemaUpdate = lastSchemaUpdate;
+        this.lastDataUpdate = lastDataUpdate;
         this.schedule = schedule;
         this.lastEvent = lastEvent;
     }
@@ -35,12 +45,12 @@ export class AggregateTableData {
     static parseFromDTO = (items) => items.map((item) => {
         const data = {
             id: item.id,
-            lastSchemaUpdate: new Date(item.last_schema_update),
-            schedule: item.schedule,
-            lastDataUpdate: new Date(item.last_data_update),
-            lastEvent: item.last_event,
             name: item.aggregation_name,
             tableName: item.table_name,
+            lastSchemaUpdate: new Date(item.last_schema_update),
+            lastDataUpdate: new Date(item.last_data_update),
+            schedule: item.schedule,
+            lastEvent: item.last_event,
         }
 
         return new AggregateTableData(data)

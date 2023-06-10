@@ -1,6 +1,12 @@
 export const generateTableRow = (keys) => (id) => {
-    return keys.reduce((acc, key) => {
-        acc[key] = `${key}-${id}`
+    return keys.reduce((acc, { key }) => {
+        const isDateColumn = ['lastSchemaUpdate', 'lastDataUpdate', 'dateTime'].includes(key)
+
+        if (isDateColumn) {
+            acc[key] = new Date(Math.random() * 1000000000000 + 500000000000)
+        } else {
+            acc[key] = `${key}-${id}`
+        }
 
         return acc
     }, {})
@@ -8,9 +14,7 @@ export const generateTableRow = (keys) => (id) => {
 
 function shuffle(array) {
     const result = [...array]
-
     result.sort(() => Math.random() - 0.5);
-
     return result
 }
 

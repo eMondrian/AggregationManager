@@ -92,6 +92,19 @@ h2 {
   }
 }
 
+// To enable full with tabs
+.full-size-tabs {
+    display: flex;
+    flex-direction: column;
+
+    .va-tabs__wrapper {
+        width: 100%;
+    }
+    .va-tabs__content {
+        width: 100%;
+    }
+}
+
 // To fix select-dropdown background 
 .va-select-dropdown__content {
   z-index: 1000;

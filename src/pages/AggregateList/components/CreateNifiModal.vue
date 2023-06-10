@@ -3,7 +3,6 @@ import { ref, computed } from 'vue';
 import isEmpty from 'lodash/isEmpty';
 import { getProcesses } from '@/api'
 import { usePromisifiedModal } from '@/composables'
-import { onMounted } from 'vue';
 import { useErrorHandler } from '../../../composables';
 
 const nameInput = ref(null)
@@ -22,7 +21,7 @@ const { isOpened, run, close } = usePromisifiedModal({ opened: async () => {
     try {
         processesListLoading.value = true;
         const processes = await getProcesses();
-        console.log(processes);
+
         processesList.value = processes.map((e) => {
             return {
                 name: e.name,
@@ -38,17 +37,6 @@ const { isOpened, run, close } = usePromisifiedModal({ opened: async () => {
 
 const isModalFilled = computed(() => !isEmpty(name.value) && !isEmpty(nifiProcess.value))
 
-// const mockedNifiProcessOptions = ref([
-//     {
-//         text: 'Option 1',
-//         value: 'option-1'
-//     },
-//     {
-//         text: 'Option 2',
-//         value: 'option-2'
-//     }
-// ])
-
 const resetState = () => {
     name.value = ''
     nifiProcess.value = {}
@@ -56,14 +44,6 @@ const resetState = () => {
 
 const onSave = async () => {
     close({ name: name.value, process: nifiProcess.value })
-    // try {
-    //     isRequestInProcess.value = true
-
-    //     await createFromNifiProcess({ name: name.value, process: nifiProcess.value })
-    // } finally {
-    //     isRequestInProcess.value = false
-    //     resetState()
-    // }
 }
 
 const onClose = () => {

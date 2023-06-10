@@ -1,19 +1,18 @@
 <script setup>
 import { ref, onMounted, getCurrentInstance } from 'vue'
 import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/api'
-import CreateWithWizzardModal from './CreateWithWizzardModal.vue'
+import ConfirmationModal from '@/modals/ConfirmationModal.vue'
+import LoadingIndicator from '@/modals/LoadingIndicator.vue'
+import { useErrorHandler } from '@/composables'
+import { sortNumbers } from '@/helpers'
+import CreateAggregationModal from './CreateAggregationModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
-import CreateAggregationModal from './CreateAggregation.vue'
-import ConfirmationModal from '../../../modals/ConfirmationModal.vue'
-import LoadingIndicator from '../../../modals/LoadingIndicator.vue'
-import { useErrorHandler } from '../../../composables'
 
 const app = getCurrentInstance()
 const customWizzards = app.appContext.config.globalProperties.$customWizzards
 
-const createWithWizzardModal = ref(null)
-const createNifiModal = ref(null)
 const createAggregationModal = ref(null)
+const createNifiModal = ref(null)
 const confirmationModal = ref(null)
 const tableData = ref([])
 const isLoading = ref(false)
@@ -51,13 +50,13 @@ onMounted(() => {
     fetchTableData()
 })
 
-const onCreateWithWizzardButtonClick = async () => {
-    const aggregationDesc = await createWithWizzardModal.value.run()
+const onCreateAggregationClick = async () => {
+    const aggregationDesc = await createAggregationModal.value.run()
     
     if (aggregationDesc) {
         try {
             apiCallRunning.value = true;
-            console.log(aggregationDesc);
+
             await addAgregation({
                 aggregation_name: aggregationDesc.propertiesData.name,
                 table_name: aggregationDesc.propertiesData.tableName,
@@ -67,12 +66,12 @@ const onCreateWithWizzardButtonClick = async () => {
                 scheduling_period: aggregationDesc.scheduleData.schedule,
                 scheduling_strategy: aggregationDesc.scheduleData.strategy,
             });
-            createWithWizzardModal.value.resetState()
+            createAggregationModal.value.resetState()
             await fetchTableData()
         } catch (e) {
             handleError(e);
             apiCallRunning.value = false;
-            await onCreateWithWizzardButtonClick()
+            await onCreateAggregationClick()
         } finally {
             apiCallRunning.value = false;
         }
@@ -99,14 +98,30 @@ const onCreateFromNifiButtonClick = async () => {
         }
     }
 }
-const onCreateAggregationClick = async () => {
-    const aggregationDesc = await createAggregationModal.value.run()
+
+const onUpdateButtonClick = () => {
+    fetchTableData()
+}
+
+const onCalculate = (item) => {
+    console.log('Run calculation', item)
+}
+
+const onEdit = async (item) => {
+    const aggregation = await getAggregation(item.id);
+    const aggregationDesc = await createAggregationModal.value.run(aggregation);
+
     if (aggregationDesc) {
         try {
             apiCallRunning.value = true;
-            await addAgregation({
-                aggregation_name: aggregationDesc.tableData.name,
-                tableName: aggregationDesc.tableData.tableName.text,
+            await updateAggregation({
+                aggregation_name: aggregationDesc.propertiesData.name,
+                table_name: aggregationDesc.propertiesData.tableName,
+                query: aggregationDesc.query,
+                start_nifi_process_id: aggregationDesc.propertiesData.nifiProcessName,
+                is_generated_nifi_process: !!aggregationDesc.propertiesData.nifiProcessName,
+                scheduling_period: aggregationDesc.scheduleData.schedule,
+                scheduling_strategy: aggregationDesc.scheduleData.strategy,
             });
             createAggregationModal.value.resetState()
             await fetchTableData()
@@ -120,46 +135,8 @@ const onCreateAggregationClick = async () => {
     }
 }
 
-const onUpdateButtonClick = () => {
-    fetchTableData()
-}
-
-const onCalculate = (item) => {
-    console.log('Run calculation', item)
-}
-
-const onEdit = async (item) => {
-    console.log(item);
-    const aggregation = await getAggregation(item.id);
-    const aggregationDesc = await createWithWizzardModal.value.run(aggregation);
-
-    if (aggregationDesc) {
-        try {
-            console.log(aggregationDesc);
-            apiCallRunning.value = true;
-            await updateAggregation({
-                aggregation_name: aggregationDesc.propertiesData.name,
-                table_name: aggregationDesc.propertiesData.tableName,
-                query: aggregationDesc.query,
-                start_nifi_process_id: aggregationDesc.propertiesData.nifiProcessName,
-                is_generated_nifi_process: !!aggregationDesc.propertiesData.nifiProcessName,
-                scheduling_period: aggregationDesc.scheduleData.schedule,
-                scheduling_strategy: aggregationDesc.scheduleData.strategy,
-            });
-            createWithWizzardModal.value.resetState()
-            await fetchTableData()
-        } catch (e) {
-            handleError(e);
-            apiCallRunning.value = false;
-            await onCreateWithWizzardButtonClick()
-        } finally {
-            apiCallRunning.value = false;
-        }
-    }
-}
-
 const onDelete = async (item) => {
-    const { confirmed } = await confirmationModal.value.run({ message: "Are you sure you want do remove this aggregation?" })
+    const { confirmed } = await confirmationModal.value.run({ message: 'Are you sure you want do remove this aggregation?' })
     if (!confirmed) return;
     try {
         apiCallRunning.value = true;
@@ -173,13 +150,13 @@ const onDelete = async (item) => {
 };
 
 const columns = [
-    { key: "name", sortable: true },
-    { key: "tableName", sortable: true },
-    { key: "lastSchemaUpdate", sortable: true },
-    { key: "schedule", sortable: true },
-    { key: "lastDataUpdate", sortable: true },
-    { key: "lastEvent", sortable: true },
-    { key: "actions", width: 80 },
+    { key: 'name', sortable: true },
+    { key: 'tableName', sortable: true },
+    { key: 'lastSchemaUpdate', sortable: true, sortingFn: sortNumbers },
+    { key: 'schedule', sortable: true },
+    { key: 'lastDataUpdate', sortable: true, sortingFn: sortNumbers },
+    { key: 'lastEvent', sortable: true },
+    { key: 'actions', width: 80 },
 ];
 </script>
 
@@ -202,20 +179,14 @@ const columns = [
                 </template>
 
                 <div class="nested-create-buttons">
+                    <va-button @click="onCreateAggregationClick" preset="secondary" size="small">
+                        Create Aggregation
+                    </va-button>
                     <va-button @click="onCreateFromNifiButtonClick" preset="secondary" size="small">
                         Create from NIFI Process
                     </va-button>
-                    <va-button @click="onCreateWithWizzardButtonClick" preset="secondary" size="small">
-                        <!-- Create with Wizzard -->
-                        Create Aggregation
-                    </va-button>
-                    <va-button @click="onCreateAggregationClick" preset="secondary" size="small">
-                        Create with Wizzard
-                        <!-- Create Aggregation -->
-                    </va-button>
                     <va-button v-for="wizzard in this.$customWizzards" @click="onCustomWizzardsOpen[wizzard.name]" preset="secondary" size="small">
                         {{wizzard.name}}
-                        <!-- Custom Wizzard -->
                     </va-button>
                 </div>
             </va-button-dropdown>
@@ -223,7 +194,10 @@ const columns = [
     </section>
     <va-data-table :loading="isLoading" class="app-table" :items="tableData" :columns="columns">
         <template #cell(lastSchemaUpdate)="data">
-            <div>{{ data.rowData.lastSchemaUpdate }}</div>
+            <div>{{ data.rowData.lastSchemaUpdate.toLocaleString() }}</div>
+        </template>
+        <template #cell(lastDataUpdate)="data">
+            <div>{{ data.rowData.lastDataUpdate.toLocaleString() }}</div>
         </template>
         <template #cell(actions)="{ rowIndex }">
             <div class="table-action-buttons">
@@ -252,12 +226,11 @@ const columns = [
         </template>
     </va-data-table>
 
-    <create-nifi-modal ref="createNifiModal"  />
-    <create-with-wizzard-modal ref="createWithWizzardModal" />
     <create-aggregation-modal ref="createAggregationModal" />
+    <create-nifi-modal ref="createNifiModal" />
     <component v-for="wizzard in this.$customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="wrappedOnSaveWizzard(wizzard.onSave)"></component>
 
-    <loading-indicator :isOpened="apiCallRunning"></loading-indicator>
+    <loading-indicator :isOpened="apiCallRunning" />
     <confirmation-modal ref="confirmationModal"  />
 </template>
 
