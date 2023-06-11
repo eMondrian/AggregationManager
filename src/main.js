@@ -24,16 +24,6 @@ app.config.globalProperties.$customWizzards = [
         open: (wizzardRef) => {
             wizzardRef.run()
         },
-        onSave: async (data) => {
-            try {
-                await addAgregation({
-                    name: data.tableData.name,
-                    tableName: data.tableData.tableName.text,
-                });
-            } catch (e) {
-                console.log(e)
-            }
-        }
     }
 ]
 app.mount('#app')

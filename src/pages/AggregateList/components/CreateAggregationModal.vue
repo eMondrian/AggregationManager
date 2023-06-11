@@ -107,7 +107,7 @@ defineExpose({ run, resetState })
 </script>
 
 <template>
-    <va-modal :modelValue="isOpened" size="large" noPadding hide-default-actions class="full-size-modal">
+    <va-modal :modelValue="isOpened" size="large" fixed-layout noPadding hide-default-actions class="full-size-modal">
         <template #header>
             <section class="modal-header">
                 <h2>
@@ -160,7 +160,6 @@ defineExpose({ run, resetState })
                             <div class="properties-inputs-wrapper">
                                 <va-input v-model="scheduleData.schedule" label="Schedule" />
                                 <va-select
-                                    ref="nifiProcessSelect" 
                                     v-model="scheduleData.strategy" 
                                     label="Scheduling strategy" 
                                     :options="['TIMER_DRIVEN', 'CRON_DRIVEN']"
@@ -208,7 +207,7 @@ defineExpose({ run, resetState })
 
 .tab-content {
     width: 100%;
-    height: 33rem;
+    // height: 33rem;
     margin-top: 1rem;
     padding: 1rem;
 }
