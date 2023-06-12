@@ -18,6 +18,7 @@ const initialState = {
     activeStep: 0,
     // TODO: Tables have unique names, no need for complex objects
     aggregationName: '',
+    tableName: '',
     tableData: null,
     selectedColumns: [],
     isAnaliticStarted: false,
@@ -30,6 +31,7 @@ const initialState = {
 const steps = ref(cloneDeep(initialState.steps))
 const activeStep = ref(initialState.activeStep)
 const aggregationName = ref(initialState.aggregationName)
+const tableName = ref(initialState.tableName)
 const tableData = ref(initialState.tableData)
 const selectedColumns = ref(cloneDeep(initialState.selectedColumns))
 const isAnaliticStarted = ref(initialState.isAnaliticStarted)
@@ -129,6 +131,7 @@ const resetState = () => {
     steps.value = cloneDeep(initialState.steps)
     activeStep.value = initialState.activeStep
     aggregationName.value = initialState.aggregationName
+    tableName.value = initialState.tableName
     tableData.value = initialState.tableData
     selectedColumns.value = cloneDeep(initialState.selectedColumns)
     scheduleData.value = cloneDeep(initialState.scheduleData)
@@ -145,7 +148,20 @@ const onClose = () => {
 const onSave = async () => {
     try {
         isRequestInProcess.value = true;
-        const { query } = await getQuery();
+        
+        const request = {
+            database: tableData.value.database,
+            table: tableData.value.name,
+            columns: selectedColumns.value.map((e) => {
+                return {
+                    name: e.name,
+                    type: e.role,
+                    aggregate_function: e.aggregate_function
+                }
+            }),
+        }
+        
+        const { query } = await getQuery(request);
         isRequestInProcess.value = false;
 
         close()
@@ -154,7 +170,7 @@ const onSave = async () => {
             query,
             is_generated_nifi_process: true,
             aggregation_name: aggregationName.value,
-            table_name: tableData.value.name,
+            table_name: tableName.value,
             name: aggregationName.value,
             scheduling_period: scheduleData.value.schedule,
             scheduling_strategy: scheduleData.value.strategy,
@@ -199,8 +215,10 @@ defineExpose({ run, resetState })
                         <section class="tab-content">
                             <div class="table-data-inputs-wrapper">
                                 <va-input v-model="aggregationName" label="Name" />
-                                <va-select v-model="tableData" label="Table name" text-by="name"
-                                    :options="tableList" prevent-overflow :loading="tableListLoading" />
+                                <va-input v-model="tableName" label="Table Name" />
+                                <va-select v-model="tableData" label="Source table name" :text-by="(option) => `${option.database}.${option.name}`"
+                                    :options="tableList" prevent-overflow :loading="tableListLoading">
+                                </va-select>
                             </div>
                         </section>
                     </template>
