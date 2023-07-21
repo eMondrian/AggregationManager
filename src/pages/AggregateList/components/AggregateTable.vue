@@ -7,6 +7,7 @@ import { useErrorHandler } from '@/composables'
 import { sortNumbers } from '@/helpers'
 import CreateAggregationModal from './CreateAggregationModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
+import RunStatusModal from './RunStatusModal.vue'
 
 const app = getCurrentInstance()
 const customWizzards = app.appContext.config.globalProperties.$customWizzards
@@ -14,6 +15,7 @@ const customWizzards = app.appContext.config.globalProperties.$customWizzards
 const createAggregationModal = ref(null)
 const createNifiModal = ref(null)
 const confirmationModal = ref(null)
+const runStatusModal = ref(null)
 const tableData = ref([])
 const isLoading = ref(false)
 const apiCallRunning = ref(false);
@@ -121,7 +123,7 @@ const onUpdateButtonClick = () => {
 }
 
 const onCalculate = (item) => {
-    console.log('Run calculation', item)
+    runStatusModal.value.run(item.id);
 }
 
 const onEdit = async (item) => {
@@ -221,7 +223,7 @@ const columns = [
                 <va-button preset="plain" color="info" title="Run calculations" @click="onCalculate(tableData[rowIndex])">
                     <template #append>
                         <va-icon class="material-icons-outlined">
-                            calculate
+                            playlist_play
                         </va-icon>
                     </template>
                 </va-button>
@@ -249,6 +251,7 @@ const columns = [
 
     <loading-indicator :isOpened="apiCallRunning" />
     <confirmation-modal ref="confirmationModal"  />
+    <run-status-modal ref="runStatusModal"></run-status-modal>
 </template>
 
 <style lang="scss" scoped>
