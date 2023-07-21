@@ -90,6 +90,10 @@ h2 {
   .va-modal__dialog {
     margin: 0 auto;
   }
+
+  .va-modal__inner .va-modal__message {
+    overflow: hidden;
+  }
 }
 
 // To enable full with tabs

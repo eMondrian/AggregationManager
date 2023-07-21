@@ -55,6 +55,6 @@ onMounted(() => {
 
 .editor {
     width: 100%;
-    height: 25.2rem;
+    min-height: 15rem;
 }
 </style>

@@ -76,6 +76,44 @@ export const removeAgregation = async (id) => {
     }
 }
 
+export const getRunStatus = async (id) => {
+    const response = await fetch(`${PATH.AGGREGATION}/${id}/run-status`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+
+    if (!response.ok) {
+        const responseText = await response.text();
+        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+    }
+    
+
+    // return {
+    //     "state": "RUNNING"
+    // }
+    const result = await response.json();
+    return result;
+}
+
+export const setRunStatus = async (id, state) => {
+    const response = await fetch(`${PATH.AGGREGATION}/${id}/run-status`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            state: state
+        }),
+    })
+
+    if (!response.ok) {
+        const responseText = await response.text();
+        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+    }
+}
+
 // export const createWithWizzard = async (data) => {
 //     const result = await new Promise((res) => {
 //         setTimeout(() => {

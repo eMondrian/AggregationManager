@@ -7,6 +7,7 @@ import { useErrorHandler } from '@/composables'
 import { sortNumbers } from '@/helpers'
 import CreateAggregationModal from './CreateAggregationModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
+import RunStatusModal from './RunStatusModal.vue'
 
 const app = getCurrentInstance()
 const customWizzards = app.appContext.config.globalProperties.$customWizzards
@@ -14,6 +15,7 @@ const customWizzards = app.appContext.config.globalProperties.$customWizzards
 const createAggregationModal = ref(null)
 const createNifiModal = ref(null)
 const confirmationModal = ref(null)
+const runStatusModal = ref(null)
 const tableData = ref([])
 const isLoading = ref(false)
 const apiCallRunning = ref(false);
@@ -41,14 +43,31 @@ const onCustomWizzardsOpen = customWizzards.reduce((acc, { name, open }) => {
     return acc
 }, {})
 
-const wrappedOnSaveWizzard = (onSave) => async (data) => {
-    await onSave(data)
-    await fetchTableData()
-}
-
 onMounted(() => {
     fetchTableData()
 })
+
+const onCreateAggregationFromWizzard = async (data) => {
+    try {
+        apiCallRunning.value = true;
+
+        await addAgregation({
+            aggregation_name: data.aggregation_name,
+            table_name: data.table_name,
+            query: data.query,
+            is_generated_nifi_process: data.is_generated_nifi_process,
+            scheduling_period: data.scheduling_period,
+            scheduling_strategy: data.scheduling_strategy,
+        });
+
+        await fetchTableData()
+    } catch (e) {
+        throw e;
+        apiCallRunning.value = false;
+    } finally {
+        apiCallRunning.value = false;
+    }
+}
 
 const onCreateAggregationClick = async () => {
     const aggregationDesc = await createAggregationModal.value.run()
@@ -104,7 +123,7 @@ const onUpdateButtonClick = () => {
 }
 
 const onCalculate = (item) => {
-    console.log('Run calculation', item)
+    runStatusModal.value.run(item.id);
 }
 
 const onEdit = async (item) => {
@@ -185,7 +204,7 @@ const columns = [
                     <va-button @click="onCreateFromNifiButtonClick" preset="secondary" size="small">
                         Create from NIFI Process
                     </va-button>
-                    <va-button v-for="wizzard in this.$customWizzards" @click="onCustomWizzardsOpen[wizzard.name]" preset="secondary" size="small">
+                    <va-button v-for="wizzard in customWizzards" @click="onCustomWizzardsOpen[wizzard.name]" preset="secondary" size="small">
                         {{wizzard.name}}
                     </va-button>
                 </div>
@@ -204,7 +223,7 @@ const columns = [
                 <va-button preset="plain" color="info" title="Run calculations" @click="onCalculate(tableData[rowIndex])">
                     <template #append>
                         <va-icon class="material-icons-outlined">
-                            calculate
+                            playlist_play
                         </va-icon>
                     </template>
                 </va-button>
@@ -228,10 +247,11 @@ const columns = [
 
     <create-aggregation-modal ref="createAggregationModal" />
     <create-nifi-modal ref="createNifiModal" />
-    <component v-for="wizzard in this.$customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="wrappedOnSaveWizzard(wizzard.onSave)"></component>
+    <component v-for="wizzard in customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="onCreateAggregationFromWizzard"></component>
 
     <loading-indicator :isOpened="apiCallRunning" />
     <confirmation-modal ref="confirmationModal"  />
+    <run-status-modal ref="runStatusModal"></run-status-modal>
 </template>
 
 <style lang="scss" scoped>
