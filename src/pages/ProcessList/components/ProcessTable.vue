@@ -7,14 +7,18 @@ import { setIntervalAsync, sortNumbers } from '@/helpers'
 const intervalTime = 30000 // 30sec
 const clearInterval = ref(null)
 const tableData = ref([])
+const isTableDataLoading = ref(false)
 const showCopiedMessage = ref(false)
 const { handleError } = useErrorHandler();
 
 const fetchTableData = async () => {
     try {
+        isTableDataLoading.value = true
         tableData.value = await getEventsTableData()
     } catch (e) {
         handleError(e);
+    } finally {
+        isTableDataLoading.value = false
     }
 }
 
@@ -25,6 +29,11 @@ onMounted(() => {
 onUnmounted(() => {
     clearInterval.value()
 })
+
+const onUpdateButtonClick = () => {
+    clearInterval.value()
+    clearInterval.value = setIntervalAsync(fetchTableData, intervalTime)
+}
 
 const copyToClipboard = (event) => {
     const str = event.target.innerHTML;
@@ -53,6 +62,21 @@ const columns = [
 <template>
     <section class="control-panel">
         <h2>List of events</h2>
+        <div class="buttons-container">
+            <va-button @click="onUpdateButtonClick" preset="plain" :disabled="isTableDataLoading">
+                <template #append>
+                    <va-icon
+                        size="large"
+                        :class = "{
+                            'material-icons-outlined': true,
+                            'app-spinned-icon': isTableDataLoading
+                        }"
+                    >
+                        change_circle
+                    </va-icon>
+                </template>
+        </va-button>
+        </div>
     </section>
     <!-- table loader has incorrect displaing in centre of content but not of table -->
     <va-data-table 
@@ -62,6 +86,7 @@ const columns = [
         sticky-header
         height="100%"
         :scroll-bottom-margin="40"
+        sortBy="dateTime"
     >
         <template #cell(dateTime)="data">
             <div>{{ data.rowData.dateTime.toLocaleString() }}</div>

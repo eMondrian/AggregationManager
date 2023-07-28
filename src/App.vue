@@ -6,11 +6,13 @@ import { useErrorHandler } from './composables';
 
 const route = useRoute();
 
-const link = computed(
-  () => route.path === ROUTES.home.path
-    ? { path: ROUTES.processes.path, text: 'Go to events' }
-    : { path: ROUTES.home.path, text: 'Go to aggregation' }
-)
+const navItems = [
+  { path: ROUTES.home.path, text: 'Aggregation' },
+  { path: ROUTES.processes.path, text: 'Events' },
+  { path: ROUTES.settings.path, text: 'Settings' },
+]
+
+const acitveNavItem = computed(() => navItems.find((item) => item.path === route.path))
 
 const { errorList, removeError } = useErrorHandler();
 const closeError = (uid) => {
@@ -21,7 +23,7 @@ const closeError = (uid) => {
 </script>
 
 <template>
-  <va-navbar color="primary">
+  <va-navbar color="primary" class="app-navbar">
     <template #left>
       <va-navbar-item>
         Aggregation Manager
@@ -29,7 +31,22 @@ const closeError = (uid) => {
     </template>
     <template #right>
       <va-navbar-item>
-        <RouterLink class="app-link" :to="link.path">{{ link.text }}</RouterLink>
+        <ul class="app-tabs">
+          <li
+            v-for="item in navItems"
+            :class = "{
+              'app-tabs-item': true,
+              'active-tab': acitveNavItem === item
+            }"
+          >
+            <RouterLink
+              :to="item.path"
+              class="app-link"
+            >
+              {{ item.text }}
+            </RouterLink>
+          </li>
+        </ul>
       </va-navbar-item>
     </template>
   </va-navbar>
@@ -61,15 +78,41 @@ main {
   height: 100%;
   overflow: hidden;
 }
+
+.app-tabs {
+  background: inherit;
+  display: flex;
+}
+
+.app-tabs-item {
+  &.active-tab {
+    background-color: #156cc1;
+    border-bottom: 6px solid #60bafa;
+  }
+
+  &:hover {
+    background-color: var(--va-info);
+  }
+}
+
+.app-link {
+  padding: 0 1rem;
+  height: 3.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-inverted);
+}
+
+.app-navbar {
+  padding-top: 0;
+  padding-bottom: 0;
+}
 </style>
 
 <style lang="scss">
 h2 {
   color: var(--va-primary)
-}
-
-.app-link {
-  color: var(--text-inverted);
 }
 
 .app-table {
@@ -121,5 +164,15 @@ h2 {
   bottom: 0;
   width: 100%;
   bottom: 20px;
+}
+
+// Global class for spinned icons
+.app-spinned-icon {
+	animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+	0%{ -webkit-transform: rotate(0deg); transform: rotate(0deg);}
+	100%{ -webkit-transform: rotate(360deg); transform: rotate(360deg);}
 }
 </style>

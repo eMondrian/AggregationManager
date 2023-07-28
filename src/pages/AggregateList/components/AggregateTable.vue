@@ -63,7 +63,6 @@ const onCreateAggregationFromWizzard = async (data) => {
         await fetchTableData()
     } catch (e) {
         throw e;
-        apiCallRunning.value = false;
     } finally {
         apiCallRunning.value = false;
     }
@@ -155,7 +154,7 @@ const onEdit = async (item) => {
 }
 
 const onDelete = async (item) => {
-    const { confirmed } = await confirmationModal.value.run({ message: 'Are you sure you want do remove this aggregation?' })
+    const { confirmed } = await confirmationModal.value.run({ message: 'Are you sure you want to remove this aggregation?' })
     if (!confirmed) return;
     try {
         apiCallRunning.value = true;
@@ -175,6 +174,7 @@ const columns = [
     { key: 'schedule', sortable: true },
     { key: 'lastDataUpdate', sortable: true, sortingFn: sortNumbers },
     { key: 'lastEvent', sortable: true },
+    { key: 'currentStatus', sortable: true },
     { key: 'actions', width: 80 },
 ];
 </script>
@@ -185,7 +185,12 @@ const columns = [
         <div class="buttons-container">
             <va-button @click="onUpdateButtonClick" preset="plain">
                 <template #append>
-                    <va-icon size="large" class="material-icons-outlined">
+                    <va-icon size="large"
+                        :class = "{
+                            'material-icons-outlined': true,
+                            'app-spinned-icon': isLoading
+                        }"
+                    >
                         change_circle
                     </va-icon>
                 </template>
@@ -211,7 +216,7 @@ const columns = [
             </va-button-dropdown>
         </div>
     </section>
-    <va-data-table :loading="isLoading" class="app-table" :items="tableData" :columns="columns">
+    <va-data-table :loading="isLoading" class="app-table" :items="tableData" :columns="columns" sortBy="name">
         <template #cell(lastSchemaUpdate)="data">
             <div>{{ data.rowData.lastSchemaUpdate.toLocaleString() }}</div>
         </template>

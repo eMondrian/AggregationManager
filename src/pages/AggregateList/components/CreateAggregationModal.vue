@@ -15,6 +15,7 @@ const initialState = {
     ],
     activeTab: 'Properties',
     propertiesData: {
+        id: '',
         name: '',
         tableName: '',
         nifiProcessId: '',
@@ -38,7 +39,9 @@ const isEdit = ref(false);
 
 const { isOpened, run, close } = usePromisifiedModal({
     opened: async (data) => {
+        console.log(data)
         if (data) {
+            propertiesData.value.id = data.id
             propertiesData.value.tableName = data.table_name;
             propertiesData.value.name = data.aggregation_name;
             propertiesData.value.generated = data.is_generated_nifi_process === 't';
@@ -138,6 +141,9 @@ defineExpose({ run, resetState })
                     <template #default>
                         <section v-if="activeTab===tabs[0].title" class="tab-content">
                             <div class="properties-inputs-wrapper">
+                                <div v-if="propertiesData.id!==''" class="info-label-wrapper">
+                                    <span class="info-label">Aggregation ID: </span><span>{{ propertiesData.id }}</span>
+                                </div>
                                 <va-input v-model="propertiesData.name" label="Name" />
                                 <va-input v-model="propertiesData.tableName" label="Table name" />
                                 <va-select
@@ -224,5 +230,15 @@ defineExpose({ run, resetState })
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
+}
+
+.info-label-wrapper {
+    display: flex;
+    gap: 1rem;
+}
+
+.info-label {
+    font-weight: bold;
+    color: var(--va-info);
 }
 </style>
