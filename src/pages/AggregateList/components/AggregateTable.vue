@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, getCurrentInstance } from 'vue'
-import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/api'
+import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/mocks/api'
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
 import LoadingIndicator from '@/modals/LoadingIndicator.vue'
 import { useErrorHandler } from '@/composables'
@@ -183,7 +183,7 @@ const columns = [
     <section class="control-panel">
         <h2>List of aggregates</h2>
         <div class="buttons-container">
-            <va-button @click="onUpdateButtonClick" preset="plain">
+            <va-button @click="onUpdateButtonClick" preset="plain" :disabled="isLoading">
                 <template #append>
                     <va-icon size="large"
                         :class = "{
@@ -216,7 +216,7 @@ const columns = [
             </va-button-dropdown>
         </div>
     </section>
-    <va-data-table :loading="isLoading" class="app-table" :items="tableData" :columns="columns" sortBy="name">
+    <va-data-table :loading="isLoading" class="app-table" :items="tableData" :columns="columns">
         <template #cell(lastSchemaUpdate)="data">
             <div>{{ data.rowData.lastSchemaUpdate.toLocaleString() }}</div>
         </template>

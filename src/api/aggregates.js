@@ -55,7 +55,6 @@ export const updateAggregation = async (data) => {
         body: JSON.stringify(data),
     })
 
-
     if (!response.ok) {
         const responseText = await response.text();
         throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
@@ -88,11 +87,7 @@ export const getRunStatus = async (id) => {
         const responseText = await response.text();
         throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
     }
-    
 
-    // return {
-    //     "state": "RUNNING"
-    // }
     const result = await response.json();
     return result;
 }
@@ -113,39 +108,3 @@ export const setRunStatus = async (id, state) => {
         throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
     }
 }
-
-// export const createWithWizzard = async (data) => {
-//     const result = await new Promise((res) => {
-//         setTimeout(() => {
-//             res(data)
-//         }, 1000)
-//     })
-
-//     console.log('createWithWizzard: ', data)
-
-//     return result
-// }
-
-// export const createFromNifiProcess = async (data) => {
-//     const result = await new Promise((res) => {
-//         setTimeout(() => {
-//             res(data)
-//         }, 1000)
-//     })
-
-//     console.log('createFromNifiProcess: ', data)
-
-//     return result
-// }
-
-// export const createAggregation = async (data) => {
-//     const result = await new Promise((res) => {
-//         setTimeout(() => {
-//             res(data)
-//         }, 1000)
-//     })
-
-//     console.log('createAggregation: ', data)
-
-//     return result
-// }

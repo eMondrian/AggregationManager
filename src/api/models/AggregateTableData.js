@@ -1,7 +1,7 @@
 /**
  * @typedef {Object} AggregateTableDataDTO
  * @property {string} id
- * @property {string} name
+ * @property {string} aggregation_name
  * @property {string} table_name
  * @property {string} last_data_update
  * @property {string} last_schema_update

@@ -2,7 +2,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { ref } from 'vue';
 import MonacoEditor from './MonacoEditor.vue';
-import { getProcesses } from '@/api'
+import { getProcesses } from '@/mocks/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
 
 const { handleError } = useErrorHandler();

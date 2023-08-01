@@ -1,5 +1,5 @@
 <script setup>
-import { getEventsTableData} from '@/api'
+import { getEventsTableData} from '@/mocks/api'
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useErrorHandler } from '@/composables'
 import { setIntervalAsync, sortNumbers } from '@/helpers'
@@ -86,7 +86,6 @@ const columns = [
         sticky-header
         height="100%"
         :scroll-bottom-margin="40"
-        sortBy="dateTime"
     >
         <template #cell(dateTime)="data">
             <div>{{ data.rowData.dateTime.toLocaleString() }}</div>
