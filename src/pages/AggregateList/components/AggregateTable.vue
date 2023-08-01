@@ -216,7 +216,14 @@ const columns = [
             </va-button-dropdown>
         </div>
     </section>
-    <va-data-table :loading="isLoading" class="app-table" :items="tableData" :columns="columns">
+    <va-data-table
+        :loading="isLoading"
+        class="app-table"
+        :items="tableData"
+        :columns="columns"
+        sticky-header
+        :scroll-bottom-margin="40"
+    >
         <template #cell(lastSchemaUpdate)="data">
             <div>{{ data.rowData.lastSchemaUpdate.toLocaleString() }}</div>
         </template>
@@ -250,13 +257,15 @@ const columns = [
         </template>
     </va-data-table>
 
-    <create-aggregation-modal ref="createAggregationModal" />
-    <create-nifi-modal ref="createNifiModal" />
-    <component v-for="wizzard in customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="onCreateAggregationFromWizzard"></component>
+    <teleport to="body">
+        <create-aggregation-modal ref="createAggregationModal" />
+        <create-nifi-modal ref="createNifiModal" />
+        <component v-for="wizzard in customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="onCreateAggregationFromWizzard"></component>
 
-    <loading-indicator :isOpened="apiCallRunning" />
-    <confirmation-modal ref="confirmationModal"  />
-    <run-status-modal ref="runStatusModal"></run-status-modal>
+        <loading-indicator :isOpened="apiCallRunning" />
+        <confirmation-modal ref="confirmationModal"  />
+        <run-status-modal ref="runStatusModal"></run-status-modal>
+    </teleport>
 </template>
 
 <style lang="scss" scoped>
@@ -273,11 +282,8 @@ const columns = [
 }
 
 .app-table {
-    display: flex;
-    height: 100%;
-    min-height: 10rem;
     width: 100%;
-    overflow-x: hidden;
+    height: 100%;
 }
 
 .buttons-container {

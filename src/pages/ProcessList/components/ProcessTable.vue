@@ -84,7 +84,6 @@ const columns = [
         :items="tableData" 
         :columns="columns" 
         sticky-header
-        height="100%"
         :scroll-bottom-margin="40"
     >
         <template #cell(dateTime)="data">
@@ -118,7 +117,7 @@ const columns = [
 <style lang="scss" scoped>
 .app-table {
     width: 100%;
-    // overflow-x: hidden;
+    height: 100%;
 }
 .control-panel {
     display: flex;
@@ -132,12 +131,9 @@ const columns = [
 }
 
 .event-message {
-    // Todo: Test in perspective overflow ellipsis;
-    // ~start~
     max-width: 55vw;
     overflow: hidden;
     text-overflow: ellipsis;
-    // ~end~
     cursor: pointer;
 }
 </style>
