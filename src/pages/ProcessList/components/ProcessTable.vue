@@ -104,10 +104,14 @@ const columns = [
             <va-popover 
                 :placement="data.rowIndex < 5 ? 'bottom-left' : 'top-left'"
                 prevent-overflow
-                :message="data.rowData.eventMessage"
                 style="z-index: 1000;"
             >
-                <div class="event-message" @click="copyToClipboard($event)">{{ data.rowData.eventMessage }}</div>
+            <template #body>
+                <p>{{ data.rowData.eventMessage }}</p>
+                <p class="popover-clipboard-message">Click to copy to clipboard</p>
+            </template>
+
+            <div class="event-message" @click="copyToClipboard($event)">{{ data.rowData.eventMessage }}</div>
             </va-popover>
         </template>
     </va-data-table>
@@ -152,6 +156,12 @@ const columns = [
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
+}
+
+.popover-clipboard-message {
+    display: flex;
+    justify-content: end;
+    color: rgb(119, 178, 31);
 }
 </style>
 
