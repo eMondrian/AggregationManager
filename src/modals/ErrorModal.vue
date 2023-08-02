@@ -12,7 +12,6 @@ const showCopiedMessage = ref(false)
 
 const { isOpened, run, close } = usePromisifiedModal({
     opened: ({ error }) => {
-        console.log(error)
         errorData.value = error;
     }
 });
