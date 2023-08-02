@@ -1,4 +1,5 @@
 <script setup>
+import sortBy from 'lodash/sortBy'
 import { ref, onMounted, getCurrentInstance } from 'vue'
 import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/mocks/api'
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
@@ -25,7 +26,8 @@ const { handleError } = useErrorHandler();
 const fetchTableData = async () => {
     try {
         isLoading.value = true
-        tableData.value = await getAggregatesTableData()
+        const data = await getAggregatesTableData()
+        tableData.value = sortBy(data, ({ name }) => name)
     } catch (e) {
         handleError(e);
     } finally {

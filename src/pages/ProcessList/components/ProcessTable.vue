@@ -1,4 +1,5 @@
 <script setup>
+import sortBy from 'lodash/sortBy'
 import { getEventsTableData} from '@/mocks/api'
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useErrorHandler } from '@/composables'
@@ -14,7 +15,8 @@ const { handleError } = useErrorHandler();
 const fetchTableData = async () => {
     try {
         isTableDataLoading.value = true
-        tableData.value = await getEventsTableData()
+        const data = await getEventsTableData()
+        tableData.value = sortBy(data, ({ dateTime }) => dateTime)
     } catch (e) {
         handleError(e);
     } finally {
@@ -85,6 +87,7 @@ const columns = [
         :columns="columns" 
         sticky-header
         :scroll-bottom-margin="40"
+        sort-by="dateTime"
     >
         <template #cell(dateTime)="data">
             <div>{{ data.rowData.dateTime.toLocaleString() }}</div>
@@ -131,6 +134,7 @@ const columns = [
 }
 
 .event-message {
+    height: 18px;
     max-width: 55vw;
     overflow: hidden;
     text-overflow: ellipsis;
