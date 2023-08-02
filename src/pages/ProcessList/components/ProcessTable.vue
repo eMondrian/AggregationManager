@@ -5,7 +5,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { useErrorHandler } from '@/composables'
 import { setIntervalAsync, sortNumbers } from '@/helpers'
 
-const intervalTime = 30000 // 30sec
+const intervalTime = 300000 // 30sec
 const clearInterval = ref(null)
 const tableData = ref([])
 const isTableDataLoading = ref(false)

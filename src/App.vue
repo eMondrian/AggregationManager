@@ -1,8 +1,11 @@
 <script setup>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { ROUTES } from '@/router/routes.js'
 import { useErrorHandler } from './composables';
+import ErrorModal from '@/modals/ErrorModal.vue';
+
+const errorModal = ref(null)
 
 const route = useRoute();
 
@@ -20,6 +23,10 @@ const closeError = (uid) => {
   removeError(uid);
 }
 
+const onOpenDetailsClick = async (error) => {
+  removeError(error.uid);
+  await errorModal.value.run({ error })
+}
 </script>
 
 <template>
@@ -60,12 +67,25 @@ const closeError = (uid) => {
         @update:model-value="closeError(error.uid)"
         closeable
         color="danger"
-        class="mb-6"
+        border="top"
+        class="app-alert"
       >
-        <b>{{ error.name }}:</b> <span>{{ error.message }}</span> 
+        <div class="error-container">
+          <p class="error-title">{{ error.name }}</p>
+          <p class="error-content">{{ error.message }}</p>
+          <va-button
+              @click="onOpenDetailsClick(error)"
+              preset="plain"
+              color="danger"
+            >
+              Open details
+          </va-button>
+        </div>
       </va-alert>
     </div>
   </main>
+
+  <ErrorModal ref="errorModal" />
 </template>
 
 
@@ -107,6 +127,50 @@ main {
 .app-navbar {
   padding-top: 0;
   padding-bottom: 0;
+}
+
+.alerts-section {
+  max-height: 40em;
+  width: 100%;
+  bottom: 20px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  z-index: 2000;
+  overflow: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.app-alert {
+  width: fit-content;
+  margin: 1rem;
+  margin-right: 5%;
+  background-color: #fdeae7 !important;
+  color: "#940909";
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.error-title {
+  color: var(--va-danger);
+  font-weight: bold;
+}
+
+.error-content {
+  max-width: 30rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
 
@@ -155,15 +219,6 @@ h2 {
 // To fix select-dropdown background 
 .va-select-dropdown__content {
   z-index: 1000;
-}
-
-.alerts-section {
-  z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  bottom: 0;
-  width: 100%;
-  bottom: 20px;
 }
 
 // Global class for spinned icons

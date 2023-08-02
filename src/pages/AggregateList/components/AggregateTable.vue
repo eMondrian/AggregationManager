@@ -275,7 +275,7 @@ const columns = [
 
         <loading-indicator :isOpened="apiCallRunning" />
         <confirmation-modal ref="confirmationModal"  />
-        <run-status-modal ref="runStatusModal"></run-status-modal>
+        <run-status-modal ref="runStatusModal" />
     </teleport>
 </template>
 

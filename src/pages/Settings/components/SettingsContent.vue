@@ -25,7 +25,7 @@ const onSaveButtonClick = async () => {
   <section class="control-panel">
     <h2>Settings</h2>
     <div class="buttons-container">
-        <va-button @click="onSaveButtonClick" :disabled="isLoading" class="save-button" size="medium">
+        <va-button @click="onSaveButtonClick" :disabled="isLoading" class="save-button" size="medium" :loading="isLoading">
             Save
         </va-button>
     </div>
