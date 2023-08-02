@@ -20,6 +20,7 @@ const runStatusModal = ref(null)
 const tableData = ref([])
 const isLoading = ref(false)
 const apiCallRunning = ref(false);
+const filterValue = ref('')
 
 const { handleError } = useErrorHandler();
 
@@ -218,11 +219,19 @@ const columns = [
             </va-button-dropdown>
         </div>
     </section>
+    <va-input
+        v-model="filterValue"
+        label="filter"
+        placeholder="contains..."
+        class="filter-input"
+        clearable
+    />
     <va-data-table
         :loading="isLoading"
         class="app-table"
         :items="tableData"
         :columns="columns"
+        :filter="filterValue"
         sticky-header
         :scroll-bottom-margin="40"
     >
@@ -281,6 +290,11 @@ const columns = [
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.filter-input {
+    width: 25rem;
+    max-width: 40%;
 }
 
 .app-table {

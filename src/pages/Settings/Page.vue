@@ -1,6 +1,7 @@
 <script setup>
+import SettingsContent from './components/SettingsContent.vue';
 </script>
 
 <template>
-  <div>Settings</div>
+  <SettingsContent />
 </template>

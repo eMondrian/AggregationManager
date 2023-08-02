@@ -10,6 +10,7 @@ const clearInterval = ref(null)
 const tableData = ref([])
 const isTableDataLoading = ref(false)
 const showCopiedMessage = ref(false)
+const filterValue = ref('')
 const { handleError } = useErrorHandler();
 
 const fetchTableData = async () => {
@@ -80,6 +81,13 @@ const columns = [
         </va-button>
         </div>
     </section>
+    <va-input
+        v-model="filterValue"
+        label="filter"
+        placeholder="contains..."
+        class="filter-input"
+        clearable
+    />
     <!-- table loader has incorrect displaing in centre of content but not of table -->
     <va-data-table 
         class="app-table" 
@@ -126,6 +134,11 @@ const columns = [
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.filter-input {
+    width: 25rem;
+    max-width: 40%;
 }
 
 .buttons-container {
