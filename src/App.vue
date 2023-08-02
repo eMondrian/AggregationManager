@@ -1,16 +1,21 @@
 <script setup>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { ROUTES } from '@/router/routes.js'
 import { useErrorHandler } from './composables';
+import ErrorModal from '@/modals/ErrorModal.vue';
+
+const errorModal = ref(null)
 
 const route = useRoute();
 
-const link = computed(
-  () => route.path === ROUTES.home.path
-    ? { path: ROUTES.processes.path, text: 'Go to events' }
-    : { path: ROUTES.home.path, text: 'Go to aggregation' }
-)
+const navItems = [
+  { path: ROUTES.home.path, text: 'Aggregation' },
+  { path: ROUTES.processes.path, text: 'Events' },
+  { path: ROUTES.settings.path, text: 'Settings' },
+]
+
+const acitveNavItem = computed(() => navItems.find((item) => item.path === route.path))
 
 const { errorList, removeError } = useErrorHandler();
 const closeError = (uid) => {
@@ -18,10 +23,14 @@ const closeError = (uid) => {
   removeError(uid);
 }
 
+const onOpenDetailsClick = async (error) => {
+  removeError(error.uid);
+  await errorModal.value.run({ error })
+}
 </script>
 
 <template>
-  <va-navbar color="primary">
+  <va-navbar color="primary" class="app-navbar">
     <template #left>
       <va-navbar-item>
         Aggregation Manager
@@ -29,7 +38,22 @@ const closeError = (uid) => {
     </template>
     <template #right>
       <va-navbar-item>
-        <RouterLink class="app-link" :to="link.path">{{ link.text }}</RouterLink>
+        <ul class="app-tabs">
+          <li
+            v-for="item in navItems"
+            :class = "{
+              'app-tabs-item': true,
+              'active-tab': acitveNavItem === item
+            }"
+          >
+            <RouterLink
+              :to="item.path"
+              class="app-link"
+            >
+              {{ item.text }}
+            </RouterLink>
+          </li>
+        </ul>
       </va-navbar-item>
     </template>
   </va-navbar>
@@ -43,12 +67,25 @@ const closeError = (uid) => {
         @update:model-value="closeError(error.uid)"
         closeable
         color="danger"
-        class="mb-6"
+        border="top"
+        class="app-alert"
       >
-        <b>{{ error.name }}:</b> <span>{{ error.message }}</span> 
+        <div class="error-container">
+          <p class="error-title">{{ error.name }}</p>
+          <p class="error-content">{{ error.message }}</p>
+          <va-button
+              @click="onOpenDetailsClick(error)"
+              preset="plain"
+              color="danger"
+            >
+              Open details
+          </va-button>
+        </div>
       </va-alert>
     </div>
   </main>
+
+  <ErrorModal ref="errorModal" />
 </template>
 
 
@@ -61,15 +98,85 @@ main {
   height: 100%;
   overflow: hidden;
 }
+
+.app-tabs {
+  background: inherit;
+  display: flex;
+}
+
+.app-tabs-item {
+  &.active-tab {
+    background-color: #156cc1;
+    border-bottom: 6px solid #60bafa;
+  }
+
+  &:hover {
+    background-color: var(--va-info);
+  }
+}
+
+.app-link {
+  padding: 0 1rem;
+  height: 3.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-inverted);
+}
+
+.app-navbar {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.alerts-section {
+  max-height: 40em;
+  width: 100%;
+  bottom: 20px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  z-index: 2000;
+  overflow: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.app-alert {
+  width: fit-content;
+  margin: 1rem;
+  margin-right: 5%;
+  background-color: #fdeae7 !important;
+  color: "#940909";
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.error-title {
+  color: var(--va-danger);
+  font-weight: bold;
+}
+
+.error-content {
+  max-width: 30rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>
 
 <style lang="scss">
 h2 {
   color: var(--va-primary)
-}
-
-.app-link {
-  color: var(--text-inverted);
 }
 
 .app-table {
@@ -114,12 +221,13 @@ h2 {
   z-index: 1000;
 }
 
-.alerts-section {
-  z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  bottom: 0;
-  width: 100%;
-  bottom: 20px;
+// Global class for spinned icons
+.app-spinned-icon {
+	animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+	0%{ -webkit-transform: rotate(0deg); transform: rotate(0deg);}
+	100%{ -webkit-transform: rotate(360deg); transform: rotate(360deg);}
 }
 </style>

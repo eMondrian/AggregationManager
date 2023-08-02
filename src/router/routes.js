@@ -7,4 +7,8 @@ export const ROUTES = {
         path: '/events',
         name: 'events',
     },
+    settings: {
+        path: '/settings',
+        name: 'settings',
+    },
 }

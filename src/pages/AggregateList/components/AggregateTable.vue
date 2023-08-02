@@ -1,6 +1,7 @@
 <script setup>
+import sortBy from 'lodash/sortBy'
 import { ref, onMounted, getCurrentInstance } from 'vue'
-import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/api'
+import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/mocks/api'
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
 import LoadingIndicator from '@/modals/LoadingIndicator.vue'
 import { useErrorHandler } from '@/composables'
@@ -19,13 +20,15 @@ const runStatusModal = ref(null)
 const tableData = ref([])
 const isLoading = ref(false)
 const apiCallRunning = ref(false);
+const filterValue = ref('')
 
 const { handleError } = useErrorHandler();
 
 const fetchTableData = async () => {
     try {
         isLoading.value = true
-        tableData.value = await getAggregatesTableData()
+        const data = await getAggregatesTableData()
+        tableData.value = sortBy(data, ({ name }) => name)
     } catch (e) {
         handleError(e);
     } finally {
@@ -63,7 +66,6 @@ const onCreateAggregationFromWizzard = async (data) => {
         await fetchTableData()
     } catch (e) {
         throw e;
-        apiCallRunning.value = false;
     } finally {
         apiCallRunning.value = false;
     }
@@ -155,7 +157,7 @@ const onEdit = async (item) => {
 }
 
 const onDelete = async (item) => {
-    const { confirmed } = await confirmationModal.value.run({ message: 'Are you sure you want do remove this aggregation?' })
+    const { confirmed } = await confirmationModal.value.run({ message: 'Are you sure you want to remove this aggregation?' })
     if (!confirmed) return;
     try {
         apiCallRunning.value = true;
@@ -175,6 +177,7 @@ const columns = [
     { key: 'schedule', sortable: true },
     { key: 'lastDataUpdate', sortable: true, sortingFn: sortNumbers },
     { key: 'lastEvent', sortable: true },
+    { key: 'currentStatus', sortable: true },
     { key: 'actions', width: 80 },
 ];
 </script>
@@ -183,9 +186,14 @@ const columns = [
     <section class="control-panel">
         <h2>List of aggregates</h2>
         <div class="buttons-container">
-            <va-button @click="onUpdateButtonClick" preset="plain">
+            <va-button @click="onUpdateButtonClick" preset="plain" :disabled="isLoading">
                 <template #append>
-                    <va-icon size="large" class="material-icons-outlined">
+                    <va-icon size="large"
+                        :class = "{
+                            'material-icons-outlined': true,
+                            'app-spinned-icon': isLoading
+                        }"
+                    >
                         change_circle
                     </va-icon>
                 </template>
@@ -211,7 +219,22 @@ const columns = [
             </va-button-dropdown>
         </div>
     </section>
-    <va-data-table :loading="isLoading" class="app-table" :items="tableData" :columns="columns">
+    <va-input
+        v-model="filterValue"
+        label="filter"
+        placeholder="contains..."
+        class="filter-input"
+        clearable
+    />
+    <va-data-table
+        :loading="isLoading"
+        class="app-table"
+        :items="tableData"
+        :columns="columns"
+        :filter="filterValue"
+        sticky-header
+        :scroll-bottom-margin="40"
+    >
         <template #cell(lastSchemaUpdate)="data">
             <div>{{ data.rowData.lastSchemaUpdate.toLocaleString() }}</div>
         </template>
@@ -245,13 +268,15 @@ const columns = [
         </template>
     </va-data-table>
 
-    <create-aggregation-modal ref="createAggregationModal" />
-    <create-nifi-modal ref="createNifiModal" />
-    <component v-for="wizzard in customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="onCreateAggregationFromWizzard"></component>
+    <teleport to="body">
+        <create-aggregation-modal ref="createAggregationModal" />
+        <create-nifi-modal ref="createNifiModal" />
+        <component v-for="wizzard in customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="onCreateAggregationFromWizzard"></component>
 
-    <loading-indicator :isOpened="apiCallRunning" />
-    <confirmation-modal ref="confirmationModal"  />
-    <run-status-modal ref="runStatusModal"></run-status-modal>
+        <loading-indicator :isOpened="apiCallRunning" />
+        <confirmation-modal ref="confirmationModal"  />
+        <run-status-modal ref="runStatusModal" />
+    </teleport>
 </template>
 
 <style lang="scss" scoped>
@@ -267,12 +292,14 @@ const columns = [
     align-items: center;
 }
 
+.filter-input {
+    width: 25rem;
+    max-width: 40%;
+}
+
 .app-table {
-    display: flex;
-    height: 100%;
-    min-height: 10rem;
     width: 100%;
-    overflow-x: hidden;
+    height: 100%;
 }
 
 .buttons-container {

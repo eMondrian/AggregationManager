@@ -1,12 +1,13 @@
 /**
  * @typedef {Object} AggregateTableDataDTO
  * @property {string} id
- * @property {string} name
+ * @property {string} aggregation_name
  * @property {string} table_name
  * @property {string} last_data_update
  * @property {string} last_schema_update
  * @property {string} schedule
  * @property {string} last_event
+ * @property {string} current_status
  */
 
 export class AggregateTableData {
@@ -19,6 +20,7 @@ export class AggregateTableData {
      * @param {Date} data.lastDataUpdate
      * @param {string} data.schedule
      * @param {string} data.lastEvent
+     * @param {string} data.currentStatus
      */
     constructor({
         id = '',
@@ -28,6 +30,7 @@ export class AggregateTableData {
         lastDataUpdate,
         schedule = '',
         lastEvent = '',
+        currentStatus = '',
     }) {
         this.id = id;
         this.name = name;
@@ -36,6 +39,7 @@ export class AggregateTableData {
         this.lastDataUpdate = lastDataUpdate;
         this.schedule = schedule;
         this.lastEvent = lastEvent;
+        this.currentStatus = currentStatus;
     }
 
     /**
@@ -51,6 +55,7 @@ export class AggregateTableData {
             lastDataUpdate: new Date(item.last_data_update),
             schedule: item.schedule,
             lastEvent: item.last_event,
+            currentStatus: item.current_status
         }
 
         return new AggregateTableData(data)

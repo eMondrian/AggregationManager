@@ -1,20 +1,27 @@
 <script setup>
-import { getEventsTableData} from '@/api'
+import sortBy from 'lodash/sortBy'
+import { getEventsTableData} from '@/mocks/api'
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useErrorHandler } from '@/composables'
 import { setIntervalAsync, sortNumbers } from '@/helpers'
 
-const intervalTime = 30000 // 30sec
+const intervalTime = 300000 // 30sec
 const clearInterval = ref(null)
 const tableData = ref([])
+const isTableDataLoading = ref(false)
 const showCopiedMessage = ref(false)
+const filterValue = ref('')
 const { handleError } = useErrorHandler();
 
 const fetchTableData = async () => {
     try {
-        tableData.value = await getEventsTableData()
+        isTableDataLoading.value = true
+        const data = await getEventsTableData()
+        tableData.value = sortBy(data, ({ dateTime }) => dateTime)
     } catch (e) {
         handleError(e);
+    } finally {
+        isTableDataLoading.value = false
     }
 }
 
@@ -25,6 +32,11 @@ onMounted(() => {
 onUnmounted(() => {
     clearInterval.value()
 })
+
+const onUpdateButtonClick = () => {
+    clearInterval.value()
+    clearInterval.value = setIntervalAsync(fetchTableData, intervalTime)
+}
 
 const copyToClipboard = (event) => {
     const str = event.target.innerHTML;
@@ -53,15 +65,37 @@ const columns = [
 <template>
     <section class="control-panel">
         <h2>List of events</h2>
+        <div class="buttons-container">
+            <va-button @click="onUpdateButtonClick" preset="plain" :disabled="isTableDataLoading">
+                <template #append>
+                    <va-icon
+                        size="large"
+                        :class = "{
+                            'material-icons-outlined': true,
+                            'app-spinned-icon': isTableDataLoading
+                        }"
+                    >
+                        change_circle
+                    </va-icon>
+                </template>
+        </va-button>
+        </div>
     </section>
+    <va-input
+        v-model="filterValue"
+        label="filter"
+        placeholder="contains..."
+        class="filter-input"
+        clearable
+    />
     <!-- table loader has incorrect displaing in centre of content but not of table -->
     <va-data-table 
         class="app-table" 
         :items="tableData" 
         :columns="columns" 
         sticky-header
-        height="100%"
         :scroll-bottom-margin="40"
+        sort-by="dateTime"
     >
         <template #cell(dateTime)="data">
             <div>{{ data.rowData.dateTime.toLocaleString() }}</div>
@@ -70,10 +104,14 @@ const columns = [
             <va-popover 
                 :placement="data.rowIndex < 5 ? 'bottom-left' : 'top-left'"
                 prevent-overflow
-                :message="data.rowData.eventMessage"
                 style="z-index: 1000;"
             >
-                <div class="event-message" @click="copyToClipboard($event)">{{ data.rowData.eventMessage }}</div>
+            <template #body>
+                <p>{{ data.rowData.eventMessage }}</p>
+                <p class="popover-clipboard-message">Click to copy to clipboard</p>
+            </template>
+
+            <div class="event-message" @click="copyToClipboard($event)">{{ data.rowData.eventMessage }}</div>
             </va-popover>
         </template>
     </va-data-table>
@@ -94,12 +132,17 @@ const columns = [
 <style lang="scss" scoped>
 .app-table {
     width: 100%;
-    // overflow-x: hidden;
+    height: 100%;
 }
 .control-panel {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.filter-input {
+    width: 25rem;
+    max-width: 40%;
 }
 
 .buttons-container {
@@ -108,13 +151,17 @@ const columns = [
 }
 
 .event-message {
-    // Todo: Test in perspective overflow ellipsis;
-    // ~start~
+    height: 18px;
     max-width: 55vw;
     overflow: hidden;
     text-overflow: ellipsis;
-    // ~end~
     cursor: pointer;
+}
+
+.popover-clipboard-message {
+    display: flex;
+    justify-content: end;
+    color: rgb(119, 178, 31);
 }
 </style>
 

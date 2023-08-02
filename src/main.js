@@ -3,7 +3,6 @@ import {
 } from 'vuestic-ui'
 import { createApp } from 'vue'
 
-import { addAgregation } from '@/api'
 import CreateAggregationWithWizzardModal from '@/pages/AggregateList/components/CreateAggregationWithWizzardModal.vue'
 import App from './App.vue'
 import router from './router'
