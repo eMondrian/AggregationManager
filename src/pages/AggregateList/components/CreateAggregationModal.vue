@@ -4,8 +4,19 @@ import { ref } from 'vue';
 import MonacoEditor from './MonacoEditor.vue';
 import { getProcesses } from '@/mocks/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
+import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
 
 const { handleError } = useErrorHandler();
+
+const scheduleOptions = [
+    'schedule-option-1',
+    'schedule-option-2',
+    'schedule-option-3',
+    'schedule-option-4',
+    'schedule-option-5',
+    'schedule-option-6',
+    'schedule-option-7',
+]
 
 const initialState = {
     tabs: [
@@ -39,7 +50,6 @@ const isEdit = ref(false);
 
 const { isOpened, run, close } = usePromisifiedModal({
     opened: async (data) => {
-        console.log(data)
         if (data) {
             propertiesData.value.id = data.id
             propertiesData.value.tableName = data.table_name;
@@ -164,7 +174,7 @@ defineExpose({ run, resetState })
                         </section>
                         <section v-if="activeTab===tabs[2].title" class="tab-content">
                             <div class="properties-inputs-wrapper">
-                                <va-input v-model="scheduleData.schedule" label="Schedule" />
+                                <InputWithOptions v-model="scheduleData.schedule" label="Schedule" :options="scheduleOptions"/>
                                 <va-select
                                     v-model="scheduleData.strategy" 
                                     label="Scheduling strategy" 
