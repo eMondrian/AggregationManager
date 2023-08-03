@@ -96,6 +96,7 @@ const columns = [
         :columns="columns" 
         sticky-header
         :scroll-bottom-margin="40"
+        sort-by="dateTime"
     >
         <template #cell(dateTime)="data">
             <div>{{ data.rowData.dateTime.toLocaleString() }}</div>
