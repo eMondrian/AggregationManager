@@ -117,8 +117,14 @@ defineExpose({ run, resetState })
 
 <style lang="scss">
 .danger-modal {
+    z-index: 1000000;
+
     & .va-modal__inner {
         background-color: #fdeae7;
+    }
+
+    .va-modal__overlay {
+        background-color: rgba(0, 0, 0, 0.2);
     }
 }
 </style>

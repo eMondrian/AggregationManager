@@ -17,7 +17,7 @@ const fetchTableData = async () => {
     try {
         isTableDataLoading.value = true
         const data = await getEventsTableData()
-        tableData.value = sortBy(data, ({ dateTime }) => dateTime)
+        tableData.value = sortBy(data, ({ dateTime }) => dateTime).reverse()
     } catch (e) {
         handleError(e);
     } finally {
@@ -89,7 +89,8 @@ const columns = [
         clearable
     />
     <!-- table loader has incorrect displaing in centre of content but not of table -->
-    <va-data-table 
+    <va-data-table
+        :filter="filterValue"
         class="app-table" 
         :items="tableData" 
         :columns="columns" 

@@ -9,7 +9,7 @@ const initialState = {
 }
 
 const isLoading = ref(false)
-const settings = ref(JSON.parse(localStorage.getItem(saveKey) || initialState))
+const settings = ref(JSON.parse(localStorage.getItem(saveKey)) || initialState)
 const { init } = useToast()
 
 const onSaveButtonClick = async () => {
