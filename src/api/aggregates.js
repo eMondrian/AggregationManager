@@ -47,7 +47,7 @@ export const getAggregation = async (id) => {
 }
 
 export const updateAggregation = async (data) => {
-    const response = await fetch(PATH.AGGREGATION, {
+    const response = await fetch(`${PATH.AGGREGATION}/${data.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

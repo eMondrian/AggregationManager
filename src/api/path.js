@@ -11,5 +11,7 @@ export const PATH = {
 
     SOURCE_TABLES: `${BASE_PATH}/v1/source-tables`,
     COLUMNS: `${BASE_PATH}/v1/source-table-columns`,
-    WIZARD_QUERY: `${BASE_PATH}/v1/wizard-query`
+    WIZARD_QUERY: `${BASE_PATH}/v1/wizard-query`,
+    SETTINGS: `${BASE_PATH}/v1/settings`,
+    TEMPLATES: `${BASE_PATH}/v1/templates`
 }

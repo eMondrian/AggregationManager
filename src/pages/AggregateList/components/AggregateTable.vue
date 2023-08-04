@@ -1,7 +1,8 @@
 <script setup>
 import sortBy from 'lodash/sortBy'
 import { ref, onMounted, getCurrentInstance } from 'vue'
-import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/mocks/api'
+// import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/mocks/api'
+import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/api'
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
 import LoadingIndicator from '@/modals/LoadingIndicator.vue'
 import { useErrorHandler } from '@/composables'
@@ -143,6 +144,7 @@ const onEdit = async (item) => {
                 is_generated_nifi_process: !!aggregationDesc.propertiesData.nifiProcessName,
                 scheduling_period: aggregationDesc.scheduleData.schedule,
                 scheduling_strategy: aggregationDesc.scheduleData.strategy,
+                id: item.id,
             });
             createAggregationModal.value.resetState()
             await fetchTableData()

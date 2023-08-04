@@ -1,23 +1,64 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useToast } from 'vuestic-ui'
 import { wait } from '@/helpers'
+import { getSettings, getTemplates, updateSettings } from '@/api'
+
 
 const saveKey = 'settings'
 const initialState = {
-    defaultTemplate: '',
+    defaultTemplate: {
+        name: '',
+        id: null,
+    }
 }
+const templateOptions = ref([]);
+
+const settings = ref(initialState)
 
 const isLoading = ref(false)
-const settings = ref(JSON.parse(localStorage.getItem(saveKey)) || initialState)
 const { init } = useToast()
 
-const onSaveButtonClick = async () => {
+const fetchSettings = async () => {
     isLoading.value = true
-    await wait(1000)
-    localStorage.setItem(saveKey, JSON.stringify(settings.value))
-    init({ message: 'Data was successfully saved', color: 'success', duration: 3500 })
-    isLoading.value = false
+    try {
+        const data = await getSettings();
+        console.log(data);
+
+        settings.value.defaultTemplate.name = data.default_template_name;
+        settings.value.defaultTemplate.id = data.default_template_id;
+
+        const availableTemplates = await getTemplates();
+        templateOptions.value = [...availableTemplates]
+    }
+    finally {
+        isLoading.value = false
+    }
+}
+
+onMounted(() => {
+    fetchSettings()
+})
+
+const setDefaultTemplate = (data) => {
+    settings.value.defaultTemplate.name = data.name;
+    settings.value.defaultTemplate.id = data.id;
+}
+
+const onSaveButtonClick = async () => {
+    console.log(settings.value);
+    try {
+        isLoading.value = true
+
+        await updateSettings({
+            default_template_id: settings.value.defaultTemplate.id
+        });
+
+        init({ message: 'Data was successfully saved', color: 'success', duration: 3500 })
+    }
+    finally {
+        isLoading.value = false
+    }
 }
 </script>
 
@@ -31,9 +72,12 @@ const onSaveButtonClick = async () => {
     </div>
   </section>
   <section class="form-data">
-    <va-input
+    <va-select
         label="default template"
-        v-model="settings.defaultTemplate"
+        :modelValue="settings.defaultTemplate"
+        @update:modelValue="setDefaultTemplate"
+        :options="templateOptions"
+        text-by="name"
     />
   </section>
 </template>

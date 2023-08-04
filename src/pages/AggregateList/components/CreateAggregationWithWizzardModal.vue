@@ -3,7 +3,8 @@ import isEmpty from 'lodash/isEmpty'
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, ref, watch } from 'vue';
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
-import { getTableList, getColumnsList, getQuery } from '@/mocks/api';
+import { getTableList, getColumnsList, getQuery } from '@/api';
+// import { getTableList, getColumnsList, getQuery } from '@/mocks/api';
 
 
 const props = defineProps(['onSave'])

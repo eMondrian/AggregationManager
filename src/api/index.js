@@ -3,3 +3,4 @@ export { getAggregatesTableData, addAgregation, removeAgregation, getAggregation
 export { getEventsTableData } from './events'
 export { getProcesses } from './processes'
 export { getColumnsList, getQuery, getTableList } from './wizzard'
+export { getSettings, getTemplates, updateSettings } from './settings'
