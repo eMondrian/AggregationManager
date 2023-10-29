@@ -50,3 +50,24 @@ export const getQuery = async (data) => {
 
   return await response.json();
 }
+
+export const getQueryPerformance = async (query, requestController) => {
+  const signal = requestController.signal;
+  const response = await fetch(PATH.QUERY_PERFORMANCE, {
+      method: "POST",
+      signal: signal,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query,
+      }),
+  })
+
+  if (!response.ok) {
+      const responseText = await response.text();
+      throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+  }
+
+  return await response.json();
+}

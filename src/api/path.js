@@ -13,5 +13,6 @@ export const PATH = {
     COLUMNS: `${BASE_PATH}/v1/source-table-columns`,
     WIZARD_QUERY: `${BASE_PATH}/v1/wizard-query`,
     SETTINGS: `${BASE_PATH}/v1/settings`,
-    TEMPLATES: `${BASE_PATH}/v1/templates`
+    TEMPLATES: `${BASE_PATH}/v1/templates`,
+    QUERY_PERFORMANCE: `${BASE_PATH}/v1/query-performance`
 }

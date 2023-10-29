@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useToast } from 'vuestic-ui'
 import { wait } from '@/helpers'
 import { getSettings, getTemplates, updateSettings } from '@/api'
+import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
 
 
 const saveKey = 'settings'
@@ -72,12 +73,12 @@ const onSaveButtonClick = async () => {
     </div>
   </section>
   <section class="form-data">
-    <va-select
-        label="default template"
-        :modelValue="settings.defaultTemplate"
-        @update:modelValue="setDefaultTemplate"
+    <InputWithOptions
+        v-model="settings.defaultTemplate.id"
+        label="Default template"
         :options="templateOptions"
-        text-by="name"
+        optionsTextBy="name"
+        optionsValueBy="id"
     />
   </section>
 </template>

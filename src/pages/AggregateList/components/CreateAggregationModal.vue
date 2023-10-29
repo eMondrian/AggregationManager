@@ -6,8 +6,43 @@ import MonacoEditor from './MonacoEditor.vue';
 import { getProcesses } from '@/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
+import { watch } from 'vue';
 
 const { handleError } = useErrorHandler();
+
+const cronScheduleOptions = [
+    {
+        text: 'Every day, 8AM, 8PM',
+        value: '0 0 8,20 * * ?'
+    },
+    {
+        text: 'MON-FRI, 2:20PM',
+        value: '0 20 14 ? * MON-FRI'
+    }
+]
+
+const timerScheduleOptions = [
+    {
+        value: '30 sec',
+        text: 'Every 30 sec',
+    },
+    {
+        value: '10 min',
+        text: 'Every 10 min',
+    },
+    {
+        value: '1 hour',
+        text: 'Every hour',
+    },
+    {
+        value: '1 day',
+        text: 'Every day',
+    },
+    {
+        value: '1 week',
+        text: 'Every hour',
+    }
+];
 
 const scheduleOptions = [
     'schedule-option-1',
@@ -98,7 +133,7 @@ const onUnmountEditor = (value) => {
 const resetState = () => {
     activeTab.value = initialState.activeTab
     propertiesData.value = cloneDeep(initialState.propertiesData)
-    query.value = initialState.editorDefaultInputValue
+    query.value = initialState.queryDefaultValue
     scheduleData.value = cloneDeep(initialState.scheduleData)
 
     isEdit.value = false;
@@ -111,6 +146,10 @@ const onSave = async () => {
         scheduleData: scheduleData.value
     })
 }
+
+watch(() => scheduleData.value.strategy, () => {
+    scheduleData.value.schedule = '';
+})
 
 const onClose = () => {
     close()
@@ -140,7 +179,7 @@ defineExpose({ run, resetState })
             <section class="modal-content">
                 <va-tabs v-model="activeTab" grow class="full-size-tabs">
                     <template #tabs>
-                        <va-tab v-for="tab in tabs" :key="tab.title" :name="tab.title">
+                        <va-tab v-for="tab in tabs" :key="tab.title" :name="tab.title" :disabled="tab.title === 'Query' && !propertiesData.generated">
                             <div class="tab-title">
                                 <va-icon class="material-icons">
                                     {{ tab.icon }}
@@ -175,7 +214,13 @@ defineExpose({ run, resetState })
                         </section>
                         <section v-if="activeTab===tabs[2].title" class="tab-content">
                             <div class="properties-inputs-wrapper">
-                                <InputWithOptions v-model="scheduleData.schedule" label="Schedule" :options="scheduleOptions"/>
+                                <InputWithOptions
+                                    v-model="scheduleData.schedule"
+                                    label="Schedule"
+                                    :options="scheduleData.strategy === 'CRON_DRIVEN' ? cronScheduleOptions : timerScheduleOptions"
+                                    optionsTextBy="text"
+                                    optionsValueBy="value"
+                                />
                                 <va-select
                                     v-model="scheduleData.strategy" 
                                     label="Scheduling strategy" 

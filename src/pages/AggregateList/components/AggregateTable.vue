@@ -1,8 +1,8 @@
 <script setup>
 import sortBy from 'lodash/sortBy'
 import { ref, onMounted, getCurrentInstance } from 'vue'
-// import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/mocks/api'
-import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/api'
+import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/mocks/api'
+// import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/api'
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
 import LoadingIndicator from '@/modals/LoadingIndicator.vue'
 import { useErrorHandler } from '@/composables'
@@ -83,8 +83,8 @@ const onCreateAggregationClick = async () => {
                 aggregation_name: aggregationDesc.propertiesData.name,
                 table_name: aggregationDesc.propertiesData.tableName,
                 query: aggregationDesc.query,
-                start_nifi_process_id: aggregationDesc.propertiesData.nifiProcessName,
-                is_generated_nifi_process: !aggregationDesc.propertiesData.nifiProcessName,
+                start_nifi_process_id: aggregationDesc.propertiesData.nifiProcessId,
+                is_generated_nifi_process: !aggregationDesc.propertiesData.nifiProcessId,
                 scheduling_period: aggregationDesc.scheduleData.schedule,
                 scheduling_strategy: aggregationDesc.scheduleData.strategy,
             });
@@ -140,8 +140,8 @@ const onEdit = async (item) => {
                 aggregation_name: aggregationDesc.propertiesData.name,
                 table_name: aggregationDesc.propertiesData.tableName,
                 query: aggregationDesc.query,
-                start_nifi_process_id: aggregationDesc.propertiesData.nifiProcessName,
-                is_generated_nifi_process: !!aggregationDesc.propertiesData.nifiProcessName,
+                start_nifi_process_id: aggregationDesc.propertiesData.nifiProcessId,
+                is_generated_nifi_process: !!aggregationDesc.propertiesData.nifiProcessId,
                 scheduling_period: aggregationDesc.scheduleData.schedule,
                 scheduling_strategy: aggregationDesc.scheduleData.strategy,
                 id: item.id,

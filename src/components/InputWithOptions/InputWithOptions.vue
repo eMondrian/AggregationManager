@@ -1,30 +1,47 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { isEmpty } from 'lodash';
+import { computed } from 'vue';
 
 const emit = defineEmits(['update:modelValue'])
 
-const { options, modelValue } = defineProps({
+const props = defineProps({
   options: {
     type: Array,
     default: [],
   },
   modelValue: {
     type: String,
-    default: '',
-  }
+  },
+  optionsTextBy: {
+    type: String
+  },
+  optionsValueBy: {
+    type: String
+  },
 })
 
 const isFocused = ref(false)
-const inputValue = ref(modelValue)
+const modelValueWrapper = ref(props.modelValue)
+const inputValue = ref(props.modelValue)
+
+
+watch(() => props.modelValue, () => {
+    inputValue.value = props.modelValue;
+})
 
 const onFocus = () => {
     isFocused.value = true
 }
 
 const onOptionClick = (option) => {
-    inputValue.value = option
-    emit('update:modelValue', option)
+    if (props.optionsValueBy) {
+        inputValue.value = option[props.optionsValueBy]
+        emit('update:modelValue', option[props.optionsValueBy])
+    } else {
+        inputValue.value = option
+        emit('update:modelValue', option)
+    }
     isFocused.value = false
 }
 
@@ -56,7 +73,11 @@ const clickOutside = (event) => {
                         @update:modelValue="onModelValueChange"
                         @focus="onFocus"
                         @keypress.enter="isFocused=false"
-                    />
+                    >
+                        <template #appendInner v-if="optionsTextBy && optionsValueBy">
+                            <span class="input-value-name">{{ options.find((e) => e[optionsValueBy] === inputValue)?.[optionsTextBy] }}</span>
+                        </template>
+                    </va-input>
                 </div>
             </template>
             <ul v-if="(isEmpty(options) === false)" class="inner-options">
@@ -66,7 +87,28 @@ const clickOutside = (event) => {
                     :key="option"
                     @click="onOptionClick(option)"
                 >
-                    {{ option }}
+                    <div :class="{
+                        'selected': $props.optionsValueBy ?
+                            option[$props.optionsValueBy] === inputValue :
+                            option === inputValue
+                    }">
+                        <template v-if="$props.optionsTextBy">
+                            <span>{{ option[$props.optionsValueBy] }}</span>
+                            <span class="text-hint">({{ option[$props.optionsTextBy] }})</span>
+                        </template>
+                        <template v-else>
+                            <span>{{ option }}</span>
+                        </template>
+                    </div>
+                    <div v-if="
+                        $props.optionsValueBy ?
+                            option[$props.optionsValueBy] === inputValue :
+                            option === inputValue
+                    ">
+                        <va-icon class="material-icons-outlined selected" size="16px">
+                            done
+                        </va-icon>
+                    </div>
                 </li>
             </ul>
         </va-dropdown>
@@ -93,6 +135,8 @@ const clickOutside = (event) => {
     scrollbar-color: var(--va-background-element) transparent;
     scrollbar-width: thin;
     z-index: 1000;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    border-radius: 4px;
 }
 
 .option {
@@ -102,10 +146,25 @@ const clickOutside = (event) => {
     align-items: center;
     word-break: break-word;
     cursor: pointer;
+    flex-direction: row;
+    justify-content: space-between;
 
     &:hover {
         color: inherit;
         background-color: rgba(21, 78, 193, 0.2);
     }
+
+    .text-hint {
+        margin-left: 0.25rem;
+        opacity: 0.7;
+    }
+
+    .selected {
+        color: var(--va-primary);
+    }
+}
+
+.input-value-name {
+    white-space: nowrap;
 }
 </style>

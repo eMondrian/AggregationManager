@@ -5,6 +5,8 @@ import { computed, ref, watch } from 'vue';
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
 import { getTableList, getColumnsList, getQuery } from '@/api';
 // import { getTableList, getColumnsList, getQuery } from '@/mocks/api';
+import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
+import { getQueryPerformance } from '../../../api';
 
 
 const props = defineProps(['onSave'])
@@ -26,7 +28,8 @@ const initialState = {
     scheduleData: {
         schedule: '',
         strategy: 'TIMER_DRIVEN'
-    }
+    },
+    columnsFilter: '',
 }
 
 const steps = ref(cloneDeep(initialState.steps))
@@ -36,6 +39,7 @@ const tableName = ref(initialState.tableName)
 const tableData = ref(initialState.tableData)
 const selectedColumns = ref(cloneDeep(initialState.selectedColumns))
 const isAnaliticStarted = ref(initialState.isAnaliticStarted)
+const columnsFilter = ref(initialState.columnsFilter)
 const isRequestInProcess = ref(false)
 
 const tableList = ref([]);
@@ -50,6 +54,11 @@ const isTableDataReadyToSave = computed(() => aggregationName.value && tableData
 const isQueryConfigured = computed(() => selectedColumns.value.length);
 
 const stepper = ref(null);
+
+const perfomanceStats = ref({
+    rowsCount: null,
+    time: null,
+})
 
 const prevStep = () => {
     console.log(stepper);
@@ -94,6 +103,40 @@ const fetchColumns = async (table) => {
     }
 }
 
+const cronScheduleOptions = [
+    {
+        text: 'Every day, 8AM, 8PM',
+        value: '0 0 8,20 * * ?'
+    },
+    {
+        text: 'MON-FRI, 2:20PM',
+        value: '0 20 14 ? * MON-FRI'
+    }
+]
+
+const timerScheduleOptions = [
+    {
+        value: '30 sec',
+        text: 'Every 30 sec',
+    },
+    {
+        value: '10 min',
+        text: 'Every 10 min',
+    },
+    {
+        value: '1 hour',
+        text: 'Every hour',
+    },
+    {
+        value: '1 day',
+        text: 'Every day',
+    },
+    {
+        value: '1 week',
+        text: 'Every hour',
+    }
+];
+
 const { isOpened, run, close } = usePromisifiedModal({
     opened: () => {
         fetchTablesList();
@@ -115,17 +158,77 @@ watch(isQueryConfigured, (isReady) => {
     steps.value[2].disabled = !isReady
 })
 
+watch(() => scheduleData.value.strategy, () => {
+    scheduleData.value.schedule = '';
+})
+
 const isSelectedColumnsReadyToSave = computed(() => !isEmpty(selectedColumns.value))
 watch(isSelectedColumnsReadyToSave, (isReady) => steps.value[1].icon = isReady ? 'done' : initialState.steps[1].icon)
 
 const isReadyToSave = computed(() => isTableDataReadyToSave.value && isSelectedColumnsReadyToSave.value)
 
-const startPerfomanceAnalitic = () => {
-    isAnaliticStarted.value = true
-}
+let analyticsInterval = null;
+let requestController = null; 
 
 const stopPerfomanceAnalitic = () => {
-    isAnaliticStarted.value = false
+    requestController.abort();
+    requestController = null;
+
+    clearInterval(analyticsInterval);
+    analyticsInterval = null;
+
+    isAnaliticStarted.value = false;
+    perfomanceStats.value.time = null;
+    perfomanceStats.value.rowsCount = null;
+}
+const startPerfomanceAnalitic = async () => {
+    try {
+        perfomanceStats.value.time = null;
+        perfomanceStats.value.rowsCount = null;
+
+        isAnaliticStarted.value = true;
+
+        const request = {
+            database: tableData.value.database,
+            table: tableData.value.name,
+            columns: selectedColumns.value.map((e) => {
+                return {
+                    name: e.name,
+                    type: e.role,
+                    aggregate_function: e.aggregate_function
+                }
+            }),
+        }
+
+        const { query } = await getQuery(request);
+
+        const analysisTimerStarted = Date.now()
+
+        analyticsInterval = setInterval(() => {
+            const curTime = Date.now()
+            const duration = (curTime - analysisTimerStarted) / 1000
+
+            perfomanceStats.value.time = duration
+        }, 1000);
+        
+        requestController = new AbortController();
+        const result = await getQueryPerformance(query, requestController);
+        const analysisTimerEnded = Date.now()
+
+        clearInterval(analyticsInterval);
+
+        const duration = (analysisTimerEnded - analysisTimerStarted) / 1000
+
+        console.log("duration", duration);
+        console.log("result", result.rows_count);
+        perfomanceStats.value.time = duration
+        perfomanceStats.value.rowsCount = result.rows_count
+    } catch (e) {
+        handleError(e);
+    } finally {
+        isAnaliticStarted.value = false
+    }
+
 }
 
 const resetState = () => {
@@ -137,6 +240,8 @@ const resetState = () => {
     selectedColumns.value = cloneDeep(initialState.selectedColumns)
     scheduleData.value = cloneDeep(initialState.scheduleData)
     isAnaliticStarted.value = initialState.isAnaliticStarted
+    columnsFilter.value = initialState.columnsFilter
+    aggregationColumnsData.value = []
     tableList.value = []
 }
 
@@ -225,7 +330,12 @@ defineExpose({ run, resetState })
                     </template>
                     <template #step-content-1>
                         <section class="tab-content">
-                            <va-data-table class="columns-table" sticky-header virtual-scroller v-model="selectedColumns" :items="aggregationColumnsData" :columns="aggregationColumns" selectable select-mode="multiple" :loading="aggregationColumnsDataLoading">
+                            <va-input
+                                v-model="columnsFilter"
+                                placeholder="Filter..."
+                                class="filter-input"
+                            />
+                            <va-data-table class="columns-table" sticky-header virtual-scroller v-model="selectedColumns" :items="aggregationColumnsData" :columns="aggregationColumns" selectable select-mode="multiple" :loading="aggregationColumnsDataLoading" :filter="columnsFilter">
                                 <template #cell(role)="data">
                                     <va-select
                                         class="role-selector"
@@ -246,7 +356,13 @@ defineExpose({ run, resetState })
                     <template #step-content-2>
                         <section class="tab-content">
                             <div class="table-data-inputs-wrapper">
-                                <va-input v-model="scheduleData.schedule" label="Schedule" />
+                                <InputWithOptions
+                                    v-model="scheduleData.schedule"
+                                    label="Schedule"
+                                    :options="scheduleData.strategy === 'CRON_DRIVEN' ? cronScheduleOptions : timerScheduleOptions"
+                                    optionsTextBy="text"
+                                    optionsValueBy="value"
+                                />
                                 <va-select
                                     v-model="scheduleData.strategy" 
                                     label="Scheduling strategy" 
@@ -265,10 +381,10 @@ defineExpose({ run, resetState })
                     <div class="perfomance-stats">
                         <h3>Perfomance</h3>
                         <div class="rows-info">
-                            <p>Rows count:</p><span class="rows-count-number">1234</span>
+                            <p>Rows count:</p><span class="rows-count-number">{{ perfomanceStats.rowsCount || "N/A" }}</span>
                         </div>
                         <div class="rows-info">
-                            <p>Time passed:</p><span class="rows-count-number">2:30</span>
+                            <p>Time passed:</p><span class="rows-count-number">{{ perfomanceStats.time ? `${perfomanceStats.time}s` : "N/A" }}</span>
                         </div>
                     </div>
                     <div class="perfomance-controll-buttons">
@@ -343,6 +459,7 @@ defineExpose({ run, resetState })
 
         .rows-count-number {
             color: var(--va-info);
+            width: 100px;
         }
     }
 
@@ -374,5 +491,9 @@ defineExpose({ run, resetState })
     gap: 1rem;
     flex-grow: 1;
     padding: 0 0 1rem;
+}
+
+.filter-input {
+    flex-grow: 0;
 }
 </style>
