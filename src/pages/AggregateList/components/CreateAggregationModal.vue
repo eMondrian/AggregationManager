@@ -40,7 +40,7 @@ const timerScheduleOptions = [
     },
     {
         value: '1 week',
-        text: 'Every hour',
+        text: 'Every week',
     }
 ];
 
@@ -57,6 +57,7 @@ const scheduleOptions = [
 const initialState = {
     tabs: [
         { title: 'Properties', icon: 'list_alt' },
+        { title: 'Default Template', icon: 'edit_document' },
         { title: 'Query', icon: 'code' },
         { title: 'Schedule', icon: 'schedule' },
     ],
@@ -68,6 +69,7 @@ const initialState = {
         nifiProcessId: '',
         generated: true,
     },
+    defaultTemplate: '',
     queryDefaultValue: '',
     scheduleData: {
         schedule: '',
@@ -78,6 +80,7 @@ const initialState = {
 const tabs = ref(cloneDeep(initialState.tabs))
 const activeTab = ref(initialState.activeTab)
 const propertiesData = ref(cloneDeep(initialState.propertiesData))
+const defaultTemplate = ref(cloneDeep(initialState.defaultTemplate))
 const query = ref(initialState.queryDefaultValue)
 const scheduleData = ref(cloneDeep(initialState.scheduleData))
 const processesListLoading = ref(false);
@@ -126,7 +129,7 @@ const { isOpened, run, close } = usePromisifiedModal({
     }
 });
 
-const onUnmountEditor = (value) => {
+const onEditorChange = (value) => {
     query.value = value
 }
 
@@ -134,6 +137,7 @@ const resetState = () => {
     activeTab.value = initialState.activeTab
     propertiesData.value = cloneDeep(initialState.propertiesData)
     query.value = initialState.queryDefaultValue
+    defaultTemplate.value = initialState.defaultTemplate
     scheduleData.value = cloneDeep(initialState.scheduleData)
 
     isEdit.value = false;
@@ -142,6 +146,7 @@ const resetState = () => {
 const onSave = async () => {
     close({
         propertiesData: propertiesData.value,
+        defaultTemplate: defaultTemplate.value,
         query: query.value,
         scheduleData: scheduleData.value
     })
@@ -210,9 +215,17 @@ defineExpose({ run, resetState })
                             </div>
                         </section>
                         <section v-if="activeTab===tabs[1].title" class="tab-content">
-                            <monaco-editor :initialInputValue="query" :onUnmount="onUnmountEditor" />
+                            <div class="properties-inputs-wrapper">
+                                <va-input
+                                    label="default template"
+                                    v-model="defaultTemplate"
+                                />
+                            </div>
                         </section>
                         <section v-if="activeTab===tabs[2].title" class="tab-content">
+                            <monaco-editor :initialInputValue="query" :onChange="onEditorChange" />
+                        </section>
+                        <section v-if="activeTab===tabs[3].title" class="tab-content">
                             <div class="properties-inputs-wrapper">
                                 <InputWithOptions
                                     v-model="scheduleData.schedule"

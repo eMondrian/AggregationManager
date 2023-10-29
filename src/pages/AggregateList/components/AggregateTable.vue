@@ -59,6 +59,7 @@ const onCreateAggregationFromWizzard = async (data) => {
             aggregation_name: data.aggregation_name,
             table_name: data.table_name,
             query: data.query,
+            default_template: data.default_template,
             is_generated_nifi_process: data.is_generated_nifi_process,
             scheduling_period: data.scheduling_period,
             scheduling_strategy: data.scheduling_strategy,
