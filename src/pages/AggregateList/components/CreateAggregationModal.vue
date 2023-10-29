@@ -3,10 +3,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import { ref } from 'vue';
 import MonacoEditor from './MonacoEditor.vue';
 // import { getProcesses } from '@/mocks/api'
-import { getProcesses } from '@/api'
+import { getProcesses, getTemplates } from '@/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
-import { watch } from 'vue';
+import { watch, onMounted } from 'vue';
 
 const { handleError } = useErrorHandler();
 
@@ -83,6 +83,7 @@ const propertiesData = ref(cloneDeep(initialState.propertiesData))
 const defaultTemplate = ref(cloneDeep(initialState.defaultTemplate))
 const query = ref(initialState.queryDefaultValue)
 const scheduleData = ref(cloneDeep(initialState.scheduleData))
+const templateOptions = ref([]);
 const processesListLoading = ref(false);
 const processesList = ref([]);
 const isEdit = ref(false);
@@ -129,6 +130,11 @@ const { isOpened, run, close } = usePromisifiedModal({
     }
 });
 
+const fetchTabplateOptions = async () => {
+    const availableTemplates = await getTemplates();
+    templateOptions.value = [...availableTemplates]
+} 
+
 const onEditorChange = (value) => {
     query.value = value
 }
@@ -154,6 +160,10 @@ const onSave = async () => {
 
 watch(() => scheduleData.value.strategy, () => {
     scheduleData.value.schedule = '';
+})
+
+onMounted(() => {
+    fetchTabplateOptions()
 })
 
 const onClose = () => {
@@ -216,9 +226,12 @@ defineExpose({ run, resetState })
                         </section>
                         <section v-if="activeTab===tabs[1].title" class="tab-content">
                             <div class="properties-inputs-wrapper">
-                                <va-input
-                                    label="default template"
+                                <InputWithOptions
                                     v-model="defaultTemplate"
+                                    label="Default Template"
+                                    :options="templateOptions"
+                                    optionsTextBy="name"
+                                    optionsValueBy="id"
                                 />
                             </div>
                         </section>
