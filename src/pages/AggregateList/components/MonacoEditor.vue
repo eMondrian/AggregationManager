@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted } from 'vue'
 import * as monaco from 'monaco-editor'
 
 const props = defineProps({
     initialInputValue: {
         default: '',
     },
-    onUnmount: {
+    onChange: {
         default: () => { }
     }
 })
@@ -23,15 +23,11 @@ const createEditor = (initialInputValue = props.initialInputValue) => {
             automaticLayout: true,
         }
     )
-}
 
-const getValue = () => {
-    return editor.getValue()
+    editor.getModel().onDidChangeContent(() => {
+        props.onChange(editor.getValue())
+    })
 }
-
-onBeforeUnmount(() => {
-    props.onUnmount(getValue())
-})
 
 onMounted(() => {
     createEditor()

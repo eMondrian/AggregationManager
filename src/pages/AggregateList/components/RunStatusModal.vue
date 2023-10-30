@@ -1,8 +1,7 @@
 <script setup>
-import { ref, computed } from 'vue';
-import isEmpty from 'lodash/isEmpty';
-import { getRunStatus, setRunStatus } from '@/api'
-// import { getRunStatus, setRunStatus } from '@/mocks/api'
+import { ref } from 'vue';
+// import { getRunStatus, setRunStatus } from '@/api'
+import { getRunStatus, setRunStatus } from '@/mocks/api'
 import { usePromisifiedModal } from '@/composables'
 import { useErrorHandler } from '../../../composables';
 
@@ -30,8 +29,6 @@ const { isOpened, run, close } = usePromisifiedModal({ opened: async (id) => {
   aggregationId = id;
   await getStatus();
 }});
-
-const isModalFilled = computed(() => !isEmpty(name.value) && !isEmpty(nifiProcess.value))
 
 const resetState = () => {
   status.value = null;
@@ -88,6 +85,7 @@ defineExpose({ run, resetState })
                     <va-button :disabled="loading" @click="setState('DISABLED')">Disable</va-button>
                     <va-button :disabled="loading" @click="setState('RUN_ONCE')">Run once</va-button>
                     <va-button :disabled="loading" @click="setState('STOPPED')">Stop</va-button>
+                    <va-button :disabled="loading" @click="setState('RESETED')">Reset</va-button>
                   </div>
               </section>
             </va-inner-loading>

@@ -3,10 +3,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import { ref } from 'vue';
 import MonacoEditor from './MonacoEditor.vue';
 // import { getProcesses } from '@/mocks/api'
-import { getProcesses } from '@/api'
+import { getProcesses, getTemplates } from '@/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
-import { watch } from 'vue';
+import { watch, onMounted } from 'vue';
 
 const { handleError } = useErrorHandler();
 
@@ -40,7 +40,7 @@ const timerScheduleOptions = [
     },
     {
         value: '1 week',
-        text: 'Every hour',
+        text: 'Every week',
     }
 ];
 
@@ -57,6 +57,7 @@ const scheduleOptions = [
 const initialState = {
     tabs: [
         { title: 'Properties', icon: 'list_alt' },
+        { title: 'Default Template', icon: 'edit_document' },
         { title: 'Query', icon: 'code' },
         { title: 'Schedule', icon: 'schedule' },
     ],
@@ -68,6 +69,7 @@ const initialState = {
         nifiProcessId: '',
         generated: true,
     },
+    defaultTemplate: '',
     queryDefaultValue: '',
     scheduleData: {
         schedule: '',
@@ -78,8 +80,10 @@ const initialState = {
 const tabs = ref(cloneDeep(initialState.tabs))
 const activeTab = ref(initialState.activeTab)
 const propertiesData = ref(cloneDeep(initialState.propertiesData))
+const defaultTemplate = ref(cloneDeep(initialState.defaultTemplate))
 const query = ref(initialState.queryDefaultValue)
 const scheduleData = ref(cloneDeep(initialState.scheduleData))
+const templateOptions = ref([]);
 const processesListLoading = ref(false);
 const processesList = ref([]);
 const isEdit = ref(false);
@@ -126,7 +130,12 @@ const { isOpened, run, close } = usePromisifiedModal({
     }
 });
 
-const onUnmountEditor = (value) => {
+const fetchTabplateOptions = async () => {
+    const availableTemplates = await getTemplates();
+    templateOptions.value = [...availableTemplates]
+} 
+
+const onEditorChange = (value) => {
     query.value = value
 }
 
@@ -134,6 +143,7 @@ const resetState = () => {
     activeTab.value = initialState.activeTab
     propertiesData.value = cloneDeep(initialState.propertiesData)
     query.value = initialState.queryDefaultValue
+    defaultTemplate.value = initialState.defaultTemplate
     scheduleData.value = cloneDeep(initialState.scheduleData)
 
     isEdit.value = false;
@@ -142,6 +152,7 @@ const resetState = () => {
 const onSave = async () => {
     close({
         propertiesData: propertiesData.value,
+        defaultTemplate: defaultTemplate.value,
         query: query.value,
         scheduleData: scheduleData.value
     })
@@ -149,6 +160,10 @@ const onSave = async () => {
 
 watch(() => scheduleData.value.strategy, () => {
     scheduleData.value.schedule = '';
+})
+
+onMounted(() => {
+    fetchTabplateOptions()
 })
 
 const onClose = () => {
@@ -210,9 +225,20 @@ defineExpose({ run, resetState })
                             </div>
                         </section>
                         <section v-if="activeTab===tabs[1].title" class="tab-content">
-                            <monaco-editor :initialInputValue="query" :onUnmount="onUnmountEditor" />
+                            <div class="properties-inputs-wrapper">
+                                <InputWithOptions
+                                    v-model="defaultTemplate"
+                                    label="Default Template"
+                                    :options="templateOptions"
+                                    optionsTextBy="name"
+                                    optionsValueBy="id"
+                                />
+                            </div>
                         </section>
                         <section v-if="activeTab===tabs[2].title" class="tab-content">
+                            <monaco-editor :initialInputValue="query" :onChange="onEditorChange" />
+                        </section>
+                        <section v-if="activeTab===tabs[3].title" class="tab-content">
                             <div class="properties-inputs-wrapper">
                                 <InputWithOptions
                                     v-model="scheduleData.schedule"

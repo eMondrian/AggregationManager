@@ -83,6 +83,7 @@ const onCreateAggregationClick = async () => {
                 aggregation_name: aggregationDesc.propertiesData.name,
                 table_name: aggregationDesc.propertiesData.tableName,
                 query: aggregationDesc.query,
+                default_template: aggregationDesc.defaultTemplate,
                 start_nifi_process_id: aggregationDesc.propertiesData.nifiProcessId,
                 is_generated_nifi_process: !aggregationDesc.propertiesData.nifiProcessId,
                 scheduling_period: aggregationDesc.scheduleData.schedule,
