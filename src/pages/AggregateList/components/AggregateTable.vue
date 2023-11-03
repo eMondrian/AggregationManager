@@ -1,6 +1,7 @@
 <script setup>
 import sortBy from 'lodash/sortBy'
 import { ref, onMounted, getCurrentInstance } from 'vue'
+import { useToast } from 'vuestic-ui'
 import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation, resetCommand } from '@/api'
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
 import LoadingIndicator from '@/modals/LoadingIndicator.vue'
@@ -23,6 +24,7 @@ const apiCallRunning = ref(false);
 const filterValue = ref('')
 
 const { handleError } = useErrorHandler();
+const { init } = useToast()
 
 const fetchTableData = async () => {
     try {
@@ -176,6 +178,7 @@ const reset = async (item) => {
     try {
         await resetCommand(item.id)
         await fetchTableData()
+        init({ message: 'Data was successfully reseted', color: 'success', duration: 3500 })
     } catch (e) {
         handleError(e);
     }
