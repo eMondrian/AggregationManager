@@ -23,6 +23,8 @@ export const usePromisifiedModal = ({
       resolveFunction = res;
     });
 
+    console.log('close')
+
     isOpened.value = false;
     resetFn();
   };

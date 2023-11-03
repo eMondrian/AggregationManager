@@ -23,20 +23,18 @@ const getStatus = async () => {
     }
 }
 
-const { isOpened, run, close } = usePromisifiedModal({ opened: async (id) => {
-  aggregationId = id;
-  await getStatus();
-}});
-
 const resetState = () => {
   status.value = null;
   aggregationId = null;
 }
 
-const onClose = () => {
-    close()
-    resetState()
-}
+const { isOpened, run, close } = usePromisifiedModal({
+    opened: async (id) => {
+        aggregationId = id;
+        await getStatus();
+    },
+    resetFn: resetState,
+});
 
 const setState = async (newState) => {
     try {
@@ -51,7 +49,12 @@ const setState = async (newState) => {
         await getStatus();
     }
 }
-defineExpose({ run, resetState })
+
+const onClose = () => {
+    close()
+}
+
+defineExpose({ run })
 </script>
 
 <template>

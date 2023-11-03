@@ -82,13 +82,13 @@ const onCreateAggregationClick = async () => {
                 aggregation_name: aggregationDesc.propertiesData.name,
                 table_name: aggregationDesc.propertiesData.tableName,
                 query: aggregationDesc.query,
-                default_template: aggregationDesc.defaultTemplate,
+                template: aggregationDesc.templateId,
                 start_nifi_process_id: aggregationDesc.propertiesData.nifiProcessId,
                 is_generated_nifi_process: !aggregationDesc.propertiesData.nifiProcessId,
                 scheduling_period: aggregationDesc.scheduleData.schedule,
                 scheduling_strategy: aggregationDesc.scheduleData.strategy,
             });
-            createAggregationModal.value.resetState()
+
             await fetchTableData()
         } catch (e) {
             handleError(e);
@@ -109,7 +109,7 @@ const onCreateFromNifiButtonClick = async () => {
                 is_generated_nifi_process: false,
                 start_nifi_process_id: nifiAggregation.process,
             })
-            createNifiModal.value.resetState()
+
             await fetchTableData()
         } catch (e) {
             handleError(e);
@@ -146,7 +146,7 @@ const onEdit = async (item) => {
                 scheduling_strategy: aggregationDesc.scheduleData.strategy,
                 id: item.id,
             });
-            createAggregationModal.value.resetState()
+
             await fetchTableData()
         } catch (e) {
             handleError(e);

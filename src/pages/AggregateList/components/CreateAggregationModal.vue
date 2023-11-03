@@ -1,12 +1,19 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, computed } from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
-import { getProcesses, getTemplates } from '@/api'
+import { getProcesses, getTemplates, getSettings } from '@/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
 import MonacoEditor from './MonacoEditor.vue';
 
 const { handleError } = useErrorHandler();
+
+const TABS_TITLE = {
+    PROPERTIES: 'Properties',
+    DEFAULT_TEMPLATE: 'Default Template',
+    QUERY: 'Query',
+    SCHEDULE: 'Schedule',
+}
 
 const cronScheduleOptions = [
     {
@@ -44,12 +51,12 @@ const timerScheduleOptions = [
 
 const initialState = {
     tabs: [
-        { title: 'Properties', icon: 'list_alt' },
-        { title: 'Default Template', icon: 'edit_document' },
-        { title: 'Query', icon: 'code' },
-        { title: 'Schedule', icon: 'schedule' },
+        { title: TABS_TITLE.PROPERTIES, icon: 'list_alt' },
+        { title: TABS_TITLE.DEFAULT_TEMPLATE, icon: 'edit_document' },
+        { title: TABS_TITLE.QUERY, icon: 'code' },
+        { title: TABS_TITLE.SCHEDULE, icon: 'schedule' },
     ],
-    activeTab: 'Properties',
+    activeTab: TABS_TITLE.PROPERTIES,
     propertiesData: {
         id: '',
         name: '',
@@ -57,7 +64,7 @@ const initialState = {
         nifiProcessId: '',
         generated: true,
     },
-    defaultTemplate: '',
+    templateId: '',
     queryDefaultValue: '',
     scheduleData: {
         schedule: '',
@@ -65,16 +72,28 @@ const initialState = {
     }
 }
 
-const tabs = ref(cloneDeep(initialState.tabs))
 const activeTab = ref(initialState.activeTab)
 const propertiesData = ref(cloneDeep(initialState.propertiesData))
-const defaultTemplate = ref(cloneDeep(initialState.defaultTemplate))
+const templateId = ref(cloneDeep(initialState.templateId))
 const query = ref(initialState.queryDefaultValue)
 const scheduleData = ref(cloneDeep(initialState.scheduleData))
 const templateOptions = ref([]);
 const processesListLoading = ref(false);
 const processesList = ref([]);
 const isEdit = ref(false);
+
+const tabs = computed(() => isEdit.value ? initialState.tabs.filter(({ title }) => title !== TABS_TITLE.DEFAULT_TEMPLATE) : initialState.tabs)
+
+const resetState = () => {
+    activeTab.value = initialState.activeTab
+    propertiesData.value = cloneDeep(initialState.propertiesData)
+    templateId.value = initialState.templateId
+    query.value = initialState.queryDefaultValue
+    scheduleData.value = cloneDeep(initialState.scheduleData)
+
+    processesListLoading.value = false
+    isEdit.value = false;
+}
 
 const { isOpened, run, close } = usePromisifiedModal({
     opened: async (data) => {
@@ -90,6 +109,16 @@ const { isOpened, run, close } = usePromisifiedModal({
             scheduleData.value.strategy = data.scheduling_strategy;
 
             isEdit.value = true;
+        }
+
+        try {
+            const settingsData = await getSettings();
+            templateId.value = settingsData.default_template_id;
+
+            const availableTemplates = await getTemplates();
+            templateOptions.value = [...availableTemplates]
+        } catch (e) {
+            handleError(e);
         }
 
         try {
@@ -115,32 +144,18 @@ const { isOpened, run, close } = usePromisifiedModal({
         } finally {
             processesListLoading.value = false;
         }
-    }
+    },
+    resetFn: resetState,
 });
-
-const fetchTabplateOptions = async () => {
-    const availableTemplates = await getTemplates();
-    templateOptions.value = [...availableTemplates]
-} 
 
 const onEditorChange = (value) => {
     query.value = value
 }
 
-const resetState = () => {
-    activeTab.value = initialState.activeTab
-    propertiesData.value = cloneDeep(initialState.propertiesData)
-    query.value = initialState.queryDefaultValue
-    defaultTemplate.value = initialState.defaultTemplate
-    scheduleData.value = cloneDeep(initialState.scheduleData)
-
-    isEdit.value = false;
-}
-
 const onSave = async () => {
     close({
         propertiesData: propertiesData.value,
-        defaultTemplate: defaultTemplate.value,
+        templateId: templateId.value,
         query: query.value,
         scheduleData: scheduleData.value
     })
@@ -150,16 +165,11 @@ watch(() => scheduleData.value.strategy, () => {
     scheduleData.value.schedule = '';
 })
 
-onMounted(() => {
-    fetchTabplateOptions()
-})
-
 const onClose = () => {
     close()
-    resetState()
 }
 
-defineExpose({ run, resetState })
+defineExpose({ run })
 </script>
 
 <template>
@@ -182,7 +192,7 @@ defineExpose({ run, resetState })
             <section class="modal-content">
                 <va-tabs v-model="activeTab" grow class="full-size-tabs">
                     <template #tabs>
-                        <va-tab v-for="tab in tabs" :key="tab.title" :name="tab.title" :disabled="tab.title === 'Query' && !propertiesData.generated">
+                        <va-tab v-for="tab in tabs" :key="tab.title" :name="tab.title" :disabled="tab.title === TABS_TITLE.QUERY && !propertiesData.generated">
                             <div class="tab-title">
                                 <va-icon class="material-icons">
                                     {{ tab.icon }}
@@ -192,7 +202,7 @@ defineExpose({ run, resetState })
                         </va-tab>
                     </template>
                     <template #default>
-                        <section v-if="activeTab===tabs[0].title" class="tab-content">
+                        <section v-if="activeTab===TABS_TITLE.PROPERTIES" class="tab-content">
                             <div class="properties-inputs-wrapper">
                                 <div v-if="propertiesData.id!==''" class="info-label-wrapper">
                                     <span class="info-label">Aggregation ID: </span><span>{{ propertiesData.id }}</span>
@@ -212,10 +222,10 @@ defineExpose({ run, resetState })
                                 />
                             </div>
                         </section>
-                        <section v-if="activeTab===tabs[1].title" class="tab-content">
+                        <section v-if="activeTab===TABS_TITLE.DEFAULT_TEMPLATE" class="tab-content">
                             <div class="properties-inputs-wrapper">
                                 <InputWithOptions
-                                    v-model="defaultTemplate"
+                                    v-model="templateId"
                                     label="Default Template"
                                     :options="templateOptions"
                                     optionsTextBy="name"
@@ -223,10 +233,10 @@ defineExpose({ run, resetState })
                                 />
                             </div>
                         </section>
-                        <section v-if="activeTab===tabs[2].title" class="tab-content">
+                        <section v-if="activeTab===TABS_TITLE.QUERY" class="tab-content">
                             <monaco-editor :initialInputValue="query" :onChange="onEditorChange" />
                         </section>
-                        <section v-if="activeTab===tabs[3].title" class="tab-content">
+                        <section v-if="activeTab===TABS_TITLE.SCHEDULE" class="tab-content">
                             <div class="properties-inputs-wrapper">
                                 <InputWithOptions
                                     v-model="scheduleData.schedule"

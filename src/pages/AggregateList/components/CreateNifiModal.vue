@@ -16,30 +16,33 @@ const processesListLoading = ref(false);
 
 const { handleError } = useErrorHandler();
 
-const { isOpened, run, close } = usePromisifiedModal({ opened: async () => {
-    try {
-        processesListLoading.value = true;
-        const processes = await getProcesses();
-
-        processesList.value = processes.map((e) => {
-            return {
-                name: e.name,
-                value: e.id
-            }
-        })
-    } catch (e) {
-        handleError(e);
-    } finally {
-        processesListLoading.value = false;
-    }
-}});
-
-const isModalFilled = computed(() => !isEmpty(name.value) && !isEmpty(nifiProcess.value))
-
 const resetState = () => {
     name.value = ''
     nifiProcess.value = {}
 }
+
+const { isOpened, run, close } = usePromisifiedModal({
+    opened: async () => {
+        try {
+            processesListLoading.value = true;
+            const processes = await getProcesses();
+
+            processesList.value = processes.map((e) => {
+                return {
+                    name: e.name,
+                    value: e.id
+                }
+            })
+        } catch (e) {
+            handleError(e);
+        } finally {
+            processesListLoading.value = false;
+        }
+    },
+    resetFn: resetState,
+});
+
+const isModalFilled = computed(() => !isEmpty(name.value) && !isEmpty(nifiProcess.value))
 
 const onSave = async () => {
     close({ name: name.value, process: nifiProcess.value })
@@ -47,10 +50,9 @@ const onSave = async () => {
 
 const onClose = () => {
     close()
-    resetState()
 }
 
-defineExpose({ run, resetState })
+defineExpose({ run })
 </script>
 
 <template>
