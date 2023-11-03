@@ -52,3 +52,10 @@ export const setRunStatus = async (id, state) => {
     console.log('$$$ api/aggregates | setRunStatus', result)
     return result
 }
+
+
+export const resetCommand = async (id) => {
+    await wait(500)
+    console.log('$$$ api/aggregates | resetCommand', id)
+    return;
+}

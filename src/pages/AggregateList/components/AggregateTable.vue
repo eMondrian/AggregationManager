@@ -1,8 +1,8 @@
 <script setup>
 import sortBy from 'lodash/sortBy'
 import { ref, onMounted, getCurrentInstance } from 'vue'
-import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/mocks/api'
-// import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation } from '@/api'
+import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation, resetCommand } from '@/mocks/api'
+// import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation, resetCommand } from '@/api'
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
 import LoadingIndicator from '@/modals/LoadingIndicator.vue'
 import { useErrorHandler } from '@/composables'
@@ -173,6 +173,15 @@ const onDelete = async (item) => {
     }
 };
 
+const reset = async (item) => {
+    try {
+        await resetCommand(item.id)
+        await fetchTableData()
+    } catch (e) {
+        handleError(e);
+    }
+}
+
 const columns = [
     { key: 'name', sortable: true },
     { key: 'tableName', sortable: true },
@@ -264,6 +273,13 @@ const columns = [
                     <template #append>
                         <va-icon class="material-icons-outlined">
                             delete
+                        </va-icon>
+                    </template>
+                </va-button>
+                <va-button preset="plain" color="info" title="Reset" @click="reset(tableData[rowIndex])">
+                    <template #append>
+                        <va-icon class="material-icons-outlined">
+                            restart_alt
                         </va-icon>
                     </template>
                 </va-button>

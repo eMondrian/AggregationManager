@@ -108,3 +108,18 @@ export const setRunStatus = async (id, state) => {
         throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
     }
 }
+
+
+export const resetCommand = async (id) => {
+    const response = await fetch(`${PATH.AGGREGATION}/${id}/reset`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        }
+    });
+
+    if (!response.ok) {
+        const responseText = await response.text();
+        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+    }
+}

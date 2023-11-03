@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
-// import { getRunStatus, setRunStatus } from '@/api'
-import { getRunStatus, setRunStatus } from '@/mocks/api'
+import { getRunStatus, setRunStatus } from '@/api'
+// import { getRunStatus, setRunStatus } from '@/mocks/api'
 import { usePromisifiedModal } from '@/composables'
 import { useErrorHandler } from '../../../composables';
 
@@ -53,7 +53,6 @@ const setState = async (newState) => {
         await getStatus();
     }
 }
-
 defineExpose({ run, resetState })
 </script>
 
@@ -85,7 +84,6 @@ defineExpose({ run, resetState })
                     <va-button :disabled="loading" @click="setState('DISABLED')">Disable</va-button>
                     <va-button :disabled="loading" @click="setState('RUN_ONCE')">Run once</va-button>
                     <va-button :disabled="loading" @click="setState('STOPPED')">Stop</va-button>
-                    <va-button :disabled="loading" @click="setState('RESETED')">Reset</va-button>
                   </div>
               </section>
             </va-inner-loading>
