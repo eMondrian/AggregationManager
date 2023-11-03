@@ -1,12 +1,10 @@
 <script setup>
+import { computed, ref, watch } from 'vue';
 import isEmpty from 'lodash/isEmpty'
 import cloneDeep from 'lodash/cloneDeep';
-import { computed, ref, watch } from 'vue';
+import { getTableList, getColumnsList, getQuery, getQueryPerformance } from '@/api';
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
-import { getTableList, getColumnsList, getQuery } from '@/api';
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
-import { getQueryPerformance } from '../../../api';
-
 
 const props = defineProps(['onSave'])
 const { handleError } = useErrorHandler();
@@ -18,7 +16,6 @@ const initialState = {
         { label: 'Schedule', icon: 'schedule', disabled: true },
     ],
     activeStep: 0,
-    // TODO: Tables have unique names, no need for complex objects
     aggregationName: '',
     tableName: '',
     tableData: null,
@@ -60,11 +57,9 @@ const perfomanceStats = ref({
 })
 
 const prevStep = () => {
-    console.log(stepper);
     stepper.value.stepControls.prevStep();
 }
 const nextStep = () => {
-    console.log(stepper);
     stepper.value.stepControls.nextStep();
 }
 
@@ -180,6 +175,7 @@ const stopPerfomanceAnalitic = () => {
     perfomanceStats.value.time = null;
     perfomanceStats.value.rowsCount = null;
 }
+
 const startPerfomanceAnalitic = async () => {
     try {
         perfomanceStats.value.time = null;
@@ -218,8 +214,6 @@ const startPerfomanceAnalitic = async () => {
 
         const duration = (analysisTimerEnded - analysisTimerStarted) / 1000
 
-        console.log("duration", duration);
-        console.log("result", result.rows_count);
         perfomanceStats.value.time = duration
         perfomanceStats.value.rowsCount = result.rows_count
     } catch (e) {
@@ -243,7 +237,6 @@ const resetState = () => {
     aggregationColumnsData.value = []
     tableList.value = []
 }
-
 
 const onClose = () => {
     close()
@@ -420,7 +413,6 @@ defineExpose({ run, resetState })
 }
 
 .modal-content {
-//    padding: 1rem;
     overflow: hidden;
     display: flex;
     flex-direction: column;

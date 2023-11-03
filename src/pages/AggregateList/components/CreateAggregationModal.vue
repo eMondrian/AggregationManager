@@ -1,11 +1,10 @@
 <script setup>
+import { ref, watch, onMounted } from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
-import { ref } from 'vue';
-import MonacoEditor from './MonacoEditor.vue';
 import { getProcesses, getTemplates } from '@/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
-import { watch, onMounted } from 'vue';
+import MonacoEditor from './MonacoEditor.vue';
 
 const { handleError } = useErrorHandler();
 
@@ -42,16 +41,6 @@ const timerScheduleOptions = [
         text: 'Every week',
     }
 ];
-
-const scheduleOptions = [
-    'schedule-option-1',
-    'schedule-option-2',
-    'schedule-option-3',
-    'schedule-option-4',
-    'schedule-option-5',
-    'schedule-option-6',
-    'schedule-option-7',
-]
 
 const initialState = {
     tabs: [

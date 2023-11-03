@@ -1,12 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useToast } from 'vuestic-ui'
-import { wait } from '@/helpers'
 import { getSettings, getTemplates, updateSettings } from '@/api'
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
 
-
-const saveKey = 'settings'
 const initialState = {
     defaultTemplate: {
         name: '',
@@ -14,17 +11,15 @@ const initialState = {
     }
 }
 const templateOptions = ref([]);
-
 const settings = ref(initialState)
-
 const isLoading = ref(false)
+
 const { init } = useToast()
 
 const fetchSettings = async () => {
     isLoading.value = true
     try {
         const data = await getSettings();
-        console.log(data);
 
         settings.value.defaultTemplate.name = data.default_template_name;
         settings.value.defaultTemplate.id = data.default_template_id;
@@ -41,13 +36,7 @@ onMounted(() => {
     fetchSettings()
 })
 
-const setDefaultTemplate = (data) => {
-    settings.value.defaultTemplate.name = data.name;
-    settings.value.defaultTemplate.id = data.id;
-}
-
 const onSaveButtonClick = async () => {
-    console.log(settings.value);
     try {
         isLoading.value = true
 

@@ -1,8 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { getRunStatus, setRunStatus } from '@/api'
-import { usePromisifiedModal } from '@/composables'
-import { useErrorHandler } from '../../../composables';
+import { usePromisifiedModal, useErrorHandler } from '@/composables'
 
 const status = ref(null)
 const loading = ref(false);

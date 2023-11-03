@@ -2,7 +2,6 @@
 import sortBy from 'lodash/sortBy'
 import { ref, onMounted, getCurrentInstance } from 'vue'
 import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation, resetCommand } from '@/api'
-// import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation, resetCommand } from '@/api'
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
 import LoadingIndicator from '@/modals/LoadingIndicator.vue'
 import { useErrorHandler } from '@/composables'

@@ -2,8 +2,8 @@
 import { ref, computed } from 'vue';
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { ROUTES } from '@/router/routes.js'
-import { useErrorHandler } from './composables';
 import ErrorModal from '@/modals/ErrorModal.vue';
+import { useErrorHandler } from './composables';
 
 const errorModal = ref(null)
 
@@ -19,7 +19,6 @@ const acitveNavItem = computed(() => navItems.find((item) => item.path === route
 
 const { errorList, removeError } = useErrorHandler();
 const closeError = (uid) => {
-  console.log('close', uid)
   removeError(uid);
 }
 

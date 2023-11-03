@@ -1,7 +1,7 @@
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue';
 import sortBy from 'lodash/sortBy'
 import { getEventsTableData} from '@/api'
-import { ref, onMounted, onUnmounted } from 'vue';
 import { useErrorHandler } from '@/composables'
 import { setIntervalAsync, sortNumbers } from '@/helpers'
 
