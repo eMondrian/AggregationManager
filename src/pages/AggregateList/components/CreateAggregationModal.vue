@@ -2,7 +2,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { ref } from 'vue';
 import MonacoEditor from './MonacoEditor.vue';
-// import { getProcesses } from '@/mocks/api'
 import { getProcesses, getTemplates } from '@/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'

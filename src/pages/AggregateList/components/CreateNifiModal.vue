@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
 import isEmpty from 'lodash/isEmpty';
-// import { getProcesses } from '@/mocks/api'
 import { getProcesses } from '@/api'
 import { usePromisifiedModal } from '@/composables'
 import { useErrorHandler } from '../../../composables';

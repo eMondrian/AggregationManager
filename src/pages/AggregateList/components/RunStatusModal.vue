@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue';
 import { getRunStatus, setRunStatus } from '@/api'
-// import { getRunStatus, setRunStatus } from '@/mocks/api'
 import { usePromisifiedModal } from '@/composables'
 import { useErrorHandler } from '../../../composables';
 
