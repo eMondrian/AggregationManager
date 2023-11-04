@@ -1,13 +1,10 @@
 <script setup>
+import { computed, ref, watch } from 'vue';
 import isEmpty from 'lodash/isEmpty'
 import cloneDeep from 'lodash/cloneDeep';
-import { computed, ref, watch } from 'vue';
+import { getTableList, getColumnsList, getQuery, getQueryPerformance } from '@/api';
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
-import { getTableList, getColumnsList, getQuery } from '@/api';
-// import { getTableList, getColumnsList, getQuery } from '@/mocks/api';
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
-import { getQueryPerformance } from '../../../api';
-
 
 const props = defineProps(['onSave'])
 const { handleError } = useErrorHandler();
@@ -19,7 +16,6 @@ const initialState = {
         { label: 'Schedule', icon: 'schedule', disabled: true },
     ],
     activeStep: 0,
-    // TODO: Tables have unique names, no need for complex objects
     aggregationName: '',
     tableName: '',
     tableData: null,
@@ -60,25 +56,40 @@ const perfomanceStats = ref({
     time: null,
 })
 
+const resetState = () => {
+    steps.value = cloneDeep(initialState.steps)
+    activeStep.value = initialState.activeStep
+    aggregationName.value = initialState.aggregationName
+    tableName.value = initialState.tableName
+    tableData.value = initialState.tableData
+    selectedColumns.value = cloneDeep(initialState.selectedColumns)
+    scheduleData.value = cloneDeep(initialState.scheduleData)
+    isAnaliticStarted.value = initialState.isAnaliticStarted
+    columnsFilter.value = initialState.columnsFilter
+    aggregationColumnsData.value = []
+    tableList.value = []
+}
+
+const { isOpened, run, close } = usePromisifiedModal({
+    opened: async () => {
+        try {
+            tableListLoading.value = true
+            const result = await getTableList();
+            tableList.value.push(...result);
+        } catch (e) {
+            handleError(e);
+        } finally {
+            tableListLoading.value = false
+        }
+    },
+    resetFn: resetState,
+});
+
 const prevStep = () => {
-    console.log(stepper);
     stepper.value.stepControls.prevStep();
 }
 const nextStep = () => {
-    console.log(stepper);
     stepper.value.stepControls.nextStep();
-}
-
-const fetchTablesList = async () => {
-    try {
-        tableListLoading.value = true
-        const result = await getTableList();
-        tableList.value.push(...result);
-    } catch (e) {
-        handleError(e);
-    } finally {
-        tableListLoading.value = false
-    }
 }
 
 const fetchColumns = async (table) => {
@@ -102,46 +113,6 @@ const fetchColumns = async (table) => {
         aggregationColumnsDataLoading.value = false
     }
 }
-
-const cronScheduleOptions = [
-    {
-        text: 'Every day, 8AM, 8PM',
-        value: '0 0 8,20 * * ?'
-    },
-    {
-        text: 'MON-FRI, 2:20PM',
-        value: '0 20 14 ? * MON-FRI'
-    }
-]
-
-const timerScheduleOptions = [
-    {
-        value: '30 sec',
-        text: 'Every 30 sec',
-    },
-    {
-        value: '10 min',
-        text: 'Every 10 min',
-    },
-    {
-        value: '1 hour',
-        text: 'Every hour',
-    },
-    {
-        value: '1 day',
-        text: 'Every day',
-    },
-    {
-        value: '1 week',
-        text: 'Every hour',
-    }
-];
-
-const { isOpened, run, close } = usePromisifiedModal({
-    opened: () => {
-        fetchTablesList();
-    }
-});
 
 watch(activeStep, (currentStep) => {
     if (currentStep === 1) {
@@ -181,6 +152,7 @@ const stopPerfomanceAnalitic = () => {
     perfomanceStats.value.time = null;
     perfomanceStats.value.rowsCount = null;
 }
+
 const startPerfomanceAnalitic = async () => {
     try {
         perfomanceStats.value.time = null;
@@ -219,8 +191,6 @@ const startPerfomanceAnalitic = async () => {
 
         const duration = (analysisTimerEnded - analysisTimerStarted) / 1000
 
-        console.log("duration", duration);
-        console.log("result", result.rows_count);
         perfomanceStats.value.time = duration
         perfomanceStats.value.rowsCount = result.rows_count
     } catch (e) {
@@ -229,26 +199,6 @@ const startPerfomanceAnalitic = async () => {
         isAnaliticStarted.value = false
     }
 
-}
-
-const resetState = () => {
-    steps.value = cloneDeep(initialState.steps)
-    activeStep.value = initialState.activeStep
-    aggregationName.value = initialState.aggregationName
-    tableName.value = initialState.tableName
-    tableData.value = initialState.tableData
-    selectedColumns.value = cloneDeep(initialState.selectedColumns)
-    scheduleData.value = cloneDeep(initialState.scheduleData)
-    isAnaliticStarted.value = initialState.isAnaliticStarted
-    columnsFilter.value = initialState.columnsFilter
-    aggregationColumnsData.value = []
-    tableList.value = []
-}
-
-
-const onClose = () => {
-    close()
-    resetState()
 }
 
 const onSave = async () => {
@@ -281,7 +231,6 @@ const onSave = async () => {
             scheduling_period: scheduleData.value.schedule,
             scheduling_strategy: scheduleData.value.strategy,
         })
-        resetState();
     } catch (e) {
         handleError(e);
         run();
@@ -295,7 +244,46 @@ const aggregationColumns = [
     { key: "aggregate_function", sortable: false, width: "30%" }
 ]
 
-defineExpose({ run, resetState })
+
+const cronScheduleOptions = [
+    {
+        text: 'Every day, 8AM, 8PM',
+        value: '0 0 8,20 * * ?'
+    },
+    {
+        text: 'MON-FRI, 2:20PM',
+        value: '0 20 14 ? * MON-FRI'
+    }
+]
+
+const timerScheduleOptions = [
+    {
+        value: '30 sec',
+        text: 'Every 30 sec',
+    },
+    {
+        value: '10 min',
+        text: 'Every 10 min',
+    },
+    {
+        value: '1 hour',
+        text: 'Every hour',
+    },
+    {
+        value: '1 day',
+        text: 'Every day',
+    },
+    {
+        value: '1 week',
+        text: 'Every hour',
+    }
+];
+
+const onClose = () => {
+    close()
+}
+
+defineExpose({ run })
 </script>
 
 <template>
@@ -421,7 +409,6 @@ defineExpose({ run, resetState })
 }
 
 .modal-content {
-//    padding: 1rem;
     overflow: hidden;
     display: flex;
     flex-direction: column;

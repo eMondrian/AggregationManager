@@ -1,7 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { isEmpty } from 'lodash';
-import { computed } from 'vue';
 
 const emit = defineEmits(['update:modelValue'])
 
@@ -22,7 +21,6 @@ const props = defineProps({
 })
 
 const isFocused = ref(false)
-const modelValueWrapper = ref(props.modelValue)
 const inputValue = ref(props.modelValue)
 
 

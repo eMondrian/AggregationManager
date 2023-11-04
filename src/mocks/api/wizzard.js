@@ -72,3 +72,14 @@ export const getQuery = async (data) => {
   console.log('$$$ api/wizzard | getQuery', result, data)
   return result
 }
+
+
+export const getQueryPerformance = async (query, requestController) => {
+  await wait(500)
+  const result = {
+    rows_count: 123
+  }
+  console.log('$$$ api/wizzard | getQuery', result, query, requestController)
+
+  return result
+}

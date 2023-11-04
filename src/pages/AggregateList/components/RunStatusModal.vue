@@ -1,9 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { getRunStatus, setRunStatus } from '@/api'
-// import { getRunStatus, setRunStatus } from '@/mocks/api'
-import { usePromisifiedModal } from '@/composables'
-import { useErrorHandler } from '../../../composables';
+import { usePromisifiedModal, useErrorHandler } from '@/composables'
 
 const status = ref(null)
 const loading = ref(false);
@@ -25,20 +23,18 @@ const getStatus = async () => {
     }
 }
 
-const { isOpened, run, close } = usePromisifiedModal({ opened: async (id) => {
-  aggregationId = id;
-  await getStatus();
-}});
-
 const resetState = () => {
   status.value = null;
   aggregationId = null;
 }
 
-const onClose = () => {
-    close()
-    resetState()
-}
+const { isOpened, run, close } = usePromisifiedModal({
+    opened: async (id) => {
+        aggregationId = id;
+        await getStatus();
+    },
+    resetFn: resetState,
+});
 
 const setState = async (newState) => {
     try {
@@ -53,7 +49,12 @@ const setState = async (newState) => {
         await getStatus();
     }
 }
-defineExpose({ run, resetState })
+
+const onClose = () => {
+    close()
+}
+
+defineExpose({ run })
 </script>
 
 <template>

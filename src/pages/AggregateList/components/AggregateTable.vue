@@ -1,8 +1,8 @@
 <script setup>
 import sortBy from 'lodash/sortBy'
 import { ref, onMounted, getCurrentInstance } from 'vue'
-import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation, resetCommand } from '@/mocks/api'
-// import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation, resetCommand } from '@/api'
+import { useToast } from 'vuestic-ui'
+import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation, updateAggregation, resetCommand } from '@/api'
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
 import LoadingIndicator from '@/modals/LoadingIndicator.vue'
 import { useErrorHandler } from '@/composables'
@@ -24,6 +24,7 @@ const apiCallRunning = ref(false);
 const filterValue = ref('')
 
 const { handleError } = useErrorHandler();
+const { init } = useToast()
 
 const fetchTableData = async () => {
     try {
@@ -83,13 +84,13 @@ const onCreateAggregationClick = async () => {
                 aggregation_name: aggregationDesc.propertiesData.name,
                 table_name: aggregationDesc.propertiesData.tableName,
                 query: aggregationDesc.query,
-                default_template: aggregationDesc.defaultTemplate,
+                template: aggregationDesc.templateId,
                 start_nifi_process_id: aggregationDesc.propertiesData.nifiProcessId,
                 is_generated_nifi_process: !aggregationDesc.propertiesData.nifiProcessId,
                 scheduling_period: aggregationDesc.scheduleData.schedule,
                 scheduling_strategy: aggregationDesc.scheduleData.strategy,
             });
-            createAggregationModal.value.resetState()
+
             await fetchTableData()
         } catch (e) {
             handleError(e);
@@ -110,7 +111,7 @@ const onCreateFromNifiButtonClick = async () => {
                 is_generated_nifi_process: false,
                 start_nifi_process_id: nifiAggregation.process,
             })
-            createNifiModal.value.resetState()
+
             await fetchTableData()
         } catch (e) {
             handleError(e);
@@ -147,7 +148,7 @@ const onEdit = async (item) => {
                 scheduling_strategy: aggregationDesc.scheduleData.strategy,
                 id: item.id,
             });
-            createAggregationModal.value.resetState()
+
             await fetchTableData()
         } catch (e) {
             handleError(e);
@@ -177,6 +178,7 @@ const reset = async (item) => {
     try {
         await resetCommand(item.id)
         await fetchTableData()
+        init({ message: 'Data was successfully reseted', color: 'success', duration: 3500 })
     } catch (e) {
         handleError(e);
     }
