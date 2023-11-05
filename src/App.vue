@@ -4,10 +4,13 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { ROUTES } from '@/router/routes.js'
 import ErrorModal from '@/modals/ErrorModal.vue';
 import { useErrorHandler } from './composables';
+import { KeycloakService } from '@/authorization/KeycloakService'
 
 const errorModal = ref(null)
 
 const route = useRoute();
+
+const userName = KeycloakService.GetUserName()
 
 const navItems = [
   { path: ROUTES.home.path, text: 'Aggregation' },
@@ -25,6 +28,10 @@ const closeError = (uid) => {
 const onOpenDetailsClick = async (error) => {
   removeError(error.uid);
   await errorModal.value.run({ error })
+}
+
+const onLogoutClick = () => {
+  KeycloakService.CallLogOut()
 }
 </script>
 
@@ -53,6 +60,14 @@ const onOpenDetailsClick = async (error) => {
             </RouterLink>
           </li>
         </ul>
+      </va-navbar-item>
+      <va-navbar-item>
+        <p class="username">
+          {{ userName }}
+        </p>
+        <va-button @click="onLogoutClick()">
+          Logout
+        </va-button>
       </va-navbar-item>
     </template>
   </va-navbar>
@@ -126,6 +141,12 @@ main {
 .app-navbar {
   padding-top: 0;
   padding-bottom: 0;
+}
+
+.username {
+  padding: 1rem;
+  border-radius: 30%;
+  background-color: #3795d9;
 }
 
 .alerts-section {

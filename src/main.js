@@ -2,7 +2,7 @@ import {
     createVuesticEssential, VaButton, VaButtonDropdown, VaInput, VaSelect, VaIcon, VaDataTable, VaNavbar, VaNavbarItem, VaModal, VaTabs, VaTab, VaStepper, VaPopover, VaInnerLoading, VaAlert, VaDropdown
 } from 'vuestic-ui'
 import { createApp } from 'vue'
-
+import { KeycloakService } from './authorization/KeycloakService'
 import CreateAggregationWithWizzardModal from '@/pages/AggregateList/components/CreateAggregationWithWizzardModal.vue'
 import App from './App.vue'
 import router from './router'
@@ -25,4 +25,10 @@ app.config.globalProperties.$customWizzards = [
         },
     }
 ]
-app.mount('#app')
+
+const renderApp = () => {
+    app.mount('#app')
+};
+  
+KeycloakService.CallLogin(renderApp);
+
