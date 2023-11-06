@@ -1,7 +1,8 @@
 import { PATH } from "./path"
+import { fetchWithAuth } from "./utils"
 
 export const getProcesses = async () => {
-  const response = await fetch(`${PATH.PROCESSES}`)
+  const response = await fetchWithAuth(`${PATH.PROCESSES}`)
 
   if (!response.ok) {
     const responseText = await response.text();

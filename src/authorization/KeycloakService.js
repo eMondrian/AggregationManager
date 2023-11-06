@@ -34,17 +34,6 @@ const Token = () => keycloakInstance?.token;
 
 const LogOut = () => keycloakInstance.logout();
 
-const UserRoles = () => {
-  if (keycloakInstance.resourceAccess === undefined) {
-    return undefined;
-  }
-  if (keycloakInstance.resourceAccess["vuejs"] === undefined) {
-    return undefined;
-  }
-
-  return keycloakInstance.resourceAccess["vuejs"].roles;
-};
-
 const updateToken = (successCallback) =>
   keycloakInstance.updateToken(5).then(successCallback).catch(doLogin);
 
@@ -57,7 +46,6 @@ export const KeycloakService = {
   GetUserName: UserName,
   GetAccesToken: Token,
   CallLogOut: LogOut,
-  GetUserRoles: UserRoles,
   UpdateToken: updateToken,
   IsLoggedIn: isLoggedIn,
 };

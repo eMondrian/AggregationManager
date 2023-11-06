@@ -36,7 +36,7 @@ export const getTableList = async () => {
     {"database":"dpd_sandbox","name":"DictScanWorkloadWeighting"},
     {"database":"dpd_sandbox","name":"DictSellerCode"},
   ]
-  console.log('$$$ api/wizzard | getTableList', result)
+  // console.log('$$$ api/wizzard | getTableList', result)
   return result
 }
 
@@ -60,7 +60,7 @@ export const getColumnsList = async (tableDesc) => {
     {"name":"CdbOrderId","position":"3","type":"String"},
     {"name":"CdbMemDateTime","position":"4","type":"DateTime"},
   ]
-  console.log('$$$ api/wizzard | getColumnsList', result, tableDesc)
+  // console.log('$$$ api/wizzard | getColumnsList', result, tableDesc)
   return result
 }
 
@@ -69,7 +69,7 @@ export const getQuery = async (data) => {
   const result = {
     query: "SELECT TEST FROM TEST"
   }
-  console.log('$$$ api/wizzard | getQuery', result, data)
+  // console.log('$$$ api/wizzard | getQuery', result, data)
   return result
 }
 
@@ -79,7 +79,7 @@ export const getQueryPerformance = async (query, requestController) => {
   const result = {
     rows_count: 123
   }
-  console.log('$$$ api/wizzard | getQuery', result, query, requestController)
+  // console.log('$$$ api/wizzard | getQuery', result, query, requestController)
 
   return result
 }
