@@ -1,7 +1,8 @@
 import { PATH } from "./path"
+import { fetchWithAuth } from "./utils"
 
 export const getSettings = async () => {
-  const response = await fetch(PATH.SETTINGS)
+  const response = await fetchWithAuth(PATH.SETTINGS)
 
   if (!response.ok) {
       const responseText = await response.text();
@@ -14,7 +15,7 @@ export const getSettings = async () => {
 }
 
 export const updateSettings = async (data) => {
-  const response = await fetch(PATH.SETTINGS, {
+  const response = await fetchWithAuth(PATH.SETTINGS, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -29,7 +30,7 @@ export const updateSettings = async (data) => {
 }
 
 export const getTemplates = async () => {
-  const response = await fetch(PATH.TEMPLATES)
+  const response = await fetchWithAuth(PATH.TEMPLATES)
 
   if (!response.ok) {
       const responseText = await response.text();

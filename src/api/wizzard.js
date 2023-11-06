@@ -1,7 +1,8 @@
 import { PATH } from "./path"
+import { fetchWithAuth } from "./utils"
 
 export const getTableList = async () => {
-  const response = await fetch(PATH.SOURCE_TABLES, {
+  const response = await fetchWithAuth(PATH.SOURCE_TABLES, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -18,7 +19,7 @@ export const getTableList = async () => {
 }
 
 export const getColumnsList = async (tableDesc) => {
-  const response = await fetch(`${PATH.COLUMNS}?database=${tableDesc.database}&table=${tableDesc.name}`, {
+  const response = await fetchWithAuth(`${PATH.COLUMNS}?database=${tableDesc.database}&table=${tableDesc.name}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -35,7 +36,7 @@ export const getColumnsList = async (tableDesc) => {
 }
 
 export const getQuery = async (data) => {
-  const response = await fetch(PATH.WIZARD_QUERY, {
+  const response = await fetchWithAuth(PATH.WIZARD_QUERY, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +54,7 @@ export const getQuery = async (data) => {
 
 export const getQueryPerformance = async (query, requestController) => {
   const signal = requestController.signal;
-  const response = await fetch(PATH.QUERY_PERFORMANCE, {
+  const response = await fetchWithAuth(PATH.QUERY_PERFORMANCE, {
       method: "POST",
       signal: signal,
       headers: {

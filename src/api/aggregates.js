@@ -1,8 +1,9 @@
 import { AggregateTableData } from "./models/AggregateTableData"
 import { PATH } from "./path"
+import { fetchWithAuth } from "./utils"
 
 export const getAggregatesTableData = async () => {
-    const response = await fetch(PATH.AGGREGATION)
+    const response = await fetchWithAuth(PATH.AGGREGATION)
 
     if (!response.ok) {
         const responseText = await response.text();
@@ -15,7 +16,7 @@ export const getAggregatesTableData = async () => {
 }
 
 export const addAgregation = async (data) => {
-    const response = await fetch(PATH.AGGREGATION, {
+    const response = await fetchWithAuth(PATH.AGGREGATION, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -30,7 +31,7 @@ export const addAgregation = async (data) => {
 }
 
 export const getAggregation = async (id) => {
-    const response = await fetch(`${PATH.AGGREGATION}/${id}`, {
+    const response = await fetchWithAuth(`${PATH.AGGREGATION}/${id}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -47,7 +48,7 @@ export const getAggregation = async (id) => {
 }
 
 export const updateAggregation = async (data) => {
-    const response = await fetch(`${PATH.AGGREGATION}/${data.id}`, {
+    const response = await fetchWithAuth(`${PATH.AGGREGATION}/${data.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +63,7 @@ export const updateAggregation = async (data) => {
 }
 
 export const removeAgregation = async (id) => {
-    const response = await fetch(`${PATH.AGGREGATION}/${id}`, {
+    const response = await fetchWithAuth(`${PATH.AGGREGATION}/${id}`, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
@@ -76,7 +77,7 @@ export const removeAgregation = async (id) => {
 }
 
 export const getRunStatus = async (id) => {
-    const response = await fetch(`${PATH.AGGREGATION}/${id}/run-status`, {
+    const response = await fetchWithAuth(`${PATH.AGGREGATION}/${id}/run-status`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -93,7 +94,7 @@ export const getRunStatus = async (id) => {
 }
 
 export const setRunStatus = async (id, state) => {
-    const response = await fetch(`${PATH.AGGREGATION}/${id}/run-status`, {
+    const response = await fetchWithAuth(`${PATH.AGGREGATION}/${id}/run-status`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -111,7 +112,7 @@ export const setRunStatus = async (id, state) => {
 
 
 export const resetCommand = async (id) => {
-    const response = await fetch(`${PATH.AGGREGATION}/${id}/reset`, {
+    const response = await fetchWithAuth(`${PATH.AGGREGATION}/${id}/reset`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",

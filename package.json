@@ -3,12 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "build:local": "vite build --base=/dist",
     "preview": "vite preview"
   },
   "dependencies": {
+    "keycloak-js": "^22.0.5",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.38.0",
     "uuid": "^9.0.0",
