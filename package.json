@@ -15,7 +15,7 @@
     "uuid": "^9.0.0",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6",
-    "vuestic-ui": "^1.6.3"
+    "vuestic-ui": "^1.8.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.1.0",

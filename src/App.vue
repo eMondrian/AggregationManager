@@ -3,14 +3,16 @@ import { ref, computed } from 'vue';
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { ROUTES } from '@/router/routes.js'
 import ErrorModal from '@/modals/ErrorModal.vue';
-import { useErrorHandler } from './composables';
 import { KeycloakService } from '@/authorization/KeycloakService'
+import config from '@/app.config'
+import { useErrorHandler } from './composables';
+
+const isKeycloakAuthActive = config.auth.isKeycloakAuthActive
+const userName = isKeycloakAuthActive ? KeycloakService.GetUserName() : ''
 
 const errorModal = ref(null)
 
 const route = useRoute();
-
-const userName = KeycloakService.GetUserName()
 
 const navItems = [
   { path: ROUTES.home.path, text: 'Aggregation' },
@@ -38,36 +40,52 @@ const onLogoutClick = () => {
 <template>
   <va-navbar color="primary" class="app-navbar">
     <template #left>
-      <va-navbar-item>
-        Aggregation Manager
-      </va-navbar-item>
-    </template>
-    <template #right>
-      <va-navbar-item>
-        <ul class="app-tabs">
-          <li
-            v-for="item in navItems"
-            :class = "{
-              'app-tabs-item': true,
-              'active-tab': acitveNavItem === item
-            }"
+        <va-navbar-item>
+          <RouterLink
+            :to="ROUTES.home.path"
+            class="app-link"
           >
-            <RouterLink
-              :to="item.path"
-              class="app-link"
+            <h1 class="logo">
+              Aggregation Manager
+            </h1>
+          </RouterLink>
+        </va-navbar-item>
+      </template>
+      <template #center>
+        <va-navbar-item>
+          <ul class="app-tabs">
+            <li
+              v-for="item in navItems"
+              :class = "{
+                'app-tabs-item': true,
+                'active-tab': acitveNavItem === item
+              }"
             >
-              {{ item.text }}
-            </RouterLink>
-          </li>
-        </ul>
-      </va-navbar-item>
+              <RouterLink
+                :to="item.path"
+                class="app-link"
+              >
+                {{ item.text }}
+              </RouterLink>
+            </li>
+          </ul>
+        </va-navbar-item>
+    </template>
+    <template #right v-if="isKeycloakAuthActive">
       <va-navbar-item>
-        <p class="username">
-          {{ userName }}
-        </p>
-        <va-button @click="onLogoutClick()">
-          Logout
-        </va-button>
+        <va-button-dropdown
+          :label="userName"
+        >
+          <div class="profile-content">
+            <va-button
+              class="logout-button"
+              preset="plain"
+              @click="onLogoutClick()"
+            >
+              Logout
+            </va-button>
+          </div>
+        </va-button-dropdown>
       </va-navbar-item>
     </template>
   </va-navbar>
@@ -103,7 +121,7 @@ const onLogoutClick = () => {
 </template>
 
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 main {
   padding: 2rem 4%;
   display: flex;
@@ -143,10 +161,20 @@ main {
   padding-bottom: 0;
 }
 
-.username {
-  padding: 1rem;
-  border-radius: 30%;
-  background-color: #3795d9;
+.logo {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+}
+
+.profile-content {
+  display: flex;
+  justify-content: center;
+}
+
+.logout-button {
+  width: 8rem;
 }
 
 .alerts-section {

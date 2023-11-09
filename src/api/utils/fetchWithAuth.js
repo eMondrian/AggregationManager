@@ -1,4 +1,5 @@
-import { KeycloakService } from "../../authorization/KeycloakService"
+import { KeycloakService } from "@/authorization/KeycloakService"
+import config from '@/app.config'
 import { merge } from "lodash";
 
 /**
@@ -20,7 +21,7 @@ const addAuthHeader = (init) => {
  * @param { RequestInit } init
  * @returns { Promise<Response> }
  */
-export const fetchWithAuth = async (input, init) => {
+const fetchWithAuthFn = async (input, init) => {
     let mergedInit = init
 
     if (KeycloakService.IsLoggedIn()) {
@@ -30,3 +31,5 @@ export const fetchWithAuth = async (input, init) => {
 
     return await fetch(input, mergedInit)
 }
+
+export const fetchWithAuth = config.auth.isKeycloakAuthActive ? fetchWithAuthFn : fetch

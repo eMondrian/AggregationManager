@@ -4,6 +4,7 @@ import {
 import { createApp } from 'vue'
 import { KeycloakService } from './authorization/KeycloakService'
 import CreateAggregationWithWizzardModal from '@/pages/AggregateList/components/CreateAggregationWithWizzardModal.vue'
+import config from './app.config'
 import App from './App.vue'
 import router from './router'
 
@@ -29,6 +30,11 @@ app.config.globalProperties.$customWizzards = [
 const renderApp = () => {
     app.mount('#app')
 };
-  
-KeycloakService.CallLogin(renderApp);
+
+if (config.auth.isKeycloakAuthActive) {
+    KeycloakService.CallLogin(renderApp);
+} else {
+    renderApp()
+}
+
 
