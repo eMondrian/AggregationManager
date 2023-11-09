@@ -178,7 +178,7 @@ const reset = async (item) => {
     try {
         await resetCommand(item.id)
         await fetchTableData()
-        init({ message: 'Data was successfully reseted', color: 'success', duration: 3500 })
+        init({ message: 'Aggregation was successfully reseted', color: 'success', duration: 3500 })
     } catch (e) {
         handleError(e);
     }

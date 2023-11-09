@@ -10,7 +10,7 @@ const { handleError } = useErrorHandler();
 
 const TABS_TITLE = {
     PROPERTIES: 'Properties',
-    DEFAULT_TEMPLATE: 'Default Template',
+    TEMPLATE: 'Template',
     QUERY: 'Query',
     SCHEDULE: 'Schedule',
 }
@@ -52,7 +52,7 @@ const timerScheduleOptions = [
 const initialState = {
     tabs: [
         { title: TABS_TITLE.PROPERTIES, icon: 'list_alt' },
-        { title: TABS_TITLE.DEFAULT_TEMPLATE, icon: 'edit_document' },
+        { title: TABS_TITLE.TEMPLATE, icon: 'edit_document' },
         { title: TABS_TITLE.QUERY, icon: 'code' },
         { title: TABS_TITLE.SCHEDULE, icon: 'schedule' },
     ],
@@ -82,7 +82,7 @@ const processesListLoading = ref(false);
 const processesList = ref([]);
 const isEdit = ref(false);
 
-const tabs = computed(() => isEdit.value ? initialState.tabs.filter(({ title }) => title !== TABS_TITLE.DEFAULT_TEMPLATE) : initialState.tabs)
+const tabs = computed(() => isEdit.value ? initialState.tabs.filter(({ title }) => title !== TABS_TITLE.TEMPLATE) : initialState.tabs)
 
 const resetState = () => {
     activeTab.value = initialState.activeTab
@@ -222,11 +222,11 @@ defineExpose({ run })
                                 />
                             </div>
                         </section>
-                        <section v-if="activeTab===TABS_TITLE.DEFAULT_TEMPLATE" class="tab-content">
+                        <section v-if="activeTab===TABS_TITLE.TEMPLATE" class="tab-content">
                             <div class="properties-inputs-wrapper">
                                 <InputWithOptions
                                     v-model="templateId"
-                                    label="Default Template"
+                                    label="Template"
                                     :options="templateOptions"
                                     optionsTextBy="name"
                                     optionsValueBy="id"
