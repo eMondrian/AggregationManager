@@ -14,5 +14,6 @@ export const PATH = {
     WIZARD_QUERY: `${BASE_PATH}/v1/wizard-query`,
     SETTINGS: `${BASE_PATH}/v1/settings`,
     TEMPLATES: `${BASE_PATH}/v1/templates`,
-    QUERY_PERFORMANCE: `${BASE_PATH}/v1/query-performance`
+    QUERY_PERFORMANCE: `${BASE_PATH}/v1/query-performance`,
+    USERS: `${BASE_PATH}/v1/users`,
 }

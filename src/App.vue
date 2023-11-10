@@ -14,11 +14,13 @@ const errorModal = ref(null)
 
 const route = useRoute();
 
-const navItems = [
+const defaultNavItems = [
   { path: ROUTES.home.path, text: 'Aggregation' },
   { path: ROUTES.processes.path, text: 'Events' },
   { path: ROUTES.settings.path, text: 'Settings' },
 ]
+
+const navItems = isKeycloakAuthActive ? [...defaultNavItems, { path: ROUTES.users.path, text: 'Users' }] : defaultNavItems;
 
 const acitveNavItem = computed(() => navItems.find((item) => item.path === route.path))
 
