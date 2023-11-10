@@ -127,8 +127,10 @@ const onUpdateButtonClick = () => {
     fetchTableData()
 }
 
-const onCalculate = (item) => {
-    runStatusModal.value.run(item.id);
+const onCalculate = async (item) => {
+    await runStatusModal.value.run(item.id);
+
+    await fetchTableData()
 }
 
 const onEdit = async (item) => {
@@ -200,19 +202,7 @@ const columns = [
     <section class="control-panel">
         <h2>List of aggregates</h2>
         <div class="buttons-container">
-            <va-button @click="onUpdateButtonClick" preset="plain" :disabled="isLoading">
-                <template #append>
-                    <va-icon size="large"
-                        :class = "{
-                            'material-icons-outlined': true,
-                            'app-spinned-icon': isLoading
-                        }"
-                    >
-                        change_circle
-                    </va-icon>
-                </template>
-            </va-button>
-            <va-button-dropdown title="Create" preset="plain" hide-icon prevent-overflow>
+            <va-button-dropdown title="Create" preset="plain" hide-icon prevent-overflow class="add-aggregation-dropdown">
                 <template #label>
                     <va-icon size="large" class="material-icons-outlined">
                         add_box
@@ -231,6 +221,18 @@ const columns = [
                     </va-button>
                 </div>
             </va-button-dropdown>
+            <va-button @click="onUpdateButtonClick" preset="plain" :disabled="isLoading">
+                <template #append>
+                    <va-icon size="large"
+                        :class = "{
+                            'material-icons-outlined': true,
+                            'app-spinned-icon': isLoading
+                        }"
+                    >
+                        change_circle
+                    </va-icon>
+                </template>
+            </va-button>
         </div>
     </section>
     <va-input
@@ -325,7 +327,12 @@ const columns = [
 
 .buttons-container {
     display: flex;
+    align-items: center;
     gap: 0.5rem;
+}
+
+.add-aggregation-dropdown {
+    height: 24px;   // NOTE: to be equal same button sizes
 }
 
 .table-action-buttons {

@@ -2,6 +2,7 @@ import { wait } from "@/helpers"
 import { AggregateTableData } from "@/api/models/AggregateTableData"
 import { aggregatesTableDataSchema } from '../dataSchema'
 import { generateArrayData } from "../helpers"
+import { random } from "lodash"
 
 export const getAggregatesTableData = async () => {
     await wait(500)
@@ -41,7 +42,7 @@ export const removeAgregation = async (id) => {
 
 export const getRunStatus = async (id) => {
     await wait(500)
-    const result = { id, state: "RUNNING" }
+    const result = { id, state: ["RUNNING", "DISABLED", "RUN_ONCE", "STOPPED",][random(0,3)] }
     // console.log('$$$ api/aggregates | getRunStatus', result)
     return result
 }
