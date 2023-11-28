@@ -1,5 +1,9 @@
 import Keycloak from "keycloak-js";
-import config from '@/app.config';
+import getConfig from '@/app.config';
+
+
+const config = await getConfig();
+console.log(config);
 
 const initOptions = {
   url: config.auth.basePath,

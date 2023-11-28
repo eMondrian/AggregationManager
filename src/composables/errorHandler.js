@@ -6,11 +6,24 @@ const errorList = ref([]);
 
 export const useErrorHandler = () => {
   const handleError = (e) => {
-    const errorObject = {
-      uid: v4(),
-      message: e.message,
-      name: e.name,
-    };
+    console.log(e);
+    console.log(e.contentType);
+    let errorObject;
+
+    if (e.contentType === 'json') {
+      errorObject = {
+        uid: v4(),
+        message: e.errorBody.message,
+        name: e.name,
+        details: e.errorBody.details,
+      };
+    } else {
+      errorObject = {
+        uid: v4(),
+        message: e.message,
+        name: e.name,
+      };
+    }
 
     errorList.value.push(errorObject);
   }

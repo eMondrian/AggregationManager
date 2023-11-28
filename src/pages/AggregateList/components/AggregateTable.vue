@@ -193,6 +193,8 @@ const columns = [
     { key: 'schedule', sortable: true },
     { key: 'lastDataUpdate', sortable: true, sortingFn: sortNumbers },
     { key: 'lastEvent', sortable: true },
+    { key: 'createdBy', sortable: true },
+    { key: 'lastModifiedBy', sortable: true },
     { key: 'currentStatus', sortable: true },
     { key: 'actions', width: 80 },
 ];

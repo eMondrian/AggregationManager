@@ -6,8 +6,21 @@ export const getAggregatesTableData = async () => {
     const response = await fetchWithAuth(PATH.AGGREGATION)
 
     if (!response.ok) {
-        const responseText = await response.text();
-        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        const type = response.headers.get("Content-Type");
+        
+        if (type.includes('application/json')) {
+            const error = new Error();
+            const responseJson = await response.json();
+            
+            error.contentType = 'json';
+            error.errorBody = responseJson;
+            error.name = `Error! Status: ${responseJson.status}.`
+
+            throw error;
+        } else {
+            const responseText = await response.text();
+            throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        }
     }
 
     const result = await response.json()
@@ -23,10 +36,23 @@ export const addAgregation = async (data) => {
         },
         body: JSON.stringify(data),
     })
-
+    
     if (!response.ok) {
-        const responseText = await response.text();
-        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        const type = response.headers.get("Content-Type");
+        
+        if (type.includes('application/json')) {
+            const error = new Error();
+            const responseJson = await response.json();
+            
+            error.contentType = 'json';
+            error.errorBody = responseJson;
+            error.name = `Error! Status: ${responseJson.status}.`
+
+            throw error;
+        } else {
+            const responseText = await response.text();
+            throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        }
     }
 }
 
@@ -38,9 +64,23 @@ export const getAggregation = async (id) => {
         },
     });
 
+   
     if (!response.ok) {
-        const responseText = await response.text();
-        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        const type = response.headers.get("Content-Type");
+        
+        if (type.includes('application/json')) {
+            const error = new Error();
+            const responseJson = await response.json();
+            
+            error.contentType = 'json';
+            error.errorBody = responseJson;
+            error.name = `Error! Status: ${responseJson.status}.`
+
+            throw error;
+        } else {
+            const responseText = await response.text();
+            throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        }
     }
     
     const result = await response.json();
@@ -57,8 +97,21 @@ export const updateAggregation = async (data) => {
     })
 
     if (!response.ok) {
-        const responseText = await response.text();
-        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        const type = response.headers.get("Content-Type");
+        
+        if (type.includes('application/json')) {
+            const error = new Error();
+            const responseJson = await response.json();
+            
+            error.contentType = 'json';
+            error.errorBody = responseJson;
+            error.name = `Error! Status: ${responseJson.status}.`
+
+            throw error;
+        } else {
+            const responseText = await response.text();
+            throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        }
     }
 }
 
@@ -71,8 +124,21 @@ export const removeAgregation = async (id) => {
     })
 
     if (!response.ok) {
-        const responseText = await response.text();
-        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        const type = response.headers.get("Content-Type");
+        
+        if (type.includes('application/json')) {
+            const error = new Error();
+            const responseJson = await response.json();
+            
+            error.contentType = 'json';
+            error.errorBody = responseJson;
+            error.name = `Error! Status: ${responseJson.status}.`
+
+            throw error;
+        } else {
+            const responseText = await response.text();
+            throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        }
     }
 }
 
@@ -103,10 +169,23 @@ export const setRunStatus = async (id, state) => {
             state: state
         }),
     })
-
+ 
     if (!response.ok) {
-        const responseText = await response.text();
-        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        const type = response.headers.get("Content-Type");
+        
+        if (type.includes('application/json')) {
+            const error = new Error();
+            const responseJson = await response.json();
+            
+            error.contentType = 'json';
+            error.errorBody = responseJson;
+            error.name = `Error! Status: ${responseJson.status}.`
+
+            throw error;
+        } else {
+            const responseText = await response.text();
+            throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        }
     }
 }
 
@@ -118,9 +197,22 @@ export const resetCommand = async (id) => {
             "Content-Type": "application/json",
         }
     });
-
+    
     if (!response.ok) {
-        const responseText = await response.text();
-        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        const type = response.headers.get("Content-Type");
+        
+        if (type.includes('application/json')) {
+            const error = new Error();
+            const responseJson = await response.json();
+            
+            error.contentType = 'json';
+            error.errorBody = responseJson;
+            error.name = `Error! Status: ${responseJson.status}.`
+
+            throw error;
+        } else {
+            const responseText = await response.text();
+            throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+        }
     }
 }

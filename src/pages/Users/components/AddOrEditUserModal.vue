@@ -22,6 +22,8 @@ const { isOpened, run, close } = usePromisifiedModal({
     opened: async (data) => {
         if (data) {
             userData.value = data
+            userData.value.is_admin = userData.value.is_admin === 't'
+            userData.value.is_power_user = userData.value.is_admin === 't'
         }
     },
     resetFn: resetState,
@@ -61,7 +63,7 @@ defineExpose({ run })
                 <div v-if="isEdit" class="info-label-wrapper">
                     <span class="info-label">User ID: </span><span>{{ userData.id }}</span>
                 </div>
-                <va-input v-model="userData.user_name" label="User name" :disabled="isEdit" />
+                <va-input v-model="userData.user_name" label="User name" />
                 <va-checkbox
                     v-model="userData.is_admin"
                     label="Is Admin"

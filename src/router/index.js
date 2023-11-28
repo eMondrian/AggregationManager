@@ -34,13 +34,13 @@ const router = createRouter({
 })
 
 // NOTE: redirect if no access to admin routes
-router.beforeEach(async (to, from) => {
-  if (
-    config.auth.isKeycloakAuthActive === false &&
-    to.name === ROUTES.users.name
-  ) {
-    return { name: ROUTES.home.name }
-  }
-})
+// router.beforeEach(async (to, from) => {
+//   if (
+//     config.auth.isKeycloakAuthActive === false &&
+//     to.name === ROUTES.users.name
+//   ) {
+//     return { name: ROUTES.home.name }
+//   }
+// })
 
 export default router

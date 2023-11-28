@@ -1,6 +1,9 @@
 import { KeycloakService } from "@/authorization/KeycloakService"
-import config from '@/app.config'
 import { merge } from "lodash";
+import getConfig from '@/app.config';
+
+const config = await getConfig();
+console.log(config);
 
 /**
  * @param { RequestInit } init

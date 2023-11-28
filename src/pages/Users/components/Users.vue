@@ -148,12 +148,12 @@ const columns = [
     >
         <template #cell(is_admin)="data">
             <va-icon class="material-icons-outlined">
-                {{ data.rowData.is_admin ? 'done' : 'block' }}
+                {{ data.rowData.is_admin === 't' ? 'done' : 'block' }}
             </va-icon>
         </template>
         <template #cell(is_power_user)="data">
             <va-icon class="material-icons-outlined">
-                {{ data.rowData.is_power_user ? 'done' : 'block' }}
+                {{ data.rowData.is_power_user === 't' ? 'done' : 'block' }}
             </va-icon>
         </template>
         <template #cell(actions)="{ rowIndex }">

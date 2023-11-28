@@ -1,13 +1,14 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, getCurrentInstance } from 'vue';
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { ROUTES } from '@/router/routes.js'
 import ErrorModal from '@/modals/ErrorModal.vue';
 import { KeycloakService } from '@/authorization/KeycloakService'
-import config from '@/app.config'
 import { useErrorHandler } from './composables';
+import getConfig from './app.config'
 
-const isKeycloakAuthActive = config.auth.isKeycloakAuthActive
+const app = getCurrentInstance()
+const isKeycloakAuthActive = app.appContext.config.globalProperties.$authConfig.isKeycloakAuthActive;
 const userName = isKeycloakAuthActive ? KeycloakService.GetUserName() : ''
 
 const errorModal = ref(null)
@@ -15,12 +16,14 @@ const errorModal = ref(null)
 const route = useRoute();
 
 const defaultNavItems = [
-  { path: ROUTES.home.path, text: 'Aggregation' },
+  { path: ROUTES.home.path, text: 'Aggregations' },
   { path: ROUTES.processes.path, text: 'Events' },
   { path: ROUTES.settings.path, text: 'Settings' },
+  { path: ROUTES.users.path, text: 'Users' },
 ]
 
-const navItems = isKeycloakAuthActive ? [...defaultNavItems, { path: ROUTES.users.path, text: 'Users' }] : defaultNavItems;
+// const navItems = isKeycloakAuthActive ? [...defaultNavItems, { path: ROUTES.users.path, text: 'Users' }] : defaultNavItems;
+const navItems = defaultNavItems;
 
 const acitveNavItem = computed(() => navItems.find((item) => item.path === route.path))
 
@@ -42,36 +45,36 @@ const onLogoutClick = () => {
 <template>
   <va-navbar color="primary" class="app-navbar">
     <template #left>
-        <va-navbar-item>
-          <RouterLink
-            :to="ROUTES.home.path"
-            class="app-link"
+      <va-navbar-item>
+        <RouterLink
+          :to="ROUTES.home.path"
+          class="app-link"
+        >
+          <h1 class="logo">
+            Aggregation Manager
+          </h1>
+        </RouterLink>
+      </va-navbar-item>
+    </template>
+    <template #center>
+      <va-navbar-item>
+        <ul class="app-tabs">
+          <li
+            v-for="item in navItems"
+            :class = "{
+              'app-tabs-item': true,
+              'active-tab': acitveNavItem === item
+            }"
           >
-            <h1 class="logo">
-              Aggregation Manager
-            </h1>
-          </RouterLink>
-        </va-navbar-item>
-      </template>
-      <template #center>
-        <va-navbar-item>
-          <ul class="app-tabs">
-            <li
-              v-for="item in navItems"
-              :class = "{
-                'app-tabs-item': true,
-                'active-tab': acitveNavItem === item
-              }"
+            <RouterLink
+              :to="item.path"
+              class="app-link"
             >
-              <RouterLink
-                :to="item.path"
-                class="app-link"
-              >
-                {{ item.text }}
-              </RouterLink>
-            </li>
-          </ul>
-        </va-navbar-item>
+              {{ item.text }}
+            </RouterLink>
+          </li>
+        </ul>
+      </va-navbar-item>
     </template>
     <template #right v-if="isKeycloakAuthActive">
       <va-navbar-item>

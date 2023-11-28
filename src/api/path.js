@@ -1,4 +1,5 @@
-import config from '@/app.config.js';
+import getConfig from '@/app.config';
+const config = await getConfig();
 
 const BASE_PATH = config.baseURL;
 
