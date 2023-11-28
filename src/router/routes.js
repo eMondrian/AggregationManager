@@ -11,4 +11,8 @@ export const ROUTES = {
         path: '/settings',
         name: 'settings',
     },
+    users: {
+        path: '/users',
+        name: 'users',
+    }
 }

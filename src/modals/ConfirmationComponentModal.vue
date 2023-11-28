@@ -2,15 +2,18 @@
 import { ref } from 'vue';
 import { usePromisifiedModal } from '@/composables'
 
-const modalMessage = ref('');
+const modalComponent = ref(null);
+const modalComponentData = ref(null);
 
 const resetState = () => {
-    modalMessage.value = '';
+    modalComponent.value = null
+    modalComponentData.value = null
 }
 
 const { isOpened, run, close } = usePromisifiedModal({
-    opened: ({ message }) => {
-        modalMessage.value = message;
+    opened: ({ component, data }) => {
+        modalComponent.value = component;
+        modalComponentData.value = data;
     },
     resetFn: resetState,
 });
@@ -44,9 +47,7 @@ defineExpose({ run })
         </template>
         <template #default>
             <section class="modal-content">
-                <div>
-                    {{ modalMessage }}
-                </div>
+                <component :is="modalComponent" :data="modalComponentData"/>
             </section>
         </template>
         <template #footer>

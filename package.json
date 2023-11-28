@@ -3,18 +3,19 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "build:local": "vite build --base=/dist",
     "preview": "vite preview"
   },
   "dependencies": {
+    "keycloak-js": "^22.0.5",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.38.0",
     "uuid": "^9.0.0",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6",
-    "vuestic-ui": "^1.6.3"
+    "vuestic-ui": "^1.8.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.1.0",

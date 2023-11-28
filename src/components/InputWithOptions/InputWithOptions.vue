@@ -56,6 +56,7 @@ const clickOutside = (event) => {
 <template>
     <div class="input-wrapper">
         <va-dropdown
+            class="wd=100%"
             v-model="isFocused"
             trigger="none"
             teleport="body"

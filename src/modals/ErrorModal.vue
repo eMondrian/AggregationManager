@@ -22,7 +22,12 @@ const resetState = () => {
 }
 
 const onCopy = () => {
-    const str = errorData.value.message;
+    let str = '';
+    if (errorData.value.details) {
+        str = errorData.value.details;
+    } else {
+        str = errorData.value.message;
+    }
     const el = document.createElement('textarea');
     el.value = str;
     document.body.appendChild(el);
@@ -63,13 +68,14 @@ defineExpose({ run, resetState })
         </template>
         <template #default>
             <section class="modal-content">
-                {{ errorData.message }}
+                <h4 class="mb-2">{{ errorData.message }}</h4>
+                <div>{{ errorData.details }}</div>
             </section>
         </template>
         <template #footer>
             <div class="controll-buttons">
                 <va-button @click="onCopy" preset="plain">
-                    Copy error message
+                    Copy error details
                 </va-button>
             </div>
         </template>

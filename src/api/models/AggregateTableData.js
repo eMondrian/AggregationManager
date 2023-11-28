@@ -31,6 +31,8 @@ export class AggregateTableData {
         schedule = '',
         lastEvent = '',
         currentStatus = '',
+        lastModifiedBy = '',
+        createdBy = '',
     }) {
         this.id = id;
         this.name = name;
@@ -40,6 +42,8 @@ export class AggregateTableData {
         this.schedule = schedule;
         this.lastEvent = lastEvent;
         this.currentStatus = currentStatus;
+        this.lastModifiedBy = lastModifiedBy;
+        this.createdBy = createdBy;
     }
 
     /**
@@ -55,7 +59,9 @@ export class AggregateTableData {
             lastDataUpdate: new Date(item.last_data_update),
             schedule: item.schedule,
             lastEvent: item.last_event,
-            currentStatus: item.current_status
+            currentStatus: item.current_status,
+            lastModifiedBy: item.last_modified_by,
+            createdBy: item.created_by,
         }
 
         return new AggregateTableData(data)
