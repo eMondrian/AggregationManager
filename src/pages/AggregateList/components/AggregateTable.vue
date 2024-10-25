@@ -128,7 +128,7 @@ const onUpdateButtonClick = () => {
 }
 
 const onCalculate = (item) => {
-    runStatusModal.value.run(item.id);
+    runStatusModal.value.run({id: item.id, name: item.name});
 }
 
 const onEdit = async (item) => {
@@ -161,7 +161,12 @@ const onEdit = async (item) => {
 }
 
 const onDelete = async (item) => {
-    const { confirmed } = await confirmationModal.value.run({ message: 'Are you sure you want to remove this aggregation?' })
+    const { confirmed } = await confirmationModal.value.run({ 
+        message: 'Are you sure you want to remove this aggregation?', 
+        id: item.id, 
+        name: item.name 
+    })
+
     if (!confirmed) return;
     try {
         apiCallRunning.value = true;
@@ -226,7 +231,7 @@ const columns = [
                     <va-button @click="onCreateFromNifiButtonClick" preset="secondary" size="small">
                         Create from NIFI Process
                     </va-button>
-                    <va-button v-for="wizzard in customWizzards" @click="onCustomWizzardsOpen[wizzard.name]" preset="secondary" size="small">
+                    <va-button v-for="wizzard in customWizzards" :key="wizzard.name" @click="onCustomWizzardsOpen[wizzard.name]" preset="secondary" size="small">
                         {{wizzard.name}}
                     </va-button>
                 </div>
@@ -292,7 +297,7 @@ const columns = [
     <teleport to="body">
         <create-aggregation-modal ref="createAggregationModal" />
         <create-nifi-modal ref="createNifiModal" />
-        <component v-for="wizzard in customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="onCreateAggregationFromWizzard"></component>
+        <component v-for="wizzard in customWizzards" :key="wizzard.name" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="onCreateAggregationFromWizzard"></component>
 
         <loading-indicator :isOpened="apiCallRunning" />
         <confirmation-modal ref="confirmationModal"  />
