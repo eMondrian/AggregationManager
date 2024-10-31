@@ -6,7 +6,7 @@ import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
 import LoadingIndicator from '@/modals/LoadingIndicator.vue'
 import { useErrorHandler } from '@/composables'
-import { sortNumbers } from '@/helpers'
+import { sortNumbers, highlightActiveRow } from '@/helpers'
 import CreateAggregationModal from './CreateAggregationModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
 import RunStatusModal from './RunStatusModal.vue'
@@ -253,6 +253,7 @@ const columns = [
         :filter="filterValue"
         sticky-header
         :scroll-bottom-margin="40"
+        @click="highlightActiveRow"
     >
         <template #cell(lastSchemaUpdate)="data">
             <div>{{ data.rowData.lastSchemaUpdate.toLocaleString() }}</div>

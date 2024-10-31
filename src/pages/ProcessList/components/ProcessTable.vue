@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import sortBy from 'lodash/sortBy'
 import { getEventsTableData} from '@/api'
 import { useErrorHandler } from '@/composables'
-import { setIntervalAsync, sortNumbers } from '@/helpers'
+import { setIntervalAsync, sortNumbers, highlightActiveRow } from '@/helpers'
 
 const intervalTime = 300000 // 30sec
 const clearInterval = ref(null)
@@ -97,6 +97,7 @@ const columns = [
         sticky-header
         :scroll-bottom-margin="40"
         sort-by="dateTime"
+        @click="highlightActiveRow"
     >
         <template #cell(dateTime)="data">
             <div>{{ data.rowData.dateTime.toLocaleString() }}</div>
