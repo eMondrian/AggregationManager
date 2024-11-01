@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import sortBy from 'lodash/sortBy'
 import { getEventsTableData} from '@/api'
 import { useErrorHandler } from '@/composables'
-import { setIntervalAsync, sortNumbers, highlightActiveRow } from '@/helpers'
+import { setIntervalAsync, sortNumbers } from '@/helpers'
+import CustomTooltip from '@/pages/AggregateList/components/CustomTooltip.vue';
 
 const intervalTime = 300000 // 30sec
 const clearInterval = ref(null)
@@ -17,7 +17,7 @@ const fetchTableData = async () => {
     try {
         isTableDataLoading.value = true
         const data = await getEventsTableData()
-        tableData.value = sortBy(data, ({ dateTime }) => dateTime).reverse()
+        tableData.value = data;
     } catch (e) {
         handleError(e);
     } finally {
@@ -38,14 +38,13 @@ const onUpdateButtonClick = () => {
     clearInterval.value = setIntervalAsync(fetchTableData, intervalTime)
 }
 
-const copyToClipboard = (event) => {
-    const str = event.target.innerHTML;
-    const el = document.createElement('textarea');
-    el.value = str;
-    document.body.appendChild(el);
-    el.select();
+const copyToClipboard = (text) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
     document.execCommand('copy');
-    document.body.removeChild(el);
+    document.body.removeChild(textarea);
 
     showCopiedMessage.value = true;
 
@@ -55,11 +54,47 @@ const copyToClipboard = (event) => {
 }
 
 const columns = [
-    { key: "aggregationName", sortable: true, width: '15%' },
-    { key: "eventType", sortable: true, width: '15%' },
-    { key: "dateTime", sortable: true, sortingFn: sortNumbers, width: '15%' },
-    { key: "eventMessage", sortable: true, width: '55%' },
-];
+    { field: "aggregationName", sortable: true, pinned: 'left', flex: 1, maxWidth: 200, minWidth: 150 },
+    { field: "eventType", sortable: true, flex: 1, maxWidth: 200, minWidth: 150 },
+    { 
+        field: "dateTime", 
+        sortable: true, flex: 1, 
+        maxWidth: 200, 
+        minWidth: 150, 
+        sort: 'desc', 
+        comparator: sortNumbers, 
+        valueFormatter: data => data.value.toLocaleString()
+    },
+    { 
+        field: "eventMessage", 
+        sortable: true, 
+        flex: 7,
+        tooltipField: 'eventMessage',
+        tooltipComponentParams: { copyToClipboard }
+    },
+]
+
+const gridOptions = {
+    suppressMovableColumns: true,
+    components: {
+        customTooltip: CustomTooltip
+    },
+    defaultColDef: {
+        tooltipComponent: 'customTooltip'
+    },
+    tooltipShowDelay: 0,
+    tooltipInteraction: true
+};
+
+const rowSelection = {
+    mode: 'singleRow',
+    checkboxes: false,
+    enableClickSelection: true,
+}
+
+const autoSizeStrategy = {
+    type: 'fitGridWidth',
+};
 </script>
 
 <template>
@@ -88,35 +123,20 @@ const columns = [
         class="filter-input"
         clearable
     />
-    <!-- table loader has incorrect displaing in centre of content but not of table -->
-    <va-data-table
-        :filter="filterValue"
-        class="app-table" 
-        :items="tableData" 
-        :columns="columns" 
-        sticky-header
-        :scroll-bottom-margin="40"
-        sort-by="dateTime"
-        @click="highlightActiveRow"
-    >
-        <template #cell(dateTime)="data">
-            <div>{{ data.rowData.dateTime.toLocaleString() }}</div>
-        </template>
-        <template #cell(eventMessage)="data">
-            <va-popover 
-                :placement="data.rowIndex < 5 ? 'bottom-left' : 'top-left'"
-                prevent-overflow
-                style="z-index: 1000;"
-            >
-            <template #body>
-                <p>{{ data.rowData.eventMessage }}</p>
-                <p class="popover-clipboard-message">Click to copy to clipboard</p>
-            </template>
 
-            <div class="event-message" @click="copyToClipboard($event)">{{ data.rowData.eventMessage }}</div>
-            </va-popover>
-        </template>
-    </va-data-table>
+    <ag-grid-vue
+        :loading="isTableDataLoading"
+        class="ag-theme-vuestic"
+        style="height: 100%;"
+        :rowData="tableData"
+        :columnDefs="columns"
+        :quickFilterText="filterValue"
+        :gridOptions="gridOptions"
+        :rowSelection="rowSelection"
+        :autoSizeStrategy="autoSizeStrategy"
+    >
+    </ag-grid-vue>
+
     <teleport to="body">
         <div class="success-alert">
             <va-alert
@@ -132,10 +152,6 @@ const columns = [
 </template>
 
 <style lang="scss" scoped>
-.app-table {
-    width: 100%;
-    height: 100%;
-}
 .control-panel {
     display: flex;
     justify-content: space-between;
@@ -151,30 +167,9 @@ const columns = [
     display: flex;
     gap: 1rem;
 }
-
-.event-message {
-    height: 18px;
-    max-width: 55vw;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: pointer;
-}
-
-.popover-clipboard-message {
-    display: flex;
-    justify-content: end;
-    color: rgb(119, 178, 31);
-}
 </style>
 
 <style lang="css">
-.va-popover__body {
-    max-width: 400px;
-    height: auto;
-    display: block;
-    white-space: initial;
-}
-
 .success-alert {
     z-index: 2000;
     display: flex;

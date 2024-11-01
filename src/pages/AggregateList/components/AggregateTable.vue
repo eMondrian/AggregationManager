@@ -6,10 +6,11 @@ import { getAggregatesTableData, addAgregation, removeAgregation, getAggregation
 import ConfirmationModal from '@/modals/ConfirmationModal.vue'
 import LoadingIndicator from '@/modals/LoadingIndicator.vue'
 import { useErrorHandler } from '@/composables'
-import { sortNumbers, highlightActiveRow } from '@/helpers'
+import { sortNumbers } from '@/helpers'
 import CreateAggregationModal from './CreateAggregationModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
 import RunStatusModal from './RunStatusModal.vue'
+import ActionCell from './ActionCell.vue'
 
 const app = getCurrentInstance()
 const customWizzards = app.appContext.config.globalProperties.$customWizzards
@@ -190,15 +191,41 @@ const reset = async (item) => {
 }
 
 const columns = [
-    { key: 'name', sortable: true },
-    { key: 'tableName', sortable: true },
-    { key: 'lastSchemaUpdate', sortable: true, sortingFn: sortNumbers },
-    { key: 'schedule', sortable: true },
-    { key: 'lastDataUpdate', sortable: true, sortingFn: sortNumbers },
-    { key: 'lastEvent', sortable: true },
-    { key: 'currentStatus', sortable: true },
-    { key: 'actions', width: 80 },
+    { field: 'name', sortable: true, pinned: 'left' },
+    { field: 'tableName', sortable: true },
+    { field: 'lastSchemaUpdate', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
+    { field: 'schedule', sortable: true, lockPinned: true },
+    { field: 'lastDataUpdate', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
+    { field: 'lastEvent', sortable: true, lockPinned: true },
+    { field: 'currentStatus', sortable: true },
+    { 
+        field: 'actions', 
+        width: 130, 
+        sortable: false, 
+        cellRenderer: ActionCell,
+        cellRendererParams: {
+            onCalculate,
+            onEdit,
+            onDelete,
+            reset
+    },
+    },
 ];
+
+const gridOptions = {
+    suppressMovableColumns: true
+};
+
+const rowSelection = {
+    mode: 'singleRow',
+    checkboxes: false,
+    enableClickSelection: true,
+}
+
+const autoSizeStrategy = {
+    type: 'fitGridWidth',
+};
+
 </script>
 
 <template>
@@ -238,6 +265,7 @@ const columns = [
             </va-button-dropdown>
         </div>
     </section>
+
     <va-input
         v-model="filterValue"
         label="filter"
@@ -245,55 +273,19 @@ const columns = [
         class="filter-input"
         clearable
     />
-    <va-data-table
+
+    <ag-grid-vue
         :loading="isLoading"
-        class="app-table"
-        :items="tableData"
-        :columns="columns"
-        :filter="filterValue"
-        sticky-header
-        :scroll-bottom-margin="40"
-        @click="highlightActiveRow"
-    >
-        <template #cell(lastSchemaUpdate)="data">
-            <div>{{ data.rowData.lastSchemaUpdate.toLocaleString() }}</div>
-        </template>
-        <template #cell(lastDataUpdate)="data">
-            <div>{{ data.rowData.lastDataUpdate.toLocaleString() }}</div>
-        </template>
-        <template #cell(actions)="{ rowIndex }">
-            <div class="table-action-buttons">
-                <va-button preset="plain" color="info" title="Run calculations" @click="onCalculate(tableData[rowIndex])">
-                    <template #append>
-                        <va-icon class="material-icons-outlined">
-                            playlist_play
-                        </va-icon>
-                    </template>
-                </va-button>
-                <va-button preset="plain" color="info" title="Edit" @click="onEdit(tableData[rowIndex])">
-                    <template #append>
-                        <va-icon class="material-icons-outlined">
-                            edit
-                        </va-icon>
-                    </template>
-                </va-button>
-                <va-button preset="plain" color="info" title="Delete" @click="onDelete(tableData[rowIndex])">
-                    <template #append>
-                        <va-icon class="material-icons-outlined">
-                            delete
-                        </va-icon>
-                    </template>
-                </va-button>
-                <va-button preset="plain" color="info" title="Reset" @click="reset(tableData[rowIndex])">
-                    <template #append>
-                        <va-icon class="material-icons-outlined">
-                            restart_alt
-                        </va-icon>
-                    </template>
-                </va-button>
-            </div>
-        </template>
-    </va-data-table>
+        class="ag-theme-vuestic"
+        style="height: 100%;"
+        :rowData="tableData"
+        :columnDefs="columns"
+        :gridOptions="gridOptions"
+        :rowSelection="rowSelection"
+        :quickFilterText="filterValue"
+        :autoSizeStrategy="autoSizeStrategy"
+        >
+    </ag-grid-vue>
 
     <teleport to="body">
         <create-aggregation-modal ref="createAggregationModal" />
@@ -324,19 +316,8 @@ const columns = [
     max-width: 40%;
 }
 
-.app-table {
-    width: 100%;
-    height: 100%;
-}
-
 .buttons-container {
     display: flex;
-    gap: 0.5rem;
-}
-
-.table-action-buttons {
-    display: flex;
-    align-items: center;
     gap: 0.5rem;
 }
 
