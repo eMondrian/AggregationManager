@@ -5,6 +5,7 @@ import { getProcesses, getTemplates, getSettings } from '@/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
 import { sortNumbers } from '@/helpers'
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
+import CreateAggregationActionModal from './CreateAggregationActionModal.vue';
 import ViewActionsButton from './ViewActionsButton.vue';
 import MonacoEditor from './MonacoEditor.vue';
 
@@ -87,6 +88,7 @@ const templateOptions = ref([]);
 const processesListLoading = ref(false);
 const processesList = ref([]);
 const isEdit = ref(false);
+const createAggregationActionModal = ref(null)
 
 const tabs = computed(() => {
     if (isEdit.value) {
@@ -181,6 +183,10 @@ const onClose = () => {
     close()
 }
 
+const onAction = async (data) => {
+    await createAggregationActionModal.value.run(data);
+}
+
 defineExpose({ run })
 
 const historyTableColumns = [
@@ -192,6 +198,12 @@ const historyTableColumns = [
 
 const gridOptions = {
     suppressMovableColumns: true,
+    onCellClicked: (event) => {
+        if (event.colDef.field === 'actions') {
+            const actionData = event.data.state;
+            onAction(actionData)
+        }
+  }
 };
 
 const rowSelection = {
@@ -312,6 +324,10 @@ const autoSizeStrategy = {
             </div>
         </template>
     </va-modal>
+
+    <teleport to="body">
+        <create-aggregation-action-modal ref="createAggregationActionModal" />
+    </teleport>
 </template>
 
 <style lang="scss" scoped>

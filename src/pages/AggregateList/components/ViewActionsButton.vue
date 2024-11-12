@@ -1,10 +1,6 @@
-<script setup>
-const viewActions = () => console.log('viewActions');
-</script>
-
 <template>
     <div class="history-action-container">
-        <va-button preset="plain" color="info" title="View actions" @click="viewActions">
+        <va-button preset="plain" color="info" title="View actions">
             <template #append>
                 <va-icon class="material-icons-outlined" size="large">
                     search
