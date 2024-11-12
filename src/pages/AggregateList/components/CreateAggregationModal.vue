@@ -3,7 +3,9 @@ import { ref, watch, computed } from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { getProcesses, getTemplates, getSettings } from '@/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
+import { sortNumbers } from '@/helpers'
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
+import ViewActionsButton from './ViewActionsButton.vue';
 import MonacoEditor from './MonacoEditor.vue';
 
 const { handleError } = useErrorHandler();
@@ -13,6 +15,7 @@ const TABS_TITLE = {
     TEMPLATE: 'Template',
     QUERY: 'Query',
     SCHEDULE: 'Schedule',
+    HISTORY: 'History'
 }
 
 const cronScheduleOptions = [
@@ -55,6 +58,7 @@ const initialState = {
         { title: TABS_TITLE.TEMPLATE, icon: 'edit_document' },
         { title: TABS_TITLE.QUERY, icon: 'code' },
         { title: TABS_TITLE.SCHEDULE, icon: 'schedule' },
+        { title: TABS_TITLE.HISTORY, icon: 'history'}
     ],
     activeTab: TABS_TITLE.PROPERTIES,
     propertiesData: {
@@ -69,7 +73,8 @@ const initialState = {
     scheduleData: {
         schedule: '',
         strategy: 'TIMER_DRIVEN'
-    }
+    },
+    historyTableData: []
 }
 
 const activeTab = ref(initialState.activeTab)
@@ -77,12 +82,19 @@ const propertiesData = ref(cloneDeep(initialState.propertiesData))
 const templateId = ref(cloneDeep(initialState.templateId))
 const query = ref(initialState.queryDefaultValue)
 const scheduleData = ref(cloneDeep(initialState.scheduleData))
+const historyTableData = ref(cloneDeep(initialState.historyTableData))
 const templateOptions = ref([]);
 const processesListLoading = ref(false);
 const processesList = ref([]);
 const isEdit = ref(false);
 
-const tabs = computed(() => isEdit.value ? initialState.tabs.filter(({ title }) => title !== TABS_TITLE.TEMPLATE) : initialState.tabs)
+const tabs = computed(() => {
+    if (isEdit.value) {
+        return initialState.tabs.filter(({ title }) => title !== TABS_TITLE.TEMPLATE)
+    }
+
+    return initialState.tabs.filter(({ title }) => title !== TABS_TITLE.HISTORY)
+})
 
 const resetState = () => {
     activeTab.value = initialState.activeTab
@@ -90,6 +102,7 @@ const resetState = () => {
     templateId.value = initialState.templateId
     query.value = initialState.queryDefaultValue
     scheduleData.value = cloneDeep(initialState.scheduleData)
+    historyTableData.value = cloneDeep(initialState.historyTableData)
 
     processesListLoading.value = false
     isEdit.value = false;
@@ -102,11 +115,14 @@ const { isOpened, run, close } = usePromisifiedModal({
             propertiesData.value.tableName = data.table_name;
             propertiesData.value.name = data.aggregation_name;
             propertiesData.value.generated = data.is_generated_nifi_process === 't';
+            propertiesData.value.nifiProcessId = data.start_nifi_process_id;
 
             query.value = data.query;
 
             scheduleData.value.schedule = data.scheduling_period;
             scheduleData.value.strategy = data.scheduling_strategy;
+
+            historyTableData.value = data.history;
 
             isEdit.value = true;
         }
@@ -135,10 +151,6 @@ const { isOpened, run, close } = usePromisifiedModal({
                     value: e.id
                 }
             }))
-
-            if (data) {
-                propertiesData.value.nifiProcessId = data.start_nifi_process_id;
-            }
         } catch (e) {
             handleError(e);
         } finally {
@@ -170,6 +182,28 @@ const onClose = () => {
 }
 
 defineExpose({ run })
+
+const historyTableColumns = [
+    { field: 'id', pinned: 'left', sortable: true },
+    { field: 'user', sortable: true },
+    { field: 'date', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
+    { field: 'actions', sortable: false, width: 55, cellRenderer: ViewActionsButton }
+]
+
+const gridOptions = {
+    suppressMovableColumns: true,
+};
+
+const rowSelection = {
+    mode: 'singleRow',
+    checkboxes: false,
+    enableClickSelection: true,
+}
+
+const autoSizeStrategy = {
+    type: 'fitGridWidth',
+};
+
 </script>
 
 <template>
@@ -253,11 +287,24 @@ defineExpose({ run })
                                 />
                             </div>
                         </section>
+
+                        <section v-if="activeTab===TABS_TITLE.HISTORY" class="tab-content">
+                            <ag-grid-vue
+                                class="ag-theme-vuestic"
+                                style="width: 100%; height: 500px;"
+                                :rowData="historyTableData"
+                                :columnDefs="historyTableColumns"
+                                :gridOptions="gridOptions"
+                                :rowSelection="rowSelection"
+                                :autoSizeStrategy="autoSizeStrategy"
+                            >
+                            </ag-grid-vue>
+                        </section>
                     </template>
                 </va-tabs>
             </section>
         </template>
-        <template #footer>
+        <template #footer v-if="activeTab!==TABS_TITLE.HISTORY">
             <div class="controll-buttons">
                 <va-button @click="onSave()">
                     Save
