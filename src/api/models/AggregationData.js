@@ -55,11 +55,7 @@ export class AggregationData {
         this.scheduling_strategy = scheduling_strategy;
         this.is_generated_nifi_process = is_generated_nifi_process;
         this.start_nifi_process_id = start_nifi_process_id;
-        this.history = history.map(h => ({
-            ...h,
-            date: new Date(h.date),
-            state: h.state,
-        }));
+        this.history = history;
     }
 
 /**
@@ -81,7 +77,7 @@ static parseFromDTO = (item) => {
             user: h.user,
             date: new Date(h.date),
             state: h.state,
-        }))
+        })),
     };
 
     return new AggregationData(data);
