@@ -128,8 +128,9 @@ const onUpdateButtonClick = () => {
     fetchTableData()
 }
 
-const onCalculate = (item) => {
-    runStatusModal.value.run({id: item.id, name: item.name});
+const onCalculate = async (item) => {
+    await runStatusModal.value.run({id: item.id, name: item.name});
+    await fetchTableData()
 }
 
 const onEdit = async (item) => {
@@ -197,6 +198,8 @@ const columns = [
     { field: 'schedule', sortable: true, lockPinned: true },
     { field: 'lastDataUpdate', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
     { field: 'lastEvent', sortable: true, lockPinned: true },
+    { field: 'createdBy', sortable: true },
+    { field: 'lastModifiedBy', sortable: true },
     { field: 'currentStatus', sortable: true },
     { 
         field: 'actions', 
@@ -208,7 +211,7 @@ const columns = [
             onEdit,
             onDelete,
             reset
-    },
+        },
     },
 ];
 
@@ -232,19 +235,7 @@ const autoSizeStrategy = {
     <section class="control-panel">
         <h2>List of aggregates</h2>
         <div class="buttons-container">
-            <va-button @click="onUpdateButtonClick" preset="plain" :disabled="isLoading">
-                <template #append>
-                    <va-icon size="large"
-                        :class = "{
-                            'material-icons-outlined': true,
-                            'app-spinned-icon': isLoading
-                        }"
-                    >
-                        change_circle
-                    </va-icon>
-                </template>
-            </va-button>
-            <va-button-dropdown title="Create" preset="plain" hide-icon prevent-overflow>
+            <va-button-dropdown title="Create" preset="plain" hide-icon prevent-overflow class="add-aggregation-dropdown">
                 <template #label>
                     <va-icon size="large" class="material-icons-outlined">
                         add_box
@@ -263,6 +254,18 @@ const autoSizeStrategy = {
                     </va-button>
                 </div>
             </va-button-dropdown>
+            <va-button @click="onUpdateButtonClick" preset="plain" :disabled="isLoading">
+                <template #append>
+                    <va-icon size="large"
+                        :class = "{
+                            'material-icons-outlined': true,
+                            'app-spinned-icon': isLoading
+                        }"
+                    >
+                        change_circle
+                    </va-icon>
+                </template>
+            </va-button>
         </div>
     </section>
 
@@ -318,6 +321,7 @@ const autoSizeStrategy = {
 
 .buttons-container {
     display: flex;
+    align-items: center;
     gap: 0.5rem;
 }
 

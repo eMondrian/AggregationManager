@@ -1,19 +1,29 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, getCurrentInstance } from 'vue';
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { ROUTES } from '@/router/routes.js'
 import ErrorModal from '@/modals/ErrorModal.vue';
+import { KeycloakService } from '@/authorization/KeycloakService'
 import { useErrorHandler } from './composables';
+import getConfig from './app.config'
+
+const app = getCurrentInstance()
+const isKeycloakAuthActive = app.appContext.config.globalProperties.$authConfig.isKeycloakAuthActive;
+const userName = isKeycloakAuthActive ? KeycloakService.GetUserName() : ''
 
 const errorModal = ref(null)
 
 const route = useRoute();
 
-const navItems = [
-  { path: ROUTES.home.path, text: 'Aggregation' },
+const defaultNavItems = [
+  { path: ROUTES.home.path, text: 'Aggregations' },
   { path: ROUTES.processes.path, text: 'Events' },
   { path: ROUTES.settings.path, text: 'Settings' },
+  { path: ROUTES.users.path, text: 'Users' },
 ]
+
+// const navItems = isKeycloakAuthActive ? [...defaultNavItems, { path: ROUTES.users.path, text: 'Users' }] : defaultNavItems;
+const navItems = defaultNavItems;
 
 const acitveNavItem = computed(() => navItems.find((item) => item.path === route.path))
 
@@ -26,16 +36,27 @@ const onOpenDetailsClick = async (error) => {
   removeError(error.uid);
   await errorModal.value.run({ error })
 }
+
+const onLogoutClick = () => {
+  KeycloakService.CallLogOut()
+}
 </script>
 
 <template>
   <va-navbar color="primary" class="app-navbar">
     <template #left>
       <va-navbar-item>
-        Aggregation Manager
+        <RouterLink
+          :to="ROUTES.home.path"
+          class="app-link"
+        >
+          <h1 class="logo">
+            Aggregation Manager
+          </h1>
+        </RouterLink>
       </va-navbar-item>
     </template>
-    <template #right>
+    <template #center>
       <va-navbar-item>
         <ul class="app-tabs">
           <li
@@ -53,6 +74,23 @@ const onOpenDetailsClick = async (error) => {
             </RouterLink>
           </li>
         </ul>
+      </va-navbar-item>
+    </template>
+    <template #right v-if="isKeycloakAuthActive">
+      <va-navbar-item>
+        <va-button-dropdown
+          :label="userName"
+        >
+          <div class="profile-content">
+            <va-button
+              class="logout-button"
+              preset="plain"
+              @click="onLogoutClick()"
+            >
+              Logout
+            </va-button>
+          </div>
+        </va-button-dropdown>
       </va-navbar-item>
     </template>
   </va-navbar>
@@ -88,7 +126,7 @@ const onOpenDetailsClick = async (error) => {
 </template>
 
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 main {
   padding: 2rem 4%;
   display: flex;
@@ -126,6 +164,22 @@ main {
 .app-navbar {
   padding-top: 0;
   padding-bottom: 0;
+}
+
+.logo {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+}
+
+.profile-content {
+  display: flex;
+  justify-content: center;
+}
+
+.logout-button {
+  width: 8rem;
 }
 
 .alerts-section {

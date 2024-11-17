@@ -10,5 +10,19 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  build: {
+    target: 'esnext',
+    rollupOptions: {
+      external: [
+        // fileURLToPath(
+        //   new URL(
+        //     './src/app.config.js',
+        //     import.meta.url
+        //   )
+        // ),
+        
+      ]
+    }
   }
 })

@@ -72,7 +72,7 @@ const initialState = {
     templateId: '',
     queryDefaultValue: '',
     scheduleData: {
-        schedule: '',
+        schedule: '1 day',
         strategy: 'TIMER_DRIVEN'
     },
     historyTableData: []

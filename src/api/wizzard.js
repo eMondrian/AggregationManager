@@ -1,41 +1,66 @@
 import { PATH } from "./path"
+import { fetchWithAuth } from "./utils"
 
 export const getTableList = async () => {
-  const response = await fetch(PATH.SOURCE_TABLES, {
+  const response = await fetchWithAuth(PATH.SOURCE_TABLES, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
   })
-
-
+  
   if (!response.ok) {
-      const responseText = await response.text();
-      throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
-  }
+    const type = response.headers.get("Content-Type");
+    
+    if (type.includes('application/json')) {
+        const error = new Error();
+        const responseJson = await response.json();
+        
+        error.contentType = 'json';
+        error.errorBody = responseJson;
+        error.name = `Error! Status: ${responseJson.status}.`
+
+        throw error;
+    } else {
+        const responseText = await response.text();
+        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+    }
+}
 
   return await response.json();
 }
 
 export const getColumnsList = async (tableDesc) => {
-  const response = await fetch(`${PATH.COLUMNS}?database=${tableDesc.database}&table=${tableDesc.name}`, {
+  const response = await fetchWithAuth(`${PATH.COLUMNS}?database=${tableDesc.database}&table=${tableDesc.name}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
   })
-
-
+  
   if (!response.ok) {
-      const responseText = await response.text();
-      throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
-  }
+    const type = response.headers.get("Content-Type");
+    
+    if (type.includes('application/json')) {
+        const error = new Error();
+        const responseJson = await response.json();
+        
+        error.contentType = 'json';
+        error.errorBody = responseJson;
+        error.name = `Error! Status: ${responseJson.status}.`
+
+        throw error;
+    } else {
+        const responseText = await response.text();
+        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+    }
+}
 
   return await response.json();
 }
 
 export const getQuery = async (data) => {
-  const response = await fetch(PATH.WIZARD_QUERY, {
+  const response = await fetchWithAuth(PATH.WIZARD_QUERY, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,16 +69,29 @@ export const getQuery = async (data) => {
   })
 
   if (!response.ok) {
-      const responseText = await response.text();
-      throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
-  }
+    const type = response.headers.get("Content-Type");
+    
+    if (type.includes('application/json')) {
+        const error = new Error();
+        const responseJson = await response.json();
+        
+        error.contentType = 'json';
+        error.errorBody = responseJson;
+        error.name = `Error! Status: ${responseJson.status}.`
+
+        throw error;
+    } else {
+        const responseText = await response.text();
+        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+    }
+}
 
   return await response.json();
 }
 
 export const getQueryPerformance = async (query, requestController) => {
   const signal = requestController.signal;
-  const response = await fetch(PATH.QUERY_PERFORMANCE, {
+  const response = await fetchWithAuth(PATH.QUERY_PERFORMANCE, {
       method: "POST",
       signal: signal,
       headers: {
@@ -65,8 +103,21 @@ export const getQueryPerformance = async (query, requestController) => {
   })
 
   if (!response.ok) {
-      const responseText = await response.text();
-      throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+      const type = response.headers.get("Content-Type");
+      
+      if (type.includes('application/json')) {
+          const error = new Error();
+          const responseJson = await response.json();
+          
+          error.contentType = 'json';
+          error.errorBody = responseJson;
+          error.name = `Error! Status: ${responseJson.status}.`
+
+          throw error;
+      } else {
+          const responseText = await response.text();
+          throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+      }
   }
 
   return await response.json();

@@ -39,6 +39,13 @@ export const eventsTableDataSchema = () => ({
     aggregation_name: null,
 })
 
+export const usersTableDataSchema = () => ({
+    id: null,
+    user_name: null,
+    is_admin: [true, false],
+    is_power_user: [true, false],
+})
+
 export const agregationDataSchema = ({id}) => ({
     id: [id],
     table_name: null,

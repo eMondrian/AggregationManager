@@ -1,0 +1,6 @@
+{
+  "isKeycloakAuthActive": "VITE_KEYCLOAK_AUTH_ENABLED",
+  "basePath": "VITE_KEYCLOAK_AUTH_BASE_PATH",
+  "realm": "VITE_KEYCLOAK_AUTH_REALM",
+  "cliendId": "VITE_KEYCLOAK_AUTH_CLIENT_ID"
+}

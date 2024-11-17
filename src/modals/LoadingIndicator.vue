@@ -15,7 +15,6 @@ const { isOpened } = defineProps({
 <style>
 .loader-container {
   height: 50px;
-  width: 100px;
   margin-top: 50px;
 }
 </style>

@@ -101,7 +101,7 @@ const autoSizeStrategy = {
     <section class="control-panel">
         <h2>List of events</h2>
         <div class="buttons-container">
-            <va-button @click="onUpdateButtonClick" preset="plain" :disabled="isTableDataLoading">
+            <va-button @click="onUpdateButtonClick" preset="plain" :disabled="isTableDataLoading" size="large">
                 <template #append>
                     <va-icon
                         size="large"
