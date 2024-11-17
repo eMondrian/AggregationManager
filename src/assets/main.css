@@ -10,3 +10,11 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+.ag-theme-vuestic .ag-header-cell-text {
+  color: #154ec1;
+}
+
+.tab-content .ag-theme-vuestic .ag-header {
+  background-color: #ecf0f1;
+}

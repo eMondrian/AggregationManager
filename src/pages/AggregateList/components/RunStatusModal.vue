@@ -5,14 +5,20 @@ import { usePromisifiedModal, useErrorHandler } from '@/composables'
 
 const status = ref(null)
 const loading = ref(false);
-let aggregationId = null;
+
+const defaultAggregationData = {
+    id: null,
+    name: null
+}
+
+let aggregationData = ref({...defaultAggregationData});
 
 const { handleError } = useErrorHandler();
 
 const getStatus = async () => {
     try {
         loading.value = true;
-        const statusReq = await getRunStatus(aggregationId);
+        const statusReq = await getRunStatus(aggregationData.value.id);
 
         status.value = statusReq.state;
     } catch (e) {
@@ -25,12 +31,12 @@ const getStatus = async () => {
 
 const resetState = () => {
   status.value = null;
-  aggregationId = null;
+  aggregationData.value = {...defaultAggregationData};
 }
 
 const { isOpened, run, close } = usePromisifiedModal({
-    opened: async (id) => {
-        aggregationId = id;
+    opened: async (data) => {
+        aggregationData.value = data;
         await getStatus();
     },
     resetFn: resetState,
@@ -39,7 +45,7 @@ const { isOpened, run, close } = usePromisifiedModal({
 const setState = async (newState) => {
     try {
         loading.value = true;
-        const statusReq = await setRunStatus(aggregationId, newState);
+        const statusReq = await setRunStatus(aggregationData.value.id, newState);
 
         // status.value = statusReq.state;
     } catch (e) {
@@ -76,16 +82,33 @@ defineExpose({ run })
         <template #default>
             <va-inner-loading :loading="loading">
               <section class="modal-content">
-                  <div>
-                    <div>Current status: {{ status }}</div>
-                    <va-button @click="getStatus" preset="plain">Refresh</va-button>
+                  <div class="info-container">
+                    <div>
+                        <b>Aggregation id: </b>
+                        {{ aggregationData.id }}
+                    </div>
+                    <div>
+                        <b>Aggregation name: </b>
+                        {{ aggregationData.name }}
+                    </div>
+                    <div>
+                        <b>Current status: </b>
+                        {{ status }}
+                    </div>
                   </div>
+
                   <div class="buttons-container">
-                    <va-button :disabled="loading" @click="setState('RUNNING')">Run</va-button>
-                    <va-button :disabled="loading" @click="setState('DISABLED')">Disable</va-button>
-                    <va-button :disabled="loading" @click="setState('RUN_ONCE')">Run once</va-button>
-                    <va-button :disabled="loading" @click="setState('STOPPED')">Stop</va-button>
+                    <va-button @click="getStatus" preset="plain">Refresh</va-button>
+
+                    <div class="control-buttons">
+                        <va-button :disabled="loading" @click="setState('RUNNING')">Run</va-button>
+                        <va-button :disabled="loading" @click="setState('DISABLED')">Disable</va-button>
+                        <va-button :disabled="loading" @click="setState('RUN_ONCE')">Run once</va-button>
+                        <va-button :disabled="loading" @click="setState('STOPPED')">Stop</va-button>
+                    </div>
                   </div>
+
+
               </section>
             </va-inner-loading>
         </template>
@@ -104,22 +127,27 @@ defineExpose({ run })
 .modal-content {
     padding: 1rem;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: space-between;
-    align-items: center;
     gap: 1rem;
 }
 
-.controll-buttons {
-    padding: 1rem 2rem;
+.info-container {
     display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: baseline;
+    gap: 0.5rem;
 }
 
 .buttons-container {
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+}
+
+.control-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
 }
 </style>

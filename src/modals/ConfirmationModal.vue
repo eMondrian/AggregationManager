@@ -2,18 +2,25 @@
 import { ref } from 'vue';
 import { usePromisifiedModal } from '@/composables'
 
-const modalMessage = ref('');
-
-const resetState = () => {
-    modalMessage.value = '';
+const defaulModalData = {
+    message: null,
+    id: null,
+    name: null
 }
 
+let modalData = ref({...defaulModalData});
+
 const { isOpened, run, close } = usePromisifiedModal({
-    opened: ({ message }) => {
-        modalMessage.value = message;
+    opened: (data) => {
+        modalData.value = data;
     },
     resetFn: resetState,
 });
+
+
+const resetState = () => {
+    modalData.value = {...defaulModalData};
+}
 
 const onSave = async () => {
     close({ confirmed: true })
@@ -44,8 +51,19 @@ defineExpose({ run })
         </template>
         <template #default>
             <section class="modal-content">
-                <div>
-                    {{ modalMessage }}
+                <div class="info-container">
+                    <div>
+                        <b>Aggregation id: </b>
+                        {{ modalData.id }}
+                    </div>
+                    <div>
+                        <b>Aggregation name: </b>
+                        {{ modalData.name }}
+                    </div>
+                </div>
+
+                <div class="message-container">
+                    {{ modalData.message }}
                 </div>
             </section>
         </template>
@@ -72,10 +90,23 @@ defineExpose({ run })
 }
 
 .modal-content {
+    margin-bottom: -1rem;
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
+}
+
+.info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.message-container {
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
 }
 
 .controll-buttons {

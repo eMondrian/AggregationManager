@@ -1,7 +1,8 @@
 import { wait } from "@/helpers"
 import { AggregateTableData } from "@/api/models/AggregateTableData"
-import { aggregatesTableDataSchema } from '../dataSchema'
-import { generateArrayData } from "../helpers"
+import { AggregationData } from "@/api/models/AggregationData"
+import { aggregatesTableDataSchema, agregationDataSchema } from '../dataSchema'
+import { generateArrayData, generateData } from "../helpers"
 import { random } from "lodash"
 
 export const getAggregatesTableData = async () => {
@@ -21,8 +22,9 @@ export const addAgregation = async (data) => {
 
 export const getAggregation = async (id) => {
     await wait(500)
-    const result = { id }
-    // console.log('$$$ api/aggregates | getAggregation', result)
+    const generatedData = generateData(agregationDataSchema({id}))
+    const result = AggregationData.parseFromDTO(generatedData)
+    console.log('$$$ api/aggregates | getAggregation', result)
     return result
 }
 

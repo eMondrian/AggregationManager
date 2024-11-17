@@ -10,6 +10,7 @@ import { sortNumbers } from '@/helpers'
 import CreateAggregationModal from './CreateAggregationModal.vue'
 import CreateNifiModal from './CreateNifiModal.vue'
 import RunStatusModal from './RunStatusModal.vue'
+import ActionCell from './ActionCell.vue'
 
 const app = getCurrentInstance()
 const customWizzards = app.appContext.config.globalProperties.$customWizzards
@@ -128,8 +129,7 @@ const onUpdateButtonClick = () => {
 }
 
 const onCalculate = async (item) => {
-    await runStatusModal.value.run(item.id);
-
+    await runStatusModal.value.run({id: item.id, name: item.name});
     await fetchTableData()
 }
 
@@ -163,7 +163,12 @@ const onEdit = async (item) => {
 }
 
 const onDelete = async (item) => {
-    const { confirmed } = await confirmationModal.value.run({ message: 'Are you sure you want to remove this aggregation?' })
+    const { confirmed } = await confirmationModal.value.run({ 
+        message: 'Are you sure you want to remove this aggregation?', 
+        id: item.id, 
+        name: item.name 
+    })
+
     if (!confirmed) return;
     try {
         apiCallRunning.value = true;
@@ -187,17 +192,43 @@ const reset = async (item) => {
 }
 
 const columns = [
-    { key: 'name', sortable: true },
-    { key: 'tableName', sortable: true },
-    { key: 'lastSchemaUpdate', sortable: true, sortingFn: sortNumbers },
-    { key: 'schedule', sortable: true },
-    { key: 'lastDataUpdate', sortable: true, sortingFn: sortNumbers },
-    { key: 'lastEvent', sortable: true },
-    { key: 'createdBy', sortable: true },
-    { key: 'lastModifiedBy', sortable: true },
-    { key: 'currentStatus', sortable: true },
-    { key: 'actions', width: 80 },
+    { field: 'name', sortable: true, pinned: 'left' },
+    { field: 'tableName', sortable: true },
+    { field: 'lastSchemaUpdate', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
+    { field: 'schedule', sortable: true, lockPinned: true },
+    { field: 'lastDataUpdate', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
+    { field: 'lastEvent', sortable: true, lockPinned: true },
+    { field: 'createdBy', sortable: true },
+    { field: 'lastModifiedBy', sortable: true },
+    { field: 'currentStatus', sortable: true },
+    { 
+        field: 'actions', 
+        width: 130, 
+        sortable: false, 
+        cellRenderer: ActionCell,
+        cellRendererParams: {
+            onCalculate,
+            onEdit,
+            onDelete,
+            reset
+        },
+    },
 ];
+
+const gridOptions = {
+    suppressMovableColumns: true
+};
+
+const rowSelection = {
+    mode: 'singleRow',
+    checkboxes: false,
+    enableClickSelection: true,
+}
+
+const autoSizeStrategy = {
+    type: 'fitGridWidth',
+};
+
 </script>
 
 <template>
@@ -218,7 +249,7 @@ const columns = [
                     <va-button @click="onCreateFromNifiButtonClick" preset="secondary" size="small">
                         Create from NIFI Process
                     </va-button>
-                    <va-button v-for="wizzard in customWizzards" @click="onCustomWizzardsOpen[wizzard.name]" preset="secondary" size="small">
+                    <va-button v-for="wizzard in customWizzards" :key="wizzard.name" @click="onCustomWizzardsOpen[wizzard.name]" preset="secondary" size="small">
                         {{wizzard.name}}
                     </va-button>
                 </div>
@@ -237,6 +268,7 @@ const columns = [
             </va-button>
         </div>
     </section>
+
     <va-input
         v-model="filterValue"
         label="filter"
@@ -244,59 +276,24 @@ const columns = [
         class="filter-input"
         clearable
     />
-    <va-data-table
+
+    <ag-grid-vue
         :loading="isLoading"
-        class="app-table"
-        :items="tableData"
-        :columns="columns"
-        :filter="filterValue"
-        sticky-header
-        :scroll-bottom-margin="40"
-    >
-        <template #cell(lastSchemaUpdate)="data">
-            <div>{{ data.rowData.lastSchemaUpdate.toLocaleString() }}</div>
-        </template>
-        <template #cell(lastDataUpdate)="data">
-            <div>{{ data.rowData.lastDataUpdate.toLocaleString() }}</div>
-        </template>
-        <template #cell(actions)="{ rowIndex }">
-            <div class="table-action-buttons">
-                <va-button preset="plain" color="info" title="Run calculations" @click="onCalculate(tableData[rowIndex])">
-                    <template #append>
-                        <va-icon class="material-icons-outlined">
-                            playlist_play
-                        </va-icon>
-                    </template>
-                </va-button>
-                <va-button preset="plain" color="info" title="Edit" @click="onEdit(tableData[rowIndex])">
-                    <template #append>
-                        <va-icon class="material-icons-outlined">
-                            edit
-                        </va-icon>
-                    </template>
-                </va-button>
-                <va-button preset="plain" color="info" title="Delete" @click="onDelete(tableData[rowIndex])">
-                    <template #append>
-                        <va-icon class="material-icons-outlined">
-                            delete
-                        </va-icon>
-                    </template>
-                </va-button>
-                <va-button preset="plain" color="info" title="Reset" @click="reset(tableData[rowIndex])">
-                    <template #append>
-                        <va-icon class="material-icons-outlined">
-                            restart_alt
-                        </va-icon>
-                    </template>
-                </va-button>
-            </div>
-        </template>
-    </va-data-table>
+        class="ag-theme-vuestic"
+        style="height: 100%;"
+        :rowData="tableData"
+        :columnDefs="columns"
+        :gridOptions="gridOptions"
+        :rowSelection="rowSelection"
+        :quickFilterText="filterValue"
+        :autoSizeStrategy="autoSizeStrategy"
+        >
+    </ag-grid-vue>
 
     <teleport to="body">
         <create-aggregation-modal ref="createAggregationModal" />
         <create-nifi-modal ref="createNifiModal" />
-        <component v-for="wizzard in customWizzards" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="onCreateAggregationFromWizzard"></component>
+        <component v-for="wizzard in customWizzards" :key="wizzard.name" :is="wizzard.component" :ref="customWizzardsRefs[wizzard.name]" :onSave="onCreateAggregationFromWizzard"></component>
 
         <loading-indicator :isOpened="apiCallRunning" />
         <confirmation-modal ref="confirmationModal"  />
@@ -322,22 +319,7 @@ const columns = [
     max-width: 40%;
 }
 
-.app-table {
-    width: 100%;
-    height: 100%;
-}
-
 .buttons-container {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.add-aggregation-dropdown {
-    height: 24px;   // NOTE: to be equal same button sizes
-}
-
-.table-action-buttons {
     display: flex;
     align-items: center;
     gap: 0.5rem;
