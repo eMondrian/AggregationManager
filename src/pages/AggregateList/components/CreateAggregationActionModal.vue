@@ -98,8 +98,9 @@ defineExpose({ run })
     gap: 1rem;
 }
 
-.query-block {
-    padding: 10px;
+:deep(.query-block) pre {
+    padding: 16px;
+    border-radius: 8px;
 }
 
 .controll-buttons {

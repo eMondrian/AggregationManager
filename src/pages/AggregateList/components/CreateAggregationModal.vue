@@ -59,7 +59,7 @@ const initialState = {
         { title: TABS_TITLE.TEMPLATE, icon: 'edit_document' },
         { title: TABS_TITLE.QUERY, icon: 'code' },
         { title: TABS_TITLE.SCHEDULE, icon: 'schedule' },
-        { title: TABS_TITLE.HISTORY, icon: 'history'}
+        // { title: TABS_TITLE.HISTORY, icon: 'history'}
     ],
     activeTab: TABS_TITLE.PROPERTIES,
     propertiesData: {
@@ -300,7 +300,7 @@ const autoSizeStrategy = {
                             </div>
                         </section>
 
-                        <section v-if="activeTab===TABS_TITLE.HISTORY" class="tab-content">
+                        <!-- <section v-if="activeTab===TABS_TITLE.HISTORY" class="tab-content">
                             <ag-grid-vue
                                 class="ag-theme-vuestic"
                                 style="width: 100%; height: 500px;"
@@ -311,7 +311,7 @@ const autoSizeStrategy = {
                                 :autoSizeStrategy="autoSizeStrategy"
                             >
                             </ag-grid-vue>
-                        </section>
+                        </section> -->
                     </template>
                 </va-tabs>
             </section>
