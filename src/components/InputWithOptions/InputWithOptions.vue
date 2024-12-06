@@ -20,17 +20,12 @@ const props = defineProps({
   },
 })
 
-const isFocused = ref(false)
+const showDropdown = ref(false);
 const inputValue = ref(props.modelValue)
-
 
 watch(() => props.modelValue, () => {
     inputValue.value = props.modelValue;
 })
-
-const onFocus = () => {
-    isFocused.value = true
-}
 
 const onOptionClick = (option) => {
     if (props.optionsValueBy) {
@@ -40,7 +35,7 @@ const onOptionClick = (option) => {
         inputValue.value = option
         emit('update:modelValue', option)
     }
-    isFocused.value = false
+    showDropdown.value = false
 }
 
 const onModelValueChange = (value) => {
@@ -48,20 +43,15 @@ const onModelValueChange = (value) => {
     emit('update:modelValue', value)
 }
 
-const clickOutside = (event) => {
-    isFocused.value = false
-}
 </script>
 
 <template>
-    <div class="input-wrapper">
+    <div class="input-wrapper" key="test">
         <va-dropdown
             class="wd=100%"
-            v-model="isFocused"
-            trigger="none"
+            v-model="showDropdown"
             teleport="body"
             keepAnchorWidth
-            @clickOutside="clickOutside(event)"
         >
             <template #anchor>
                 <div>
@@ -70,8 +60,7 @@ const clickOutside = (event) => {
                         class="inner-input"
                         :modelValue="inputValue"
                         @update:modelValue="onModelValueChange"
-                        @focus="onFocus"
-                        @keypress.enter="isFocused=false"
+                        @click="showDropdown = true"
                     >
                         <template #appendInner v-if="optionsTextBy && optionsValueBy">
                             <span class="input-value-name">{{ options.find((e) => e[optionsValueBy] === inputValue)?.[optionsTextBy] }}</span>
@@ -79,7 +68,7 @@ const clickOutside = (event) => {
                     </va-input>
                 </div>
             </template>
-            <ul v-if="(isEmpty(options) === false)" class="inner-options">
+            <ul v-if="(isEmpty(options) === false)" class="inner-options" >
                 <li
                     v-for="option in options"
                     class="option"
@@ -133,7 +122,7 @@ const clickOutside = (event) => {
     overflow: auto;
     scrollbar-color: var(--va-background-element) transparent;
     scrollbar-width: thin;
-    z-index: 1000;
+    z-index: 1000 !important;
     box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
     border-radius: 4px;
 }

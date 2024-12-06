@@ -7,6 +7,7 @@ export const PATH = {
     BASE: BASE_PATH,
     PROCESSES: `${BASE_PATH}/v1/nifi-processes`,
     AGGREGATION_TABLE: `${BASE_PATH}/aggregation_table`,
+    AGGREGATION_HISTORY: `${BASE_PATH}/v1/aggregation-history-items`,
     AGGREGATION: `${BASE_PATH}/v1/aggregations`,
     EVENT: `${BASE_PATH}/v1/events`,
 

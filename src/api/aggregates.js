@@ -159,6 +159,23 @@ export const getRunStatus = async (id) => {
     return result;
 }
 
+export const getAggregationHistoryItem = async (id) => {
+    const response = await fetchWithAuth(`${PATH.AGGREGATION_HISTORY}/${id}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+
+    if (!response.ok) {
+        const responseText = await response.text();
+        throw new Error(`Error! status: ${response.status}, message: ${responseText}`);
+    }
+
+    const result = await response.json();
+    return result;
+}
+
 export const setRunStatus = async (id, state) => {
     const response = await fetchWithAuth(`${PATH.AGGREGATION}/${id}/run-status`, {
         method: "PUT",

@@ -33,6 +33,7 @@ export class AggregateTableData {
         currentStatus = '',
         lastModifiedBy = '',
         createdBy = '',
+        isGenerated = false,
     }) {
         this.id = id;
         this.name = name;
@@ -44,6 +45,7 @@ export class AggregateTableData {
         this.currentStatus = currentStatus;
         this.lastModifiedBy = lastModifiedBy;
         this.createdBy = createdBy;
+        this.isGenerated = isGenerated;
     }
 
     /**
@@ -62,6 +64,7 @@ export class AggregateTableData {
             currentStatus: item.current_status,
             lastModifiedBy: item.last_modified_by,
             createdBy: item.created_by,
+            isGenerated: item.is_generated_nifi_process === 'f' ? false : true,
         }
 
         return new AggregateTableData(data)

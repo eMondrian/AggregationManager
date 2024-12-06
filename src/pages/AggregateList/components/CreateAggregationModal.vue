@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, nextTick } from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { getProcesses, getTemplates, getSettings } from '@/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
@@ -8,6 +8,7 @@ import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue
 import CreateAggregationActionModal from './CreateAggregationActionModal.vue';
 import ViewActionsButton from './ViewActionsButton.vue';
 import MonacoEditor from './MonacoEditor.vue';
+import { getAggregationHistoryItem } from '@/api/aggregates';
 
 const { handleError } = useErrorHandler();
 
@@ -59,7 +60,7 @@ const initialState = {
         { title: TABS_TITLE.TEMPLATE, icon: 'edit_document' },
         { title: TABS_TITLE.QUERY, icon: 'code' },
         { title: TABS_TITLE.SCHEDULE, icon: 'schedule' },
-        // { title: TABS_TITLE.HISTORY, icon: 'history'}
+        { title: TABS_TITLE.HISTORY, icon: 'history'}
     ],
     activeTab: TABS_TITLE.PROPERTIES,
     propertiesData: {
@@ -89,6 +90,7 @@ const processesListLoading = ref(false);
 const processesList = ref([]);
 const isEdit = ref(false);
 const createAggregationActionModal = ref(null)
+let inited = false;
 
 const tabs = computed(() => {
     if (isEdit.value) {
@@ -112,6 +114,8 @@ const resetState = () => {
 
 const { isOpened, run, close } = usePromisifiedModal({
     opened: async (data) => {
+        inited = false;
+        console.log(data);
         if (data) {
             propertiesData.value.id = data.id
             propertiesData.value.tableName = data.table_name;
@@ -121,10 +125,11 @@ const { isOpened, run, close } = usePromisifiedModal({
 
             query.value = data.query;
 
-            scheduleData.value.schedule = data.scheduling_period;
             scheduleData.value.strategy = data.scheduling_strategy;
+            scheduleData.value.schedule = data.scheduling_period;
+            console.log(scheduleData.value.schedule);
 
-            historyTableData.value = data.history;
+            historyTableData.value = data.history_items;
 
             isEdit.value = true;
         }
@@ -158,6 +163,9 @@ const { isOpened, run, close } = usePromisifiedModal({
         } finally {
             processesListLoading.value = false;
         }
+
+        await nextTick();
+        inited = true;
     },
     resetFn: resetState,
 });
@@ -176,6 +184,8 @@ const onSave = async () => {
 }
 
 watch(() => scheduleData.value.strategy, () => {
+    if (!inited) return;
+    console.log("Reset");
     scheduleData.value.schedule = '';
 })
 
@@ -183,39 +193,13 @@ const onClose = () => {
     close()
 }
 
-const onAction = async (data) => {
-    await createAggregationActionModal.value.run(data);
+const onAction = async (id) => {
+    const historyItem = await getAggregationHistoryItem(id);
+    console.log(historyItem);
+    await createAggregationActionModal.value.run(historyItem);
 }
 
 defineExpose({ run })
-
-const historyTableColumns = [
-    { field: 'id', pinned: 'left', sortable: true },
-    { field: 'user', sortable: true },
-    { field: 'date', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
-    { field: 'actions', sortable: false, width: 55, cellRenderer: ViewActionsButton }
-]
-
-const gridOptions = {
-    suppressMovableColumns: true,
-    onCellClicked: (event) => {
-        if (event.colDef.field === 'actions') {
-            const actionData = event.data.state;
-            onAction(actionData)
-        }
-  }
-};
-
-const rowSelection = {
-    mode: 'singleRow',
-    checkboxes: false,
-    enableClickSelection: true,
-}
-
-const autoSizeStrategy = {
-    type: 'fitGridWidth',
-};
-
 </script>
 
 <template>
@@ -300,18 +284,38 @@ const autoSizeStrategy = {
                             </div>
                         </section>
 
-                        <!-- <section v-if="activeTab===TABS_TITLE.HISTORY" class="tab-content">
+                        <section v-if="activeTab===TABS_TITLE.HISTORY" class="tab-content">
                             <ag-grid-vue
                                 class="ag-theme-vuestic"
+                                key="qwe"
                                 style="width: 100%; height: 500px;"
                                 :rowData="historyTableData"
-                                :columnDefs="historyTableColumns"
-                                :gridOptions="gridOptions"
-                                :rowSelection="rowSelection"
-                                :autoSizeStrategy="autoSizeStrategy"
+                                :columnDefs="[
+                                    { field: 'id', pinned: 'left', sortable: true },
+                                    { field: 'last_modified_by', sortable: true, cellDataType: 'text' },
+                                    { field: 'last_schema_update', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
+                                    { field: 'actions', sortable: false, width: 100, cellRenderer: ViewActionsButton }
+                                ]"
+                                :gridOptions="{
+                                    suppressMovableColumns: true,
+                                    onCellClicked: (event) => {
+                                        if (event.colDef.field === 'actions') {
+                                            const actionData = event.data.id;
+                                            onAction(actionData)
+                                        }
+                                    }
+                                }"
+                                :rowSelection="{
+                                    mode: 'singleRow',
+                                    checkboxes: false,
+                                    enableClickSelection: true,
+                                }"
+                                :autoSizeStrategy="{
+                                    type: 'fitGridWidth',
+                                }"
                             >
                             </ag-grid-vue>
-                        </section> -->
+                        </section>
                     </template>
                 </va-tabs>
             </section>

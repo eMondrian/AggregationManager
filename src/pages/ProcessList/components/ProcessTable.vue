@@ -54,15 +54,14 @@ const copyToClipboard = (text) => {
 }
 
 const columns = [
-    { field: "aggregationName", sortable: true, pinned: 'left', flex: 1, maxWidth: 200, minWidth: 150 },
-    { field: "eventType", sortable: true, flex: 1, maxWidth: 200, minWidth: 150 },
+    { field: "aggregationName", sortable: true, pinned: 'left' },
+    { field: "eventType", sortable: true, minWidth: 120 },
     { 
         field: "dateTime", 
-        sortable: true, flex: 1, 
-        maxWidth: 200, 
-        minWidth: 150, 
+        sortable: true, 
         sort: 'desc', 
         comparator: sortNumbers, 
+        minWidth: 150,
         valueFormatter: data => data.value.toLocaleString()
     },
     { 
@@ -83,7 +82,8 @@ const gridOptions = {
         tooltipComponent: 'customTooltip'
     },
     tooltipShowDelay: 0,
-    tooltipInteraction: true
+    tooltipInteraction: true,
+    enableCellTextSelection: true,
 };
 
 const rowSelection = {
@@ -93,7 +93,7 @@ const rowSelection = {
 }
 
 const autoSizeStrategy = {
-    type: 'fitGridWidth',
+    type: 'fitCellContents',
 };
 </script>
 
@@ -167,6 +167,34 @@ const autoSizeStrategy = {
     display: flex;
     gap: 1rem;
 }
+
+:deep() .ag-header-cell:last-child .ag-header-cell-resize::before {
+    display: none;
+}
+
+:deep() .ag-header-cell-resize::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    display: block;
+    width: var(--ag-header-column-resize-handle-width);
+    height: var(--ag-header-column-resize-handle-height);
+    top: calc(50% - var(--ag-header-column-resize-handle-height)* 0.5);
+    background-color: var(--ag-header-column-resize-handle-color);
+}
+
+
+:deep() .ag-cell {
+    display: flex;
+    align-items: center;
+}
+
+:deep() .ag-body-horizontal-scroll-viewport,
+:deep() .ag-body-vertical-scroll-viewport {
+    scrollbar-width: unset;
+    scrollbar-color: silver transparent;
+}
+
 </style>
 
 <style lang="css">

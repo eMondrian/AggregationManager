@@ -10,17 +10,16 @@ const defaulModalData = {
 
 let modalData = ref({...defaulModalData});
 
+const resetState = () => {
+    modalData.value = {...defaulModalData};
+}
+
 const { isOpened, run, close } = usePromisifiedModal({
     opened: (data) => {
         modalData.value = data;
     },
     resetFn: resetState,
 });
-
-
-const resetState = () => {
-    modalData.value = {...defaulModalData};
-}
 
 const onSave = async () => {
     close({ confirmed: true })

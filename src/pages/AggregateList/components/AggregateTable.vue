@@ -102,6 +102,7 @@ const onCreateAggregationClick = async () => {
         }
     }
 }
+
 const onCreateFromNifiButtonClick = async () => {
     const nifiAggregation = await createNifiModal.value.run()
     if (nifiAggregation) {
@@ -193,7 +194,8 @@ const reset = async (item) => {
 
 const columns = [
     { field: 'name', sortable: true, pinned: 'left' },
-    { field: 'tableName', sortable: true },
+    { field: 'tableName', sortable: true, resizable: true },
+    { field: 'isGenerated', sortable: true, cellDataType: 'text', resizable: true, valueFormatter: data => data.value ? 'Yes' : 'No' },
     { field: 'lastSchemaUpdate', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
     { field: 'schedule', sortable: true, lockPinned: true },
     { field: 'lastDataUpdate', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
@@ -203,7 +205,7 @@ const columns = [
     { field: 'currentStatus', sortable: true },
     { 
         field: 'actions', 
-        width: 130, 
+        width: 200, 
         sortable: false, 
         cellRenderer: ActionCell,
         cellRendererParams: {
@@ -216,7 +218,8 @@ const columns = [
 ];
 
 const gridOptions = {
-    suppressMovableColumns: true
+    suppressMovableColumns: true,
+    enableCellTextSelection: true,
 };
 
 const rowSelection = {
@@ -226,7 +229,7 @@ const rowSelection = {
 }
 
 const autoSizeStrategy = {
-    type: 'fitGridWidth',
+    type: 'fitCellContents',
 };
 
 </script>
@@ -298,6 +301,9 @@ const autoSizeStrategy = {
         <loading-indicator :isOpened="apiCallRunning" />
         <confirmation-modal ref="confirmationModal"  />
         <run-status-modal ref="runStatusModal" />
+
+        <table class="table1"></table>
+        <table class="table2"></table>
     </teleport>
 </template>
 
@@ -331,5 +337,39 @@ const autoSizeStrategy = {
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
+}
+
+// :deep() .ag-header-cell:last-child .ag-header-cell-resize::before {
+//     display: none;
+// }
+
+:deep() .ag-pinned-left-header .ag-header-cell-resize::before {
+    display: none;
+}
+
+:deep() .ag-header-cell-resize::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    display: block; 
+    width: var(--ag-header-column-resize-handle-width);
+    height: var(--ag-header-column-resize-handle-height);
+    top: calc(50% - var(--ag-header-column-resize-handle-height)* 0.5);
+    background-color: var(--ag-header-column-resize-handle-color);
+}
+
+:deep() .ag-cell {
+    display: flex;
+    align-items: center;
+}
+
+:deep() .ag-cell-wrapper {
+    width: 100%;
+}
+
+:deep() .ag-body-horizontal-scroll .ag-body-horizontal-scroll-viewport,
+:deep() .ag-body-vertical-scroll .ag-body-vertical-scroll-viewport {
+    scrollbar-width: unset;
+    scrollbar-color: silver transparent;
 }
 </style>

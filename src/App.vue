@@ -271,12 +271,16 @@ h2 {
 
 // To fix select-dropdown background 
 .va-select-dropdown__content {
-  z-index: 1000;
+  z-index: 100 !important;
 }
 
 // Global class for spinned icons
 .app-spinned-icon {
 	animation: spin 2s linear infinite;
+}
+
+.full-size-modal {
+  z-index: 100 !important;
 }
 
 @keyframes spin {

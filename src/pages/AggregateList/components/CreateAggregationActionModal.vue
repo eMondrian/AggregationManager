@@ -6,7 +6,7 @@ import { usePromisifiedModal } from '@/composables'
 import { codeToHtml } from 'shiki'
 
 const initialData = {
-    id: '',
+    aggregation_id: '',
     user: '',
     tableName: '',
     nifiProcess: '',
@@ -52,15 +52,22 @@ defineExpose({ run })
                 <h2>
                     Aggregation info
                 </h2>
+                <va-button preset="plain" title="Close" @click="onClose">
+                    <template #append>
+                        <va-icon class="material-icons-outlined">
+                            close
+                        </va-icon>
+                    </template>
+                </va-button>
             </section>
         </template>
         <template #default>
             <section class="modal-content">
-                <span><b>Id: </b>{{ actionData.id }}</span>
+                <span><b>Aggregation Id: </b>{{ actionData.aggregation_id }}</span>
                 <span><b>Name: </b>{{ actionData.aggregation_name }}</span>
                 <span><b>Table name: </b>{{ actionData.table_name }}</span>
                 <span><b>NIFI Process: </b>{{ actionData.start_nifi_process_id }}</span>
-                <span>
+                <span class="query">
                     <b>Query: </b>
                     <div v-html="query" class="query-block"></div>
                 </span>
@@ -73,9 +80,9 @@ defineExpose({ run })
                 <va-button color="primary" @click="onClose">
                     Close
                 </va-button>
-                <va-button color="primary">
+                <!-- <va-button color="primary">
                     Restore
-                </va-button>
+                </va-button> -->
             </div>
         </template>
     </va-modal>
@@ -101,6 +108,7 @@ defineExpose({ run })
 :deep(.query-block) pre {
     padding: 16px;
     border-radius: 8px;
+    width: fit-content;
 }
 
 .controll-buttons {
@@ -109,5 +117,19 @@ defineExpose({ run })
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
+}
+
+.query {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 300px;
+    overflow: hidden;
+}
+
+.query-block {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
 }
 </style>
