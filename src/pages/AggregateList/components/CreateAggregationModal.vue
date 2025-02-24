@@ -320,7 +320,7 @@ defineExpose({ run })
                 </va-tabs>
             </section>
         </template>
-        <template #footer v-if="activeTab!==TABS_TITLE.HISTORY">
+        <template #footer>
             <div class="controll-buttons">
                 <va-button @click="onSave()">
                     Save
@@ -360,7 +360,7 @@ defineExpose({ run })
 
 .tab-content {
     width: 100%;
-    // height: 33rem;
+    height: 60vh;
     margin-top: 1rem;
     padding: 1rem;
 }
