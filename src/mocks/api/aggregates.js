@@ -1,7 +1,8 @@
 import { wait } from "@/helpers"
 import { AggregateTableData } from "@/api/models/AggregateTableData"
 import { AggregationData } from "@/api/models/AggregationData"
-import { aggregatesTableDataSchema, agregationDataSchema } from '../dataSchema'
+import { AggregationHistoryItemData } from "@/api/models/AggregationHistoryItemData"
+import { aggregatesTableDataSchema, agregationDataSchema, agregationHistoryItemDataSchema } from '../dataSchema'
 import { generateArrayData, generateData } from "../helpers"
 import { random } from "lodash"
 
@@ -46,6 +47,13 @@ export const getRunStatus = async (id) => {
     await wait(500)
     const result = { id, state: ["RUNNING", "DISABLED", "RUN_ONCE", "STOPPED",][random(0,3)] }
     // console.log('$$$ api/aggregates | getRunStatus', result)
+    return result
+}
+export const getAggregationHistoryItem = async (id) => {
+    await wait(500)
+    const generatedData = generateData(agregationHistoryItemDataSchema({id}))
+    const result = AggregationHistoryItemData.parseFromDTO(generatedData)
+    console.log('$$$ api/aggregates | getAggregationHistoryItem', result)
     return result
 }
 
