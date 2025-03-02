@@ -1,14 +1,13 @@
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
-import { getProcesses, getTemplates, getSettings } from '@/api'
+import { getProcesses, getTemplates, getSettings, getAggregationHistoryItem } from '@/api'
 import { usePromisifiedModal, useErrorHandler } from '@/composables'
 import { sortNumbers } from '@/helpers'
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
 import CreateAggregationActionModal from './CreateAggregationActionModal.vue';
 import ViewActionsButton from './ViewActionsButton.vue';
 import MonacoEditor from './MonacoEditor.vue';
-import { getAggregationHistoryItem } from '@/api/aggregates';
 
 const { handleError } = useErrorHandler();
 

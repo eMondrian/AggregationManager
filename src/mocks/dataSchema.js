@@ -55,37 +55,27 @@ export const agregationDataSchema = ({id}) => ({
     query: null,
     scheduling_period: null,
     scheduling_strategy: ['TIMER_DRIVEN', 'CRON_DRIVEN'],
-    history: [
+    history_items: [
         [{
             id: 'test-id-1',
-            user: 'test-user-1',
-            date: new Date().toISOString(),
-            state: {
-                id: 'test-state--id-1',
-                table_name: 'test-state--table_name-1',
-                aggregation_name: 'test-state--aggregation_name-1',
-                is_generated_nifi_process: 'test-state--is_generated_nifi_process-1',
-                start_nifi_process_id: 'test-state--start_nifi_process_id-1',
-                query: 'SELECT * FROM table_name;',
-                scheduling_period: 'test-state--scheduling_period-1',
-                scheduling_strategy: 'test-state--scheduling_strategy-1',
-            }
+            last_modified_by: 'test-user-1',
+            last_schema_update: new Date().toISOString(),
         },
         {
             id: 'test-id-2',
-            user: 'test-user-2',
-            date: new Date().toISOString(),
-            state: {
-                id: 'test-state--id-2',
-                table_name: 'test-state--table_name-2',
-                aggregation_name: 'test-state--aggregation_name-2',
-                is_generated_nifi_process: 'test-state--is_generated_nifi_process-2',
-                start_nifi_process_id: 'test-state--start_nifi_process_id-2',
-                query: 'SELECT * FROM table_name;',
-                scheduling_period: 'test-state--scheduling_period-2',
-                scheduling_strategy: 'test-state--scheduling_strategy-2',
-            }
+            last_modified_by: 'test-user-2',
+            last_schema_update: new Date().toISOString(),
         }
         ]
     ]
+})
+
+export const agregationHistoryItemDataSchema = ({id}) => ({
+    aggregation_id: [id],
+    aggregation_name: null,
+    table_name: null,
+    query: null,
+    scheduling_period: null,
+    scheduling_strategy: null,
+    start_nifi_process_id: null,
 })

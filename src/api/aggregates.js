@@ -1,4 +1,6 @@
 import { AggregateTableData } from "./models/AggregateTableData"
+import { AggregationData } from "./models/AggregationData"
+import { AggregationHistoryItemData } from "./models/AggregationHistoryItemData"
 import { PATH } from "./path"
 import { fetchWithAuth } from "./utils"
 
@@ -84,7 +86,8 @@ export const getAggregation = async (id) => {
     }
     
     const result = await response.json();
-    return result;
+    
+    return AggregationData.parseFromDTO(result);
 }
 
 export const updateAggregation = async (data) => {
@@ -173,7 +176,8 @@ export const getAggregationHistoryItem = async (id) => {
     }
 
     const result = await response.json();
-    return result;
+    
+    return AggregationHistoryItemData.parseFromDTO(result);
 }
 
 export const setRunStatus = async (id, state) => {
