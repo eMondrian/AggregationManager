@@ -6,8 +6,11 @@ import { usePromisifiedModal, useErrorHandler } from '@/composables'
 import { sortNumbers } from '@/helpers'
 import InputWithOptions from '@/components/InputWithOptions/InputWithOptions.vue'
 import CreateAggregationActionModal from './CreateAggregationActionModal.vue';
-import ViewActionsButton from './ViewActionsButton.vue';
+import CreateAggregationJsonModal from './CreateAggregationJsonModal.vue';
+import HistoryActionsButtons from './HistoryActionsButtons.vue';
 import MonacoEditor from './MonacoEditor.vue';
+import { HISTORY_JSON_MOCK } from '@/mocks/static';
+import { HISTORY_ACTION_TYPES } from '@/constants/constants';
 
 const { handleError } = useErrorHandler();
 
@@ -89,6 +92,7 @@ const processesListLoading = ref(false);
 const processesList = ref([]);
 const isEdit = ref(false);
 const createAggregationActionModal = ref(null)
+const createAggregationJsonModal = ref(null);
 let inited = false;
 
 const tabs = computed(() => {
@@ -192,11 +196,46 @@ const onClose = () => {
     close()
 }
 
-const onAction = async (id) => {
-    const historyItem = await getAggregationHistoryItem(id);
-    console.log(historyItem);
-    await createAggregationActionModal.value.run(historyItem);
-}
+const downloadJson = (data) => {
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'data.json';
+    document.body.appendChild(link);
+    link.click();
+
+    URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+};
+
+const onAction = async (id, actionType) => {
+    try {
+        switch (actionType) {
+            case HISTORY_ACTION_TYPES.SEARCH:
+                const historyItem = await getAggregationHistoryItem(id);
+                await createAggregationActionModal.value.run(historyItem);
+                break;
+            
+            case HISTORY_ACTION_TYPES.CODE:
+                const jsonData = JSON.stringify(HISTORY_JSON_MOCK, null, 2);
+                await createAggregationJsonModal.value.run(jsonData);
+                break;
+
+            case HISTORY_ACTION_TYPES.DOWNLOAD:
+                downloadJson(HISTORY_JSON_MOCK);
+                break;
+
+            default:
+                // error is needed for developers if we forgot to add something
+                throw new Error("Unknown action type");
+        }
+    } catch (e) {
+        handleError(e);
+    }
+};
 
 defineExpose({ run })
 </script>
@@ -291,16 +330,22 @@ defineExpose({ run })
                                 :rowData="historyTableData"
                                 :columnDefs="[
                                     { field: 'id', pinned: 'left', sortable: true },
-                                    { field: 'last_modified_by', sortable: true, cellDataType: 'text' },
-                                    { field: 'last_schema_update', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
-                                    { field: 'actions', sortable: false, width: 100, cellRenderer: ViewActionsButton }
+                                    { headerName: 'last modified by', field: 'last_modified_by', sortable: true, cellDataType: 'text' },
+                                    { headerName: 'last schema update', field: 'last_schema_update', sortable: true, comparator: sortNumbers, valueFormatter: data => data.value.toLocaleString() },
+                                    { field: 'actions', sortable: false, width: 100, cellRenderer: HistoryActionsButtons }
                                 ]"
                                 :gridOptions="{
                                     suppressMovableColumns: true,
                                     onCellClicked: (event) => {
                                         if (event.colDef.field === 'actions') {
                                             const actionData = event.data.id;
-                                            onAction(actionData)
+                                            const target = event.event.target.closest('[data-action]');
+
+                                            if (target) {
+                                                const actionType = target.dataset.action; 
+
+                                                onAction(actionData, actionType);
+                                            }
                                         }
                                     }
                                 }"
@@ -330,6 +375,7 @@ defineExpose({ run })
 
     <teleport to="body">
         <create-aggregation-action-modal ref="createAggregationActionModal" />
+        <create-aggregation-json-modal ref="createAggregationJsonModal" />
     </teleport>
 </template>
 
